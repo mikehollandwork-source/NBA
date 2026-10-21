@@ -176,3 +176,11 @@ In the season simulation: games-played error 14.3 → 13.8; season PTS error wit
 
 ## 3. Closing-line backtest (`nba/analysis/lines_backtest.py`)
 Built and plumbing-tested; **no real lines yet** — no free source of historical player-prop closing lines was found. Drop CSVs (date, player, stat, line, over_odds, under_odds) into `data/lines/` or run `scripts/fetch_odds_api.py` with an Odds API key (paid; props from May 2023; fetcher untested without a key). Outputs: model vs no-vig market Brier/log loss, an information test (does the model add to the market?), and hit rate / ROI by edge threshold.
+
+## 4. -120 test against stand-in lines (NOT real market lines)
+No real prop lines available, so the "line" is a public average (season / last 10 / last 5) rounded to a half point, both sides at -120 (break-even 54.55%). Files: `proxy_line_backtest_minus120.csv`, `proxy_line_backtest_by_season.csv`, `proxy_line_backtest_quiet_games.csv`.
+
+Result: ~65% hit rate / ~+19% ROI at model probability ≥ 58%, stable every season, ~64% even in games with no teammate news. **This is not an edge estimate:**
+- Average-based lines sit above the typical (median) outcome because stat lines are right-skewed: always betting the under wins 52–55% with no model.
+- A last-10 average is a far weaker forecast than ours (and than a sportsbook's), and ignores injury news books price within minutes.
+Real closing lines are set near the median by books with injury and lineup information, so real results will be far lower. Whether any edge survives (needs real lines) is unknown; prior estimate ~20%.

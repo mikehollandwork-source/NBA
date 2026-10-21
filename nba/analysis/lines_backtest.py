@@ -140,3 +140,47 @@ def run(path_glob=None):
     P = pd.read_parquet(PROC / "projections_all_games_oos.parquet")
     m = model_probs(attach_projections(L), P)
     return m, information_test(m), betting(m)
+
+
+BREAK_EVEN_120 = 120 / 220  # 54.55%
+
+
+def proxy_backtest(odds: int = -120, proxies=("szn", "l10", "l5"), min_gp: int = 5) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """UPPER-BOUND test without real lines: the 'line' is a public average
+    (season-to-date / last 10 / last 5) rounded to a half point, priced at
+    `odds` on both sides. Real books set sharper lines, so real results will be
+    worse. Bet the side whose model probability clears a threshold."""
+    P = pd.read_parquet(PROC / "projections_all_games_oos.parquet")
+    F = pd.read_parquet(PROC / "features_all.parquet",
+                        columns=["season", "gameId", "pid"] + [f"{s}_{w}" for s in STATS for w in ("l10", "l5")])
+    P = P.merge(F, on=["season", "gameId", "pid"], how="left")
+    P = P[P.gp >= min_gp]
+    frames = []
+    for px in proxies:
+        for s in STATS:
+            src = P[f"{s}_{px}"] if px != "szn" else P[f"{s}_szn"]
+            d = P[src.notna()].copy()
+            d["stat"], d["line"], d["proxy"] = s, np.floor(src[src.notna()]) + 0.5, px
+            frames.append(d)
+    m = pd.concat(frames, ignore_index=True)
+    m["over_odds"] = m["under_odds"] = odds
+    m["p_mkt"] = 0.5
+    out = []
+    for px, d in m.groupby("proxy"):
+        out.append(model_probs(d, P).assign(proxy=px))
+    m = pd.concat(out, ignore_index=True)
+    p_side = np.maximum(m.p_model, 1 - m.p_model)
+    side_over = m.p_model >= 0.5
+    win = np.where(side_over, m.result == 1, m.result == 0)
+    m["p_side"], m["win"] = p_side, win
+    m["profit"] = np.where(win, payout(odds), -1.0)
+    rows = []
+    for t in (BREAK_EVEN_120, 0.56, 0.58, 0.60, 0.65):
+        k = m[m.p_side >= t]
+        for (px, s), d in list(k.groupby(["proxy", "stat"])) + [((px, "all"), d) for px, d in k.groupby("proxy")]:
+            rows.append({"proxy_line": px, "stat": s, "min_model_prob": round(t, 4), "bets": len(d),
+                         "bets_per_season": len(d) / d.season.nunique(), "hit_rate": d.win.mean(), "roi": d.profit.mean(),
+                         "avg_model_prob": d.p_side.mean()})
+    seasons = (m[m.p_side >= 0.58].groupby(["proxy", "season"])
+               .agg(bets=("win", "size"), hit_rate=("win", "mean"), roi=("profit", "mean")).reset_index())
+    return pd.DataFrame(rows), seasons

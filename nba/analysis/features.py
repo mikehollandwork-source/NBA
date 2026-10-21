@@ -103,7 +103,10 @@ def _shot_profile_allowed(seasons):
     from nba.ingest.reconcile import official_games
     out = []
     for y in seasons:
-        s = pd.read_csv(RAW / f"bulk/shotdetail_{y}/shotdetail_{y}.csv", usecols=["GAME_ID", "HTM", "VTM", "TEAM_ID", "SHOT_ZONE_BASIC", "TEAM_NAME"])
+        path = RAW / f"bulk/shotdetail_{y}/shotdetail_{y}.csv"
+        if not path.exists():  # live season: nba.com mirror not available yet
+            continue
+        s = pd.read_csv(path, usecols=["GAME_ID", "HTM", "VTM", "TEAM_ID", "SHOT_ZONE_BASIC", "TEAM_NAME"])
         og = official_games(y)[["gameId", "date"]]
         s["zone"] = s.SHOT_ZONE_BASIC.map(ZONES)
         s = s.dropna(subset=["zone"])
@@ -121,10 +124,10 @@ def _shot_profile_allowed(seasons):
         for k in zc:
             z[f"opp_allow_{k}"] = c[k] / tot
         out.append(z[["gameId", "def_team"] + [f"opp_allow_{k}" for k in zc]])
-    return pd.concat(out)
+    return pd.concat(out) if out else pd.DataFrame()
 
 
-def build(seasons=SEASONS) -> pd.DataFrame:
+def build(seasons=SEASONS, out_path=None) -> pd.DataFrame:
     allg = load_games(seasons, qualified_only=False)
     allg["usg"] = allg.fga + 0.44 * allg.fta + allg.tov
     tg = _team_games(allg)
@@ -205,12 +208,17 @@ def build(seasons=SEASONS) -> pd.DataFrame:
         r = matchups.build_season(y, pos_by_nba)
         if r is not None:
             mds.append(r[0]); scs.append(r[1])
+    if not mds:
+        mds = [pd.DataFrame(columns=["gameId", "def_team", "pos", "match_diff"])]
+        scs = [pd.DataFrame(columns=["gameId", "def_team", "opp_switch_proxy", "opp_cross_share"])]
     md, sc = pd.concat(mds), pd.concat(scs)
     t = t.merge(md.rename(columns={"def_team": "opp"}), on=["gameId", "opp", "pos"], how="left")
     t = t.merge(sc.rename(columns={"def_team": "opp"}), on=["gameId", "opp"], how="left")
-    t = t.merge(_shot_profile_allowed(seasons).rename(columns={"def_team": "opp"}), on=["gameId", "opp"], how="left")
+    sp = _shot_profile_allowed(seasons)
+    if len(sp):
+        t = t.merge(sp.rename(columns={"def_team": "opp"}), on=["gameId", "opp"], how="left")
     t = add_preseason(t)
-    t.to_parquet(PROC / "features_all.parquet", index=False)
+    t.to_parquet(out_path or PROC / "features_all.parquet", index=False)
     return t
 
 

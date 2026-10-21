@@ -23,6 +23,8 @@ def season_features(R: pd.DataFrame, season: int) -> pd.DataFrame:
     keep = ["gp", "avail", "starter", "out_episodes", "out_longest", "out_at_end", "out_last10", "inj_dnp", "rest_dnp",
             "lower_dnp", "team_last"] + [f"{s}_pg" for s in pre.STATS + ["usg"]] + [f"{s}_p36" for s in pre.RATE + ["usg"]] \
         + [f"{s}_tot" for s in pre.STATS]
+    TEAM = {"GS": "GSW", "NY": "NYK", "SA": "SAS", "NO": "NOP", "UTAH": "UTA", "WSH": "WAS"}
+    R = R.assign(team=R.team.map(lambda x: TEAM.get(x, x)))  # ESPN -> nba.com team codes
     f = R[["pid", "player", "team", "height_in", "weight_lb", "dob", "pos"]].copy()
     f["season"] = season
     f["age"] = (pd.Timestamp(f"{season}-10-15") - pd.to_datetime(f.dob, errors="coerce")).dt.days / 365.25

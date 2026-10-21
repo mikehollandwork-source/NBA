@@ -27,3 +27,11 @@ Results: `reports/phase2/FINDINGS.md` (Phase 1, single season: `reports/phase1/`
 - `nba/analysis/drivers.py` — Test B: which inputs improve projections (walk-forward by season, bootstrap CIs)
 - `nba/analysis/projection.py` — projection system (minutes x rate, direct, residual, ensemble) + calibrated distributions
 - `nba/analysis/disagreement.py` — why projections differ from the season average, and which factors to trust
+
+## Daily projections (live season)
+```bash
+python scripts/live.py 2026-10-22        # game-day model for that date's slate -> reports/live/game_day_<date>.md/.csv
+python scripts/score_live.py 2026-10-21  # after games are final: accuracy vs box scores
+```
+First run trains and caches models in `data/models/` (~10 min); `--retrain` refreshes them.
+Uses ESPN box scores for this season, current rosters and the ESPN injury report. No betting lines.

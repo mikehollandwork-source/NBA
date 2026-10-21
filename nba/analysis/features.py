@@ -209,8 +209,19 @@ def build(seasons=SEASONS) -> pd.DataFrame:
     t = t.merge(md.rename(columns={"def_team": "opp"}), on=["gameId", "opp", "pos"], how="left")
     t = t.merge(sc.rename(columns={"def_team": "opp"}), on=["gameId", "opp"], how="left")
     t = t.merge(_shot_profile_allowed(seasons).rename(columns={"def_team": "opp"}), on=["gameId", "opp"], how="left")
+    t = add_preseason(t)
     t.to_parquet(PROC / "features_all.parquet", index=False)
     return t
+
+
+def add_preseason(t: pd.DataFrame) -> pd.DataFrame:
+    """Merge preseason projections (nba/analysis/preseason.py) as a prior."""
+    path = PROC / "preseason_final.parquet"
+    if not path.exists():
+        return t
+    pre = pd.read_parquet(path)
+    t = t.drop(columns=[c for c in pre.columns if c.startswith("pre_") and c in t.columns])
+    return t.merge(pre, on=["season", "pid"], how="left")
 
 
 if __name__ == "__main__":

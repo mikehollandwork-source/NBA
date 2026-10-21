@@ -77,3 +77,16 @@ if step in ("season", "all"):
     _, _, S = season_sim.run_preseason()
     S.to_csv(out / "season_sim_preseason_summary.csv", index=False)
     print(pg.round(3).to_string()); print(S.round(3).to_string())
+if step in ("preseason", "all"):
+    from nba.analysis import preseason, features as _feat, season_sim as _ss
+    ps, allg, tg = preseason.player_seasons()
+    f = preseason.feature_table(ps, allg, tg)
+    f.to_parquet(out.parents[1] / "data" / "processed" / "preseason_features.parquet", index=False)
+    p = preseason.walk_forward(f)
+    acc, av = preseason.evaluate(p)
+    acc.to_csv(out / "preseason_accuracy.csv", index=False); av.to_csv(out / "availability_accuracy.csv", index=False)
+    preseason.final_projection(p, f)
+    _feat.build()  # re-merge preseason prior into game features; then rerun step "project"/"season"
+    R, S, G = _ss.run_preseason_v2()
+    S.to_csv(out / "preseason_v2_season_totals.csv", index=False); G.to_csv(out / "preseason_v2_games_played.csv", index=False)
+    print(acc.round(3).to_string()); print(av.round(3).to_string()); print(S.round(3).to_string())

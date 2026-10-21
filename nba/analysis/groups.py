@@ -1,6 +1,7 @@
 """Feature groups shared by Test B, the projection models and the disagreement analysis."""
 
 RATE = {"pts", "reb", "ast", "fg3m", "stl", "blk", "tov"}
+PRE = {"min", "pts", "reb", "ast", "fg3m", "stl", "blk", "tov", "pra", "pr", "pa", "ra"}
 OPP = {"pts", "reb", "ast", "fg3m", "stl", "blk", "tov", "pra"}
 
 
@@ -24,6 +25,7 @@ def groups(s: str, lineup_known: bool = False) -> dict[str, list[str]]:
         "game_script": ["net_prior", "net_diff", "abs_net_diff"],
         "rest_home": ["days_rest", "b2b", "opp_b2b", "home"],
         "season_timing": ["team_gnum"],
+        "preseason_prior": [f"pre_{s}"] + (["pre_min"] if s != "min" else []),
     }
     if s == "min":
         g["season_avg"] = ["min_szn", "gp"]

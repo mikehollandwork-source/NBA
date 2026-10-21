@@ -490,3 +490,73 @@ def run_preseason(seasons=range(2020, 2026)):
                             "crps_total": R[f"{s}_{v}_{mode}_crps"].mean(),
                             "coverage50": R[f"{s}_{v}_{mode}_in50"].mean(), "coverage80": R[f"{s}_{v}_{mode}_in80"].mean()})
     return T, R, pd.DataFrame(out)
+
+
+# ================================================================ preseason v2
+def run_preseason_v2(seasons=range(2020, 2026)):
+    """Before/after: preseason projection model + games-played model.
+    Means: base (old first-game projection), model (new preseason projection),
+    last_szn. Availability: actual, old (nearest by last-season availability),
+    new (nearest by the games-played model's prediction)."""
+    T = pd.read_parquet(PROC / "season_sim_preseason_targets.parquet")
+    pre = pd.read_parquet(PROC / "preseason_final.parquet")
+    T = T.merge(pre[["season", "pid", "pre_pts", "pre_reb", "pre_ast", "pre_avail"]], on=["season", "pid"], how="left")
+    for s in COMP:
+        T[f"{s}_pre_model"] = T[f"pre_{s}"].fillna(T[f"{s}_pre_base"]).clip(lower=0.05)
+    P = pd.read_parquet(PROC / "projections_all_games_oos.parquet")
+    variants = ["base", "model", "last_szn"]
+    pairs = T.groupby(["season", "pid"]).agg(prev=("prev_avail", "first"), pred=("pre_avail", "first"),
+                                             cur=("played", "mean"))
+    rows = []
+    for S in seasons:
+        var, C = fit_params(P, S)
+        q_mm, _ = availability_params(T, S)
+        oth = pairs.drop(index=S, level=0)
+        pool_old = oth[["prev", "cur"]].dropna()
+        pool_new = oth[["pred", "cur"]].dropna().rename(columns={"pred": "prev"})
+        taus = {v: preseason_shift_sd(T, var, S, v) for v in variants}
+        print(S, {v: round(taus[v]["pts"], 3) for v in variants}, flush=True)
+        for pid, d in T[T.season == S].groupby("pid"):
+            played = d.played.to_numpy()
+            n = len(d)
+            pa = d.pre_avail.iloc[0]
+            av = {"old": simulate_availability(n, draw_availability_rate(d.prev_avail.iloc[0], pool_old), q_mm),
+                  "new": simulate_availability(n, draw_availability_rate(pa if np.isfinite(pa) else np.nan, pool_new), q_mm)}
+            z = RNG.standard_normal(N_SIMS)
+            row = {"season": S, "pid": pid, "player": d.player.iloc[0], "games_actual": int(played.sum()),
+                   "games_old_mean": av["old"].sum(1).mean(), "games_new_mean": av["new"].sum(1).mean()}
+            for k in ("old", "new"):
+                g = av[k].sum(1)
+                q = np.percentile(g, [10, 90])
+                row[f"games_{k}_in80"] = q[0] <= played.sum() <= q[1]
+                row[f"games_{k}_crps"] = crps_samples(g[:, None].astype(float), np.array([played.sum()]))[0]
+            for s in COMP + ["pra"]:
+                row[f"{s}_actual_total"] = d[s].fillna(0).sum() if s != "pra" else sum(d[c].fillna(0).sum() for c in COMP)
+            for v in variants:
+                shift = np.column_stack([np.clip(1 + taus[v][s] * z, 0.05, None) for s in COMP])
+                mu = np.column_stack([d[f"{s}_pre_{v}"].to_numpy() for s in COMP])
+                sims = draw_shifted(mu, shift, var, C)
+                pra = sims.sum(2)
+                for mode, mask in (("actual", np.broadcast_to(played, av["old"].shape)), ("old", av["old"]), ("new", av["new"])):
+                    tot = np.concatenate([(sims * mask[:, :, None]).sum(1), (pra * mask).sum(1)[:, None]], 1)
+                    for j, s in enumerate(COMP + ["pra"]):
+                        y, x = row[f"{s}_actual_total"], tot[:, j]
+                        q = np.percentile(x, [10, 90])
+                        row[f"{s}_{v}_{mode}_mean"] = x.mean()
+                        row[f"{s}_{v}_{mode}_in80"] = q[0] <= y <= q[1]
+                        row[f"{s}_{v}_{mode}_crps"] = crps_samples(x[:, None], np.array([y]))[0]
+            rows.append(row)
+    R = pd.DataFrame(rows)
+    R.to_parquet(PROC / "season_sim_preseason_v2.parquet", index=False)
+    out = []
+    for mode in ("actual", "old", "new"):
+        for v in variants:
+            for s in COMP + ["pra"]:
+                y, m = R[f"{s}_actual_total"], R[f"{s}_{v}_{mode}_mean"]
+                out.append({"availability": mode, "projection": v, "stat": s, "mae_total": (y - m).abs().mean(),
+                            "crps_total": R[f"{s}_{v}_{mode}_crps"].mean(), "coverage80": R[f"{s}_{v}_{mode}_in80"].mean()})
+    games = pd.DataFrame([{"availability": k, "mae_games": (R.games_actual - R[f"games_{k}_mean"]).abs().mean(),
+                           "crps_games": R[f"games_{k}_crps"].mean(), "coverage80": R[f"games_{k}_in80"].mean(),
+                           "avg_sim_games": R[f"games_{k}_mean"].mean(), "avg_actual": R.games_actual.mean()}
+                          for k in ("old", "new")])
+    return R, pd.DataFrame(out), games

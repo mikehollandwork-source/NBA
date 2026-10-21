@@ -144,3 +144,35 @@ Avg error in season total (actual games played / simulated games played):
 - Games played dominates season-total error: simulating availability raises error ~60% (147 → 233 PTS) for every version.
 
 Invalid comparison avoided: summing game-day projections over a season reuses in-season results (a "last 8 games miss" adjustment scores 16 vs 45 purely mechanically), so season totals are judged only with preseason-frozen forecasts.
+
+---
+
+# Preseason projection, games-played model, closing-line harness
+
+## 1. Preseason projection (`nba/analysis/preseason.py`)
+Per-game averages for the coming season, using only preseason info: last 3 seasons, age, height/weight, role, team change, opening-roster context (usage/minutes vacated, usage competition). LightGBM walk-forward (2018-19 to 2025-26), blended 50/50 with last season's average (blend best for every stat; flat between 0.5–0.7).
+
+Per-game average error, rotation players (≥10 games this season), 2018-19 to 2025-26:
+| | MIN | PTS | REB | AST | 3PM | TOV |
+|---|---|---|---|---|---|---|
+| Last season avg | 3.55 | 2.44 | 0.83 | 0.66 | 0.35 | 0.33 |
+| Marcel (3-yr weighted + regression) | 3.86 | 2.68 | 0.89 | 0.70 | 0.37 | 0.34 |
+| **Blend (model + last season)** | **3.33** | **2.31** | **0.80** | **0.64** | **0.34** | **0.31** |
+
+Season totals in the preseason simulation (2020-21 to 2025-26, actual games played): PTS error 147 (old first-game projection) / 139 (last season) → **130**; PRA 215 / 200 → **186**.
+
+Early-season star fix: the preseason projection was added as a prior feature to the game-day models. Star (≥25 ppg last season) under-projection fell from 0.45 to 0.31 pts overall and from 2.0 to 1.9 in game 1 / 1.1 to 0.9 in games 2-5; PRA squared error improved 0.3–0.5% in every season. Partial fix: a fading blend with the preseason number and an isotonic recalibration were tested and did not reduce error overall.
+
+## 2. Games-played model
+Predicts share of team games played from absence history on the real schedule (episodes, longest absence, out at end of last season, last-10 absences), ESPN injury tags (sparse — most absences are listed as coach's decision or missing), age, size, workload, team change.
+
+| Availability forecast | Avg error (games) |
+|---|---|
+| League average | 15.0 |
+| Last season's availability | 15.3 |
+| **Model** | **13.7** |
+
+In the season simulation: games-played error 14.3 → 13.8; season PTS error with simulated games 233 → 227. Injuries remain the largest season-level uncertainty (227 with simulated games vs 130 with actual games).
+
+## 3. Closing-line backtest (`nba/analysis/lines_backtest.py`)
+Built and plumbing-tested; **no real lines yet** — no free source of historical player-prop closing lines was found. Drop CSVs (date, player, stat, line, over_odds, under_odds) into `data/lines/` or run `scripts/fetch_odds_api.py` with an Odds API key (paid; props from May 2023; fetcher untested without a key). Outputs: model vs no-vig market Brier/log loss, an information test (does the model add to the market?), and hit rate / ROI by edge threshold.

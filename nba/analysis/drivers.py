@@ -25,10 +25,16 @@ PARAMS = dict(objective="regression", learning_rate=0.06, n_estimators=300, num_
 RNG = np.random.default_rng(7)
 
 
-def load():
+def load(min_prior_games: int = MIN_PRIOR_GAMES, include_prev_rotation: bool = False):
+    """Qualified player-seasons (>=20 g, >=15 mpg). With include_prev_rotation, also
+    players who were rotation players LAST season (>=20 g, >=15 mpg) — needed for
+    season simulations, where this season's games played must not be known upfront."""
     f = pd.read_parquet(PROC / "features_all.parquet")
-    f = qualify(f)
-    return f[f.gp >= MIN_PRIOR_GAMES].copy()
+    q = qualify(f)
+    if include_prev_rotation:
+        prev = f[(f.prev_gp >= 20) & (f.prev_mpg >= 15)]
+        q = pd.concat([q, prev]).drop_duplicates(["season", "gameId", "pid"])
+    return q[q.gp >= min_prior_games].copy()
 
 
 def fit_predict(tr, te, feats, y, params=PARAMS, weight=None):

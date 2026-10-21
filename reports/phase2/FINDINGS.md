@@ -105,3 +105,42 @@ Variations (4 or 15 neighbours, stricter/looser similarity, excluding the same o
 **Were projections accurate in those games?** Yes — out-of-sample projections exist for every game in the window: MAE PTS 4.85 vs season average 5.03, bias ≈ 0. Even in the 10% of games where the similar-defense history was most strongly "over", projections were low by only 0.34 pts on average (PRA 0.33); strongest "under" → projections high by 0.24 (PRA 0.46). Examples with the projection and actual for each similar game: `similar_defense_examples_pts_2025.json`.
 
 **What did work (side finding):** a per-player bias correction (shrunk average miss vs our projection) is small but consistent: +0.1–0.5% error reduction and a ~4–5 pt hit-rate spread vs the season-average line. Worth adding to the model.
+
+---
+
+# Season simulation (NumPy Monte Carlo, 2020-21 to 2025-26, 1,861 player-seasons)
+
+Setup (`nba/analysis/season_sim.py`): every player who was a rotation player last season (≥20 g, ≥15 mpg) and played this season, over his team's real schedule (follows trades; teams meet 2×/3×/4× per season ≈ 51% / 16% / 32% of opponents). 1,000 simulated seasons each.
+- Game outcome: negative binomial, variance curve fit on other seasons; PTS/REB/AST correlated within a game (Gaussian copula, scaled so PRA spread matches reality: PRA 80% range covers 80.4%).
+- Season-long shift: players run ±5–7% vs game-day projections for a whole season (±24–36% vs a preseason forecast); simulated as one random multiplier per season.
+- Games played: actual, or simulated — availability drawn from what happened to players with similar last-season availability (other seasons), plus streaky absences (out today → out next game 77%). Simulated avg 56.6 games vs 56.4 actual; 80% range covers 89%.
+
+Versions compared: **base** (our projection), **simdef** (+ history vs similar defenses), **h2h** (average vs that exact team), **last_szn** (last season's average), plus **bias** (player's general miss) and a **placebo** (least similar defenses) as controls.
+
+## Per matchup (game-day forecasts, 104,872 games)
+| Version | PTS avg miss | PRA avg miss | PTS CRPS | PTS 80% range coverage |
+|---|---|---|---|---|
+| Our projection | **4.80** | **6.12** | **3.37** | 82% |
+| + similar defense | 4.91 | 6.26 | 3.47 | 81% |
+| Last season avg | 5.46 | 7.23 | 3.84 | 76% |
+| Head-to-head avg | 5.99 | 7.85 | 4.31 | 71% |
+Examples (SGA, Jokic, Brunson 2025-26, each version + 10/50/90% range + actual): `season_sim_matchup_examples_2025.csv`.
+
+## Season totals — true preseason forecast (everything frozen before opening night)
+Avg error in season total (actual games played / simulated games played):
+
+| Version | PTS | PRA | PTS with simulated games |
+|---|---|---|---|
+| Our preseason projection | 147 | 215 | 233 |
+| + similar defense | 147 | 215 | 230 |
+| Placebo (least similar) | 148 | 215 | 229 |
+| Player bias | 148 | 215 | 230 |
+| Head-to-head (last season) | 138 | 198 | 234 |
+| Last season avg | 139 | 199 | 236 |
+
+- Similar defense = placebo → no defense-similarity effect at season level either.
+- Head-to-head ≈ last-season average (a player's averages vs all 29 teams add back up to his season average) — no head-to-head effect.
+- Both beat our preseason projection *only because* our "preseason projection" is the first-game projection, which under-projects stars (~1.3 pts early in the season) and carries one-night context. A dedicated preseason model is needed.
+- Games played dominates season-total error: simulating availability raises error ~60% (147 → 233 PTS) for every version.
+
+Invalid comparison avoided: summing game-day projections over a season reuses in-season results (a "last 8 games miss" adjustment scores 16 vs 45 purely mechanically), so season totals are judged only with preseason-frozen forecasts.

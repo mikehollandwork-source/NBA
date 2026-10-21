@@ -25,14 +25,16 @@ COMBOS = {"pra": ["pts", "reb", "ast"], "pr": ["pts", "reb"], "pa": ["pts", "ast
 METHODS = ["two_stage", "direct", "residual", "ensemble"]
 
 
-def project(test_seasons=TEST_SEASONS, scenarios=("injury_report", "lineup_known")):
-    f = load()
+def project(test_seasons=TEST_SEASONS, scenarios=("injury_report", "lineup_known"), all_games: bool = False):
+    """all_games=True: every game incl. a player's first games of the season and
+    last-season rotation players (for season simulations); saved separately."""
+    f = load(0, True) if all_games else load()
     out = []
     for scen in scenarios:
         lk = scen == "lineup_known"
         for y in test_seasons:
             tr, te = f[f.season < y].copy(), f[f.season == y].copy()
-            r = te[["season", "gameId", "game_date", "pid", "player", "team", "opp", "min", "min_szn", "min_sd"]
+            r = te[["season", "gameId", "game_date", "pid", "player", "team", "opp", "gp", "min", "min_szn", "min_sd"]
                    + COMPONENTS + list(COMBOS) + [f"{s}_szn" for s in COMPONENTS + list(COMBOS)]
                    + [f"{s}_sd" for s in COMPONENTS + list(COMBOS)]].copy()
             r["scenario"] = scen
@@ -47,14 +49,14 @@ def project(test_seasons=TEST_SEASONS, scenarios=("injury_report", "lineup_known
                 else:
                     r[f"{s}_two_stage"] = sum(r[f"{c}_two_stage"] for c in COMBOS[s])
                 r[f"{s}_direct"], _ = fit_predict(tr, te, feats, s)
-                trd = tr.assign(_dev=tr[s] - tr[f"{s}_szn"])
+                trd = tr.assign(_dev=tr[s] - tr[f"{s}_szn"]).dropna(subset=["_dev"])
                 dev, _ = fit_predict(trd, te, feats, "_dev")
                 r[f"{s}_residual"] = te[f"{s}_szn"].to_numpy() + dev
                 r[f"{s}_ensemble"] = r[[f"{s}_{m}" for m in ("two_stage", "direct", "residual")]].mean(axis=1)
             out.append(r)
             print(scen, y, "done", flush=True)
     p = pd.concat(out, ignore_index=True)
-    p.to_parquet(PROC / "projections_oos.parquet", index=False)
+    p.to_parquet(PROC / ("projections_all_games_oos.parquet" if all_games else "projections_oos.parquet"), index=False)
     return p
 
 

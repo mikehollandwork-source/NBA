@@ -65,3 +65,15 @@ if step in ("similar", "all"):
     similar_defense.robustness(p, v).to_csv(out / "similar_defense_robustness.csv", index=False)
     json.dump(similar_defense.examples(d, prof, "pts", 2025, 4), open(out / "similar_defense_examples_pts_2025.json", "w"), indent=1)
     print(bt.groupby("stat").mean(numeric_only=True).round(3).to_string())
+if step in ("season", "all"):
+    from nba.analysis import season_sim
+    from nba.analysis import projection as _proj
+    _proj.project(scenarios=("injury_report",), all_games=True)
+    T, G, R = season_sim.run()
+    pg, se, gp = season_sim.summarise(G, R)
+    pg.to_csv(out / "season_sim_per_matchup_summary.csv", index=False)
+    se.to_csv(out / "season_sim_gameday_sum_summary.csv", index=False)
+    gp.to_csv(out / "season_sim_games_played.csv", index=False)
+    _, _, S = season_sim.run_preseason()
+    S.to_csv(out / "season_sim_preseason_summary.csv", index=False)
+    print(pg.round(3).to_string()); print(S.round(3).to_string())

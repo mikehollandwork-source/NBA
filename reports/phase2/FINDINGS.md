@@ -71,3 +71,37 @@ Re-weighting each factor by its historical trust (fit on other seasons) improves
 - Teammates-out / lineup features use who actually played; live you rely on injury reports and announced lineups, so live accuracy will be a bit lower, especially for late scratches.
 - "Season average as the line" is a stand-in. Real edge needs comparison to closing lines (agreed: evaluation only).
 - Players filtered to ≥20 games & ≥15 mpg in a season (uses full-season info for the filter, not for predictions).
+
+---
+
+# Similar-defense signal (backtest 2019-20 to 2025-26)
+
+**Question:** when a player faces defense D, does how he did (vs our projection) against defenses *similar to D* predict tonight?
+
+**Defense fingerprint** (prior games only, blended with last season early on; `nba/analysis/defense_profiles.py`), four equally weighted groups:
+- Size: minute-weighted height (all / guards / forwards / bigs), weight — ESPN bios.
+- Speed (proxies — real tracking speed isn't free/reachable): age, steals & turnovers forced, block rate, fast-break share of shots allowed (2020-21+), defensive rebounding.
+- Coverage: shot locations allowed (rim / paint / mid / corner 3 / above-break 3), shot types allowed (pull-up / drive / catch-and-shoot / cut / post / putback), switching spread, bigs-on-guards, foul rate, assisted share.
+- What they allow: pts/100, rim FG%, mid FG%, 3P%, eFG%, share of points to G / F / C.
+End-of-2025-26 cards with best / worst / most-similar teams: `defense_cards_2025.csv` (e.g. OKC ≈ DET, NYK; SAS ≈ BOS; GSW ≈ PHX, CLE, MIA).
+
+**Signal:** the player's 8 most similar earlier matchups (this + last season, similarity ≥ 0.3), similarity-weighted average of (actual − our out-of-sample projection), shrunk toward 0.
+**Control:** the same player's average miss vs *all* earlier opponents ("general bias").
+**Placebo:** the player's 8 *least* similar earlier matchups.
+
+| | PTS | REB | AST | PRA | MIN |
+|---|---|---|---|---|---|
+| Correlation with tonight's miss — similar defenses | 0.024 | 0.020 | 0.025 | 0.026 | 0.043 |
+| — placebo (least similar) | 0.020 | 0.013 | 0.010 | 0.020 | 0.035 |
+| Error reduction — similar defenses alone | 0.05% | 0.04% | 0.07% | 0.06% | 0.22% |
+| — general player bias alone | 0.19% | 0.11% | 0.11% | 0.20% | 0.47% |
+| — both | 0.20% | 0.11% | 0.13% | 0.21% | 0.51% |
+
+Vs the season-average stand-in line (strongest 30% of signals): projection side wins 59.8% when the history agrees vs 56.5% when it disagrees (PTS). But using general player bias instead gives a bigger spread (60.5 vs 56.2), and the similar-defense part *minus* general bias gives 58.0 vs 57.4 — noise.
+Variations (4 or 15 neighbours, stricter/looser similarity, excluding the same opponent) all give the same picture (`similar_defense_robustness.csv`).
+
+**Verdict:** the similar-defense signal has no usable edge beyond a player's general tendency to beat or miss projections. Small samples (8 games) are dominated by outliers (e.g. one 83-point game drove a +7 signal; the next game vs a similar defense he scored 14).
+
+**Were projections accurate in those games?** Yes — out-of-sample projections exist for every game in the window: MAE PTS 4.85 vs season average 5.03, bias ≈ 0. Even in the 10% of games where the similar-defense history was most strongly "over", projections were low by only 0.34 pts on average (PRA 0.33); strongest "under" → projections high by 0.24 (PRA 0.46). Examples with the projection and actual for each similar game: `similar_defense_examples_pts_2025.json`.
+
+**What did work (side finding):** a per-player bias correction (shrunk average miss vs our projection) is small but consistent: +0.1–0.5% error reduction and a ~4–5 pt hit-rate spread vs the season-average line. Worth adding to the model.

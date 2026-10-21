@@ -1,0 +1,282 @@
+[
+ {
+  "player": "Trey Murphy III",
+  "date": "2025-12-19",
+  "opp": "HOU",
+  "opp_card": {
+   "best": [
+    "transition shots allowed (-1.7\u03c3)",
+    "corner 3s allowed (-1.3\u03c3)",
+    "3P% allowed (-1.0\u03c3)"
+   ],
+   "worst": [
+    "rim FG% allowed (+0.4\u03c3)",
+    "mid FG% allowed (+0.0\u03c3)",
+    "turnovers forced (+0.0\u03c3)"
+   ],
+   "distinctive": [
+    "assisted shots allowed (-2.1\u03c3)",
+    "share of pts to guards (-1.8\u03c3)",
+    "bigs on guards (+1.7\u03c3)"
+   ]
+  },
+  "season_avg": 21.1,
+  "projection": 20.5,
+  "similar_defense_signal": 7.6,
+  "actual": 27,
+  "similar_games": [
+   {
+    "date": "2024-12-20",
+    "opp": "HOU",
+    "projection": 15.5,
+    "actual": 28
+   },
+   {
+    "date": "2024-12-27",
+    "opp": "HOU",
+    "projection": 17.3,
+    "actual": 21
+   },
+   {
+    "date": "2025-12-03",
+    "opp": "MIN",
+    "projection": 20.7,
+    "actual": 33
+   },
+   {
+    "date": "2025-02-01",
+    "opp": "BOS",
+    "projection": 18.5,
+    "actual": 40
+   },
+   {
+    "date": "2025-11-09",
+    "opp": "SAS",
+    "projection": 18.7,
+    "actual": 41
+   },
+   {
+    "date": "2024-12-28",
+    "opp": "MEM",
+    "projection": 17.6,
+    "actual": 35
+   },
+   {
+    "date": "2025-01-12",
+    "opp": "BOS",
+    "projection": 17.0,
+    "actual": 30
+   },
+   {
+    "date": "2025-12-05",
+    "opp": "MIN",
+    "projection": 22.0,
+    "actual": 21
+   }
+  ]
+ },
+ {
+  "player": "Tyrese Maxey",
+  "date": "2025-12-06",
+  "opp": "MIL",
+  "opp_card": {
+   "best": [
+    "corner 3s allowed (-0.6\u03c3)",
+    "defensive rebounding (+0.3\u03c3)",
+    "3P% allowed (-0.3\u03c3)"
+   ],
+   "worst": [
+    "mid FG% allowed (+2.0\u03c3)",
+    "fouling (+0.8\u03c3)",
+    "steals forced (-0.7\u03c3)"
+   ],
+   "distinctive": [
+    "mid FG% allowed (+2.0\u03c3)",
+    "age (+1.1\u03c3)",
+    "wing/forward height (+0.9\u03c3)"
+   ]
+  },
+  "season_avg": 32.6,
+  "projection": 27.7,
+  "similar_defense_signal": 7.4,
+  "actual": 12,
+  "similar_games": [
+   {
+    "date": "2025-11-21",
+    "opp": "MIL",
+    "projection": 28.8,
+    "actual": 54
+   },
+   {
+    "date": "2024-12-29",
+    "opp": "UTA",
+    "projection": 28.0,
+    "actual": 32
+   },
+   {
+    "date": "2025-01-07",
+    "opp": "PHX",
+    "projection": 26.2,
+    "actual": 31
+   },
+   {
+    "date": "2025-02-09",
+    "opp": "MIL",
+    "projection": 26.7,
+    "actual": 39
+   }
+  ]
+ },
+ {
+  "player": "Bam Adebayo",
+  "date": "2026-04-04",
+  "opp": "WAS",
+  "opp_card": {
+   "best": [
+    "shot blocking (+0.6\u03c3)",
+    "corner 3s allowed (-0.5\u03c3)",
+    "mid FG% allowed (-0.0\u03c3)"
+   ],
+   "worst": [
+    "defensive rebounding (-2.7\u03c3)",
+    "points per 100 allowed (+2.1\u03c3)",
+    "putbacks allowed (+1.5\u03c3)"
+   ],
+   "distinctive": [
+    "weight (-2.7\u03c3)",
+    "defensive rebounding (-2.7\u03c3)",
+    "points per 100 allowed (+2.1\u03c3)"
+   ]
+  },
+  "season_avg": 20.3,
+  "projection": 24.8,
+  "similar_defense_signal": 7.2,
+  "actual": 14,
+  "similar_games": [
+   {
+    "date": "2026-03-10",
+    "opp": "WAS",
+    "projection": 24.2,
+    "actual": 83
+   },
+   {
+    "date": "2026-02-08",
+    "opp": "WAS",
+    "projection": 20.7,
+    "actual": 22
+   },
+   {
+    "date": "2025-03-31",
+    "opp": "WAS",
+    "projection": 20.1,
+    "actual": 28
+   },
+   {
+    "date": "2025-03-04",
+    "opp": "WAS",
+    "projection": 21.9,
+    "actual": 19
+   },
+   {
+    "date": "2025-03-23",
+    "opp": "CHA",
+    "projection": 18.6,
+    "actual": 11
+   },
+   {
+    "date": "2024-11-28",
+    "opp": "CHA",
+    "projection": 17.7,
+    "actual": 8
+   },
+   {
+    "date": "2025-03-10",
+    "opp": "CHA",
+    "projection": 20.4,
+    "actual": 23
+   },
+   {
+    "date": "2025-04-12",
+    "opp": "NOP",
+    "projection": 18.8,
+    "actual": 23
+   }
+  ]
+ },
+ {
+  "player": "Nikola Jokic",
+  "date": "2026-03-12",
+  "opp": "HOU",
+  "opp_card": {
+   "best": [
+    "corner 3s allowed (-1.6\u03c3)",
+    "shot blocking (+1.3\u03c3)",
+    "eFG% allowed (-1.1\u03c3)"
+   ],
+   "worst": [
+    "turnovers forced (-0.5\u03c3)",
+    "putbacks allowed (-0.1\u03c3)",
+    "defensive rebounding (+0.2\u03c3)"
+   ],
+   "distinctive": [
+    "wing/forward height (+1.8\u03c3)",
+    "overall height (+1.6\u03c3)",
+    "assisted shots allowed (-1.6\u03c3)"
+   ]
+  },
+  "season_avg": 28.9,
+  "projection": 27.5,
+  "similar_defense_signal": 6.9,
+  "actual": 16,
+  "similar_games": [
+   {
+    "date": "2025-12-20",
+    "opp": "HOU",
+    "projection": 28.4,
+    "actual": 25
+   },
+   {
+    "date": "2025-12-16",
+    "opp": "HOU",
+    "projection": 27.4,
+    "actual": 39
+   },
+   {
+    "date": "2025-11-22",
+    "opp": "HOU",
+    "projection": 26.9,
+    "actual": 34
+   },
+   {
+    "date": "2025-01-25",
+    "opp": "MIN",
+    "projection": 27.2,
+    "actual": 20
+   },
+   {
+    "date": "2025-04-02",
+    "opp": "MIN",
+    "projection": 27.5,
+    "actual": 61
+   },
+   {
+    "date": "2026-03-01",
+    "opp": "MIN",
+    "projection": 27.3,
+    "actual": 35
+   },
+   {
+    "date": "2025-03-13",
+    "opp": "MIN",
+    "projection": 27.3,
+    "actual": 34
+   },
+   {
+    "date": "2025-12-26",
+    "opp": "MIN",
+    "projection": 27.7,
+    "actual": 56
+   }
+  ]
+ }
+]

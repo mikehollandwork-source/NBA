@@ -1,0 +1,16 @@
+stat,group,n,projection_side_hit_rate
+pts,all games,120287,0.5796719512499272
+pts,history agrees with projection,17795,0.5976959820174206
+pts,history disagrees with projection,18312,0.5646570554827436
+reb,all games,119733,0.5705027018449383
+reb,history agrees with projection,17819,0.5828048712048937
+reb,history disagrees with projection,18137,0.5720350664387716
+ast,all games,119309,0.5617430369879892
+ast,history agrees with projection,17744,0.5843101893597836
+ast,history disagrees with projection,18136,0.550727834142038
+pra,all games,120348,0.5978329511084521
+pra,history agrees with projection,18206,0.6165549818741074
+pra,history disagrees with projection,17908,0.5768930087111905
+tov,all games,119014,0.5688574453425648
+tov,history agrees with projection,16664,0.5817930868939031
+tov,history disagrees with projection,19036,0.5652447993275899

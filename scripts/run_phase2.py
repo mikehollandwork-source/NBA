@@ -10,6 +10,8 @@ import pandas as pd  # noqa: E402
 
 from nba.config import REPORTS, SEASONS  # noqa: E402
 from nba.analysis import consistency, features, drivers, projection, disagreement  # noqa: E402
+from nba.analysis import defense_profiles, similar_defense  # noqa: E402
+from nba.ingest import espn_athletes  # noqa: E402
 
 out = REPORTS / "phase2"
 out.mkdir(parents=True, exist_ok=True)
@@ -49,3 +51,17 @@ if step in ("disagree", "all"):
     b.to_csv(out / "disagreement_by_factor.csv", index=False)
     disagreement.examples(d, "pts", 25).to_csv(out / "disagreement_examples_pts.csv", index=False)
     print(a.round(3).to_string()); print(b.round(3).to_string())
+if step in ("similar", "all"):
+    import json
+    from nba.analysis.common import load_games
+    espn_athletes.build(load_games(qualified_only=False).pid.unique())
+    defense_profiles.build()
+    p, v, prof = similar_defense.load()
+    d = similar_defense.signals(p, v)
+    bt, bk, ln = similar_defense.backtest(d)
+    bt.to_csv(out / "similar_defense_backtest_by_season.csv", index=False)
+    bk.to_csv(out / "similar_defense_signal_buckets.csv", index=False)
+    ln.to_csv(out / "similar_defense_vs_season_avg_line.csv", index=False)
+    similar_defense.robustness(p, v).to_csv(out / "similar_defense_robustness.csv", index=False)
+    json.dump(similar_defense.examples(d, prof, "pts", 2025, 4), open(out / "similar_defense_examples_pts_2025.json", "w"), indent=1)
+    print(bt.groupby("stat").mean(numeric_only=True).round(3).to_string())

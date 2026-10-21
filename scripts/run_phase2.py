@@ -1,0 +1,51 @@
+"""Phase 2 end to end (assumes scripts/fetch_espn_all.py + scripts/reconcile_all.py ran).
+
+    python scripts/run_phase2.py [features|testA|testB|project|disagree|all]
+"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import pandas as pd  # noqa: E402
+
+from nba.config import REPORTS, SEASONS  # noqa: E402
+from nba.analysis import consistency, features, drivers, projection, disagreement  # noqa: E402
+
+out = REPORTS / "phase2"
+out.mkdir(parents=True, exist_ok=True)
+step = sys.argv[1] if len(sys.argv) > 1 else "all"
+
+if step in ("features", "all"):
+    features.build()
+if step in ("testA", "all"):
+    per, summ = consistency.run_all(SEASONS)
+    per.to_csv(out / "testA_by_season.csv", index=False)
+    summ.to_csv(out / "testA_stability_summary.csv")
+    print(summ.to_string())
+if step in ("testB", "all"):
+    S, R = drivers.run()
+    S.to_csv(out / "testB_model_gain_by_season.csv", index=False)
+    R.to_csv(out / "testB_group_drop_loss_by_season.csv", index=False)
+    s, r = drivers.summarise(S, R)
+    s.to_csv(out / "testB_model_gain_summary.csv"); r.to_csv(out / "testB_group_summary.csv", index=False)
+    print(s.to_string()); print(r.to_string())
+if step in ("project", "all"):
+    p = projection.project()
+    acc = projection.accuracy(p)
+    acc.to_csv(out / "projection_accuracy_by_season.csv", index=False)
+    summ = acc.groupby(["scenario", "stat", "method"]).agg(gain_mean=("gain_pct", "mean"), gain_min=("gain_pct", "min"),
+                                                            seasons_sig=("sig", "sum"), rmse=("rmse", "mean"),
+                                                            mae=("mae", "mean")).round(3).reset_index()
+    summ.to_csv(out / "projection_accuracy_summary.csv", index=False)
+    print(summ.to_string())
+    cal, rel = projection.calibration(p)
+    cal.to_csv(out / "projection_calibration_by_season.csv", index=False)
+    rel.to_csv(out / "projection_reliability_p_over_season_avg.csv", index=False)
+    print(cal.groupby("stat").mean(numeric_only=True).round(3).to_string()); print(rel.to_string())
+if step in ("disagree", "all"):
+    d = disagreement.contributions()
+    a, b = disagreement.by_size(d), disagreement.by_factor(d)
+    a.to_csv(out / "disagreement_by_size.csv", index=False)
+    b.to_csv(out / "disagreement_by_factor.csv", index=False)
+    disagreement.examples(d, "pts", 25).to_csv(out / "disagreement_examples_pts.csv", index=False)
+    print(a.round(3).to_string()); print(b.round(3).to_string())

@@ -91,7 +91,7 @@ def stints(c: pd.DataFrame) -> pd.DataFrame:
     return s
 
 
-def build(cdn_path) -> pd.DataFrame:
+def build(cdn_path, season: int) -> pd.DataFrame:
     c = load(cdn_path)
     box = counting_stats(c)
     st = stints(c)
@@ -105,6 +105,6 @@ def build(cdn_path) -> pd.DataFrame:
     games = c.groupby("gameId").agg(date=("timeActual", lambda x: str(x.iloc[0])[:10]))
     out = out.join(games, on="gameId")
     PROC.mkdir(parents=True, exist_ok=True)
-    out.to_parquet(PROC / "pbp_box.parquet", index=False)
-    st.to_parquet(PROC / "stints.parquet", index=False)
+    out.to_parquet(PROC / f"pbp_box_{season}.parquet", index=False)
+    st.to_parquet(PROC / f"stints_{season}.parquet", index=False)
     return out

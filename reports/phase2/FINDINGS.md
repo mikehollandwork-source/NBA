@@ -1,0 +1,73 @@
+# Phase 2 findings — 10 seasons (2016-17 to 2025-26)
+
+No betting lines or outside projections are used anywhere. Outcomes are scored against official box scores.
+
+## Data
+- 252,000+ player-games, every official regular-season game (12,099) matched in all 10 seasons.
+- Truth = ESPN box scores. 326 games where ESPN's box is blank (2016-18) were filled from Basketball-Reference; spot checks matched ESPN exactly.
+- 2020-21 onward cross-checked against nba.com play-by-play: ≥99.0% exact agreement on every stat, every season (`data_audit_espn_vs_pbp_by_season.csv`).
+- nba.com's public matchup data leaves `switches_on` / `help_*` empty, so coverage is proxied (see "matchup_coverage" below).
+
+## Test A — predictability holds across all 10 seasons
+Ranking is near-identical every season (`testA_stability_summary.csv`):
+MIN (nMAE 0.20) > FGA > PRA (0.32) > PR > PA > RA > PTS (0.40) > 3PA > REB (0.43) > DREB > AST (0.51) > TOV > 3PM (0.69) > FTA > STOCKS > OREB > STL (0.91) > BLK (1.08).
+Season-to-date average is within ~1% of the full-season (future-knowing) average every season.
+
+## Test B — what improves projections (walk-forward: train on earlier seasons, test 2019-20 … 2025-26)
+Full model vs season-to-date average, % squared-error reduction (significant in 7/7 seasons for every stat):
+
+| MIN | PRA | PTS | AST | REB | TOV | STL | 3PM | BLK |
+|---|---|---|---|---|---|---|---|---|
+| 25.4 | 10.9 | 7.7 | 6.4 | 5.9 | 5.0 | 3.0 | 2.9 | 2.3 |
+
+Correction to Phase 1: with 10 seasons of training, 3PM/STL/BLK *are* beatable — but only by 2–3%.
+
+Inputs that hold up across seasons (drop-one loss significant in ≥ half the seasons and positive in ≥6/7):
+- **Teammates out** — #1 for every stat (MIN 6.5%, PRA 3.5%, PTS 2.5%, AST 1.8%, REB 1.4%, TOV 1.2%).
+- **Minutes/role** — MIN, PTS, REB, AST, PRA.
+- **Recent form** — MIN (4.8%) and AST only.
+- **Teammates returning** — MIN, PRA.
+- **Last season** — REB, AST, TOV.
+- **Opponent defense** — TOV only.
+- Not holding up anywhere: pace, game script, opponent absences, rest/home, matchup/coverage proxies.
+
+## Projection system (`projection_accuracy_summary.csv`)
+Stats projected: MIN, PTS, REB, AST, TOV and PRA/PR/PA/RA (the predictable ones).
+Ensemble (avg of minutes×rate, direct, and season-avg+deviation models) is best for every stat, both scenarios, all 7 seasons.
+
+| % error reduction vs season avg | MIN | PRA | PR | PA | PTS | RA | AST | REB | TOV |
+|---|---|---|---|---|---|---|---|---|---|
+| Injury report known | 25.4 | 11.6 | 9.9 | 10.3 | 8.2 | 8.8 | 6.9 | 6.6 | 5.5 |
+| + starting lineup known | 30.9 | 13.0 | 11.0 | 11.4 | 9.1 | 10.2 | 7.7 | 7.7 | 5.8 |
+| Worst season (injury report) | 21.5 | 9.0 | 7.8 | 7.7 | 6.1 | 6.4 | 4.9 | 4.5 | 4.7 |
+
+Distributions: negative binomial with variance ∝ μ^p fit out-of-sample (p ≈ 0.7–1.05; constant-dispersion NB was overconfident and was replaced).
+50%/80% intervals cover 48–50% / 77–80%. P(stat > season avg) is calibrated within ~1–2 pts in every bucket and beats the season-average distribution on Brier/log-loss for every stat.
+
+## When the projection disagrees with the season average
+(`disagreement_by_size.csv`, `disagreement_by_factor.csv`) — out-of-sample, 7 seasons.
+
+How often reality moved off the season average in the direction the model said:
+
+| Size of disagreement | share of games | MIN | PTS | PRA | REB | AST |
+|---|---|---|---|---|---|---|
+| < 0.1 SD | ~28% | 52% | 52% | 52% | 52% | 51% |
+| 0.1–0.25 SD | ~32% | 58% | 56% | 56% | 56% | 55% |
+| 0.25–0.5 SD | ~25% | 64% | 61% | 62% | 61% | 59% |
+| 0.5–1 SD | ~12% | 76% | 68% | 71% | 67% | 64% |
+| > 1 SD | ~3% | 86% | 76% | 80% | 75% | 71% |
+
+Realized move ≈ 0.9–0.97× the predicted move — size is about right, slightly too big.
+
+Which factors to trust (`disagreement_trust_weights.csv`; 1.0 = moves exactly as projected, 0 = noise, controlled for all other factors):
+- **Trust (≈1.0):** minutes/role, teammates out, teammates back, return from absence, recent form, opponent defense, season timing (≥1: late-season effects are under-weighted).
+- **Discount (0.5–0.75):** last season (PTS/PRA/MIN), rest/home (except MIN 1.65), usage profile (REB 0.41).
+- **Ignore (≈0 or negative):** matchup/coverage proxies, pace, opponent absences, game script (PTS/REB).
+When the "last season" factor is the main thing pulling a projection away from the current average, it is right only ~49% of the time.
+
+Re-weighting each factor by its historical trust (fit on other seasons) improves every stat slightly (+0.2–0.4 pts), including every stat's worst season (`disagreement_trust_weighted.csv`).
+
+## Caveats
+- Teammates-out / lineup features use who actually played; live you rely on injury reports and announced lineups, so live accuracy will be a bit lower, especially for late scratches.
+- "Season average as the line" is a stand-in. Real edge needs comparison to closing lines (agreed: evaluation only).
+- Players filtered to ≥20 games & ≥15 mpg in a season (uses full-season info for the filter, not for predictions).

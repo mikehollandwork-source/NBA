@@ -86,9 +86,34 @@ def nb_dist(mu, alpha):
     return st.nbinom(n, n / (n + mu))
 
 
-def calibration(p: pd.DataFrame, method: str = "ensemble", scenario: str = "injury_report") -> tuple[pd.DataFrame, pd.DataFrame]:
+def fit_variance(y, mu, bins=20):
+    """Var(y | mu) = k * mu^p, fit on binned out-of-sample residuals (log-log)."""
+    d = pd.DataFrame({"mu": np.clip(mu, 0.05, None), "v": (y - mu) ** 2})
+    g = d.groupby(pd.qcut(d.mu, bins, duplicates="drop"), observed=True).mean()
+    p, logk = np.polyfit(np.log(g.mu), np.log(g.v), 1)
+    return float(np.exp(logk)), float(p)
+
+
+def dist(mu, k, p):
+    """Negative binomial whose variance follows k*mu^p (falls back to ~Poisson
+    when that variance is below the mean)."""
+    mu = np.clip(mu, 0.05, None)
+    var = k * mu ** p
+    alpha = np.clip((var - mu) / mu ** 2, 1e-4, None)
+    n = 1 / alpha
+    return st.nbinom(n, n / (n + mu))
+
+
+def _logit(x):
+    x = np.clip(x, 1e-4, 1 - 1e-4)
+    return np.log(x / (1 - x))
+
+
+def calibration(p: pd.DataFrame, method: str = "ensemble", scenario: str = "injury_report"):
     """Interval coverage and calibration of P(stat > season-to-date average).
-    Dispersion is fit on all OTHER seasons' out-of-sample residuals."""
+    Variance curve and probability recalibration are fit on all OTHER seasons'
+    out-of-sample results, then applied to the held-out season."""
+    from sklearn.linear_model import LogisticRegression
     p = p[p.scenario == scenario]
     rows, rel = [], []
     for s in COMPONENTS + list(COMBOS):
@@ -97,24 +122,29 @@ def calibration(p: pd.DataFrame, method: str = "ensemble", scenario: str = "inju
             te, oth = p[p.season == y], p[p.season != y]
             if oth.empty:
                 oth = te
-            a = _nb_alpha(oth[s].to_numpy(), oth[col].to_numpy())
-            a0 = _nb_alpha(oth[s].to_numpy(), oth[f"{s}_szn"].to_numpy())
-            d, d0 = nb_dist(te[col].to_numpy(), a), nb_dist(te[f"{s}_szn"].to_numpy(), a0)
+            k, pw = fit_variance(oth[s].to_numpy(), oth[col].to_numpy())
+            k0, pw0 = fit_variance(oth[s].to_numpy(), oth[f"{s}_szn"].to_numpy())
+            d, d0 = dist(te[col].to_numpy(), k, pw), dist(te[f"{s}_szn"].to_numpy(), k0, pw0)
             yv = te[s].to_numpy()
-            # randomized PIT for discrete outcomes
             u = np.random.default_rng(1).uniform(size=len(yv))
-            pit = d.cdf(yv - 1) + u * (d.pmf(yv))
+            pit = d.cdf(yv - 1) + u * d.pmf(yv)
             line = te[f"{s}_szn"].to_numpy()  # stand-in "line": season-to-date average
-            p_over = 1 - d.cdf(np.floor(line))
-            p_over0 = 1 - d0.cdf(np.floor(line))
+            p_raw = 1 - d.cdf(np.floor(line))
+            p0 = 1 - d0.cdf(np.floor(line))
+            # recalibrate P(over) with logistic regression on logit(p), fit on other seasons
+            do = dist(oth[col].to_numpy(), k, pw)
+            po = 1 - do.cdf(np.floor(oth[f"{s}_szn"].to_numpy()))
+            lr = LogisticRegression().fit(_logit(po)[:, None], (oth[s] > oth[f"{s}_szn"]).astype(int))
+            p_cal = lr.predict_proba(_logit(p_raw)[:, None])[:, 1]
             over = (yv > line).astype(float)
-            rows.append({"stat": s, "season": y, "alpha": a,
+            ll = lambda q: -np.mean(over * np.log(np.clip(q, 1e-6, 1)) + (1 - over) * np.log(np.clip(1 - q, 1e-6, 1)))
+            rows.append({"stat": s, "season": y, "var_k": k, "var_power": pw,
                          "cov50": np.mean((pit > 0.25) & (pit < 0.75)), "cov80": np.mean((pit > 0.1) & (pit < 0.9)),
-                         "brier_model": np.mean((p_over - over) ** 2), "brier_season_avg": np.mean((p_over0 - over) ** 2),
-                         "logloss_model": -np.mean(over * np.log(np.clip(p_over, 1e-6, 1)) + (1 - over) * np.log(np.clip(1 - p_over, 1e-6, 1))),
-                         "logloss_season_avg": -np.mean(over * np.log(np.clip(p_over0, 1e-6, 1)) + (1 - over) * np.log(np.clip(1 - p_over0, 1e-6, 1)))})
-            b = pd.cut(p_over, [0, .3, .4, .45, .5, .55, .6, .7, 1.0])
-            rel.append(pd.DataFrame({"stat": s, "bin": b.astype(str), "p": p_over, "o": over}))
+                         "brier_season_avg": np.mean((p0 - over) ** 2), "brier_model_raw": np.mean((p_raw - over) ** 2),
+                         "brier_model_cal": np.mean((p_cal - over) ** 2),
+                         "logloss_season_avg": ll(p0), "logloss_model_raw": ll(p_raw), "logloss_model_cal": ll(p_cal)})
+            b = pd.cut(p_cal, [0, .3, .4, .45, .5, .55, .6, .7, 1.0])
+            rel.append(pd.DataFrame({"stat": s, "bin": b.astype(str), "p": p_cal, "o": over}))
     cal = pd.DataFrame(rows)
     rel = pd.concat(rel).groupby(["stat", "bin"]).agg(n=("o", "size"), predicted=("p", "mean"), actual=("o", "mean")).reset_index()
     return cal, rel

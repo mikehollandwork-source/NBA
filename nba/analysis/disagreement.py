@@ -95,3 +95,27 @@ def examples(d, stat="pts", n=15):
     x["main_push"] = [x.at[i, "g_" + f] for i, f in zip(x.index, x.main_factor)]
     return x.reindex(x.pred_dev.abs().sort_values(ascending=False).index).head(n)[
         ["season", "player", "szn", "pred_dev", "actual", "main_factor", "main_push"]]
+
+
+def trust_weighted(d: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Re-weight each factor's push by how much it has historically been right.
+    For each held-out season: fit actual_dev ~ bias + sum(beta_g * contrib_g) on
+    the OTHER seasons, apply to the held-out one. Compare squared error vs the
+    raw deviation model and vs the season average."""
+    gcols = [c for c in d.columns if c.startswith("g_")]
+    rows, betas = [], []
+    for s, x in d.groupby("stat"):
+        for y in sorted(x.season.unique()):
+            tr, te = x[x.season != y], x[x.season == y]
+            Xtr = np.column_stack([np.ones(len(tr)), tr[gcols].fillna(0)])
+            b = np.linalg.lstsq(Xtr, tr.actual_dev - tr.bias, rcond=None)[0]
+            pred = te.bias + b[0] + te[gcols].fillna(0).to_numpy() @ b[1:]
+            e0 = (te.actual_dev ** 2).mean()
+            e_raw = ((te.actual_dev - te.pred_dev) ** 2).mean()
+            e_tw = ((te.actual_dev - pred) ** 2).mean()
+            rows.append({"stat": s, "season": y, "gain_raw_pct": 100 * (1 - e_raw / e0),
+                         "gain_trust_weighted_pct": 100 * (1 - e_tw / e0)})
+            betas.append(pd.Series(b[1:], index=[c[2:] for c in gcols], name=(s, y)))
+    B = pd.DataFrame(betas)
+    B.index = pd.MultiIndex.from_tuples(B.index, names=["stat", "season"])
+    return pd.DataFrame(rows), B.groupby("stat").agg(["mean", "std"]).round(2)

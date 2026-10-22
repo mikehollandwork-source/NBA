@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS
+from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS, VOL_MAX, VOL_MIN_GAMES
 from nba.ingest import espn, espn_athletes
 from nba.analysis import features, drivers, season_sim as ss
 from nba.analysis.groups import all_features
@@ -213,6 +213,19 @@ def ranges(r: pd.DataFrame, n_sims=4000) -> pd.DataFrame:
     return r
 
 
+def volatility_filter(r: pd.DataFrame, season: int) -> pd.DataFrame:
+    """Baseline: PRA swing (CV) over last season; above VOL_MAX -> no projection."""
+    from nba.analysis.common import load_games
+    t = load_games([season - 1], qualified_only=False)
+    v = t.groupby("pid").agg(g=("gameId", "size"), m=("pra", "mean"), sd=("pra", "std"))
+    v = v[v.g >= VOL_MIN_GAMES]
+    r = r.merge((v.sd / v.m).rename("pra_cv_last").reset_index(), on="pid", how="left")
+    r["projected"] = r.pra_cv_last <= VOL_MAX
+    r["no_projection_reason"] = np.where(r.pra_cv_last.isna(), "no qualifying last season",
+                                         np.where(r.projected, "", "too volatile"))
+    return r
+
+
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -232,6 +245,7 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     M = train_models(retrain)
     r = ranges(normalize_minutes(predict(M, te).reset_index(drop=True), te.reset_index(drop=True)))
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
+    r = volatility_filter(r, season)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     write_sheet(r, G, R, d)
     return r
@@ -240,24 +254,31 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
 def write_sheet(r, G, R, d):
     out_dir = ROOT / "reports" / "live"
     out_dir.mkdir(parents=True, exist_ok=True)
-    keep = r[r.proj_min >= 10].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
-    cols = ["team", "opp", "player", "status", "proj_min", "proj_pts", "pts_p10", "pts_p90", "proj_reb", "reb_p10", "reb_p90",
+    keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
+    skipped = r[(r.proj_min >= 10) & ~r.projected]
+    cols = ["team", "opp", "player", "status", "pra_cv_last", "proj_min", "proj_pts", "pts_p10", "pts_p90", "proj_reb", "reb_p10", "reb_p90",
             "proj_ast", "ast_p10", "ast_p90", "proj_pra", "pra_p10", "pra_p90", "proj_fg3m", "proj_stl", "proj_blk", "proj_tov"]
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Game-day projections — {d:%a %b %-d, %Y}", "",
          "Full game-day model (same as the backtests): no betting lines used. 80% range = 10th–90th percentile.",
          "Teammates-out adjusts automatically once a team has played 3+ games this season.",
-         "Team minutes = 240: top-8 keep model minutes, bench squeezed (rule, not backtested); * = no NBA history (rookie), given the early-season average.", ""]
+         "Team minutes = 240: top-8 keep model minutes, bench squeezed (rule, not backtested).",
+         f"Baseline: no projection if last season's PRA swing (SD/avg) > {VOL_MAX} or no qualifying last season (<{VOL_MIN_GAMES} games).", ""]
     for _, g in G.sort_values("tip_utc").iterrows():
         tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         L.append(f"## {g.away} @ {g.home} — {tip}")
         for t in (g.away, g.home):
             x = keep[keep.team == t]
-            L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM", "|---|---|---|---|---|---|---|"]
+            L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM | PRA swing", "|---|---|---|---|---|---|---|---|"]
             for _, q in x.iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "") + (" *" if q.no_nba_history else "")
                 L.append(f"{nm} | {q.proj_min:.0f} | {q.proj_pts:.1f} ({q.pts_p10:.0f}–{q.pts_p90:.0f}) | {q.proj_reb:.1f} | "
-                         f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f}")
+                         f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f} | {q.pra_cv_last:.2f}")
+            sk = skipped[skipped.team == t]
+            if len(sk):
+                L.append("No projection: " + ", ".join(
+                    f"{q.player} ({'swing ' + format(q.pra_cv_last, '.2f') if q.no_projection_reason == 'too volatile' else 'no history'})"
+                    for _, q in sk.iterrows()))
             o = R[(R.team == t) & (R.status == "Out")]
             if len(o):
                 L.append("OUT: " + ", ".join(o.player))

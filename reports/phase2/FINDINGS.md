@@ -184,3 +184,20 @@ Result: ~65% hit rate / ~+19% ROI at model probability ≥ 58%, stable every sea
 - Average-based lines sit above the typical (median) outcome because stat lines are right-skewed: always betting the under wins 52–55% with no model.
 - A last-10 average is a far weaker forecast than ours (and than a sportsbook's), and ignores injury news books price within minutes.
 Real closing lines are set near the median by books with injury and lineup information, so real results will be far lower. Whether any edge survives (needs real lines) is unknown; prior estimate ~20%.
+
+---
+
+# Volatility baseline (no projection if PRA swings too much)
+Swing = last season's PRA game-to-game SD ÷ average (≥20 games). It persists: season-to-season correlation 0.65 (0.35 after controlling for PRA level).
+Out-of-sample projections 2019-25 (130k games), by last-season swing:
+
+| Max swing | Kept | Typical miss (share of projection) | 80% range coverage |
+|---|---|---|---|
+| none | 100% | 36% | 80% |
+| 0.60 | 78% | 33% | 81% |
+| 0.50 | 62% | 31% | 81% |
+| **0.45 (default)** | 53% | 29% | 82% |
+| 0.40 | 40% | 27% | 82% |
+| 0.30 | 16% | 23% | 84% |
+
+The filter mostly removes low-usage players (they swing most). Ranges are not player-specific yet: 80% coverage is 76% for the most volatile fifth and 84% for the steadiest. Setting: `VOL_MAX` in `nba/config.py`.

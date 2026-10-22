@@ -28,3 +28,10 @@ STATS = ["min", "pts", "reb", "ast", "fg3m", "stl", "blk", "tov",
          "oreb", "dreb", "fga", "fgm", "fta", "ftm", "fg3a", "pf"]
 COMBOS = {"pra": ["pts", "reb", "ast"], "pr": ["pts", "reb"],
           "pa": ["pts", "ast"], "ra": ["reb", "ast"], "stocks": ["stl", "blk"]}
+
+# Volatility baseline for live projections: no projection if a player's PRA swung
+# too much last season (coefficient of variation = game-to-game SD / average, >=20 games).
+# Backtest 2019-25: no filter -> 36% typical miss (share of projection), 0.45 -> 29% (keeps ~53%),
+# 0.40 -> 27% (keeps ~40%). Players without a qualifying last season get no projection.
+VOL_MAX = 0.45
+VOL_MIN_GAMES = 20

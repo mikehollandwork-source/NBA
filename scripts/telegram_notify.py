@@ -117,7 +117,8 @@ def results_messages():
         lines.append(f"Game: {record.fmt(s)}")
         send("\n".join(lines))
     send(html.escape(record.report(led)).replace("**", ""))
-    st_path.write_text(json.dumps(sorted(done | set(new))))
+    if TOKEN:  # dry runs must not mark anything as sent
+        st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
 def main(d: date):
@@ -170,7 +171,8 @@ def main(d: date):
                 send(game_message(g, r))
             if csv.exists():
                 send_file(csv, f"Updated projections {d}")
-    state_path.write_text(json.dumps(now))
+    if TOKEN:  # dry runs must not mark the board as sent
+        state_path.write_text(json.dumps(now))
 
 
 if __name__ == "__main__":

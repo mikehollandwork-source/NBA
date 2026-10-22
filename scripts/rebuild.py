@@ -28,8 +28,8 @@ from nba.config import PROC, SEASONS  # noqa: E402
 FORCE = "--force" in sys.argv
 
 
-def step(name, outputs, fn):
-    if not FORCE and all(Path(o).exists() for o in outputs):
+def step(name, outputs, fn, always=False):
+    if not always and not FORCE and outputs and all(Path(o).exists() for o in outputs):
         print(f"[skip] {name}", flush=True)
         return
     t = time.time()
@@ -92,9 +92,16 @@ step("2 reconcile + backfill", [PROC / f"player_games_{y}.parquet" for y in SEAS
 step("3 player bios", [PROC / "player_bio.parquet"], s3)
 step("4 features (no prior)", [PROC / "preseason_oos.parquet"], s4)   # only needed before step 5
 step("5 preseason model", [PROC / "preseason_final.parquet", PROC / "preseason_oos.parquet"], s5)
-step("6 features (+ prior)", [PROC / "features_all.parquet"], s6)
-if FORCE or "pre_pts" not in pd.read_parquet(PROC / "features_all.parquet", columns=None).columns:
-    step("6b features (+ prior)", [], s6)
+def has_prior():
+    import pyarrow.parquet as pq
+    f = PROC / "features_all.parquet"
+    return f.exists() and "pre_pts" in pq.read_schema(f).names
+
+
+if FORCE or not has_prior():  # features must be rebuilt after step 5 so they carry the preseason prior
+    step("6 features (+ prior)", [], s6, always=True)
+else:
+    print("[skip] 6 features (+ prior)", flush=True)
 step("7 OOS projections, all games", [PROC / "projections_all_games_oos.parquet"], s7)
 
 

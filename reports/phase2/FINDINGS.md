@@ -216,3 +216,12 @@ The filter mostly removes low-usage players (they swing most). Ranges are not pl
 
 Top-lean stat hits 67% vs 60% for a player's other stats. Stable by season (68–70% at stated ≥60%). By stat: PRA strongest (73%). Early season: unders vs last-season baseline hit 66% (game 1) / 70% (games 2-5); game-1 overs slightly overstated (65% stated, 61.5% hit).
 **Not a sportsbook test** — books set sharper lines than a player's own average; edge vs real lines still unknown.
+
+---
+
+# Kalshi prices (first real-market test)
+Source: Kalshi public API (free). NBA player ladders exist for PTS/REB/AST/PRA/3PM; history (PTS/REB/AST) from 2025-11-19. Polymarket has no nightly player props.
+Model tail calibration at ladder rungs (150k OOS games): predicted vs actual within ~1 pt in every bucket (e.g. 7.3% → 6.8%, 24.8% → 25.2%).
+
+**2026-10-21 retro test** (locked projections, Kalshi quote at tip, buy at ask + 0.07·p·(1−p) fee, best rung per player-stat, exp. return ≥5%): 240 picks, **53-187, −45.7u, ROI −19%** vs expected +42%. YES long shots 16-143 (−27%); NO 37-44 (−3%). Median spread 4¢.
+Conclusion: large model–market disagreements are mostly model error (market knows minutes/roles we don't, esp. opening night). The "≥5% expected return" rule is not usable. Next step: full-season backtest of rules on 2025-26 Kalshi history before any picks go on the board.

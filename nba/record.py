@@ -37,8 +37,10 @@ def _box(d: str) -> pd.DataFrame:
 def grade_all() -> pd.DataFrame:
     rows = []
     for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
-        L = pd.concat([pd.read_csv(f, dtype={"pid": str}).assign(game=f.stem) for f in day.glob("*.csv")],
-                      ignore_index=True)
+        files = [f for f in day.glob("*.csv") if not f.name.endswith(".kalshi.csv")]
+        if not files:
+            continue
+        L = pd.concat([pd.read_csv(f, dtype={"pid": str}).assign(game=f.stem) for f in files], ignore_index=True)
         if "lean_stat" not in L:
             continue  # locks from before leans existed
         L = L[L.lean_stat.notna() & (L.proj_min >= 10)]
@@ -72,6 +74,50 @@ def grade_all() -> pd.DataFrame:
     return led
 
 
+KLEDGER = ROOT / "reports" / "live" / "kalshi_record.csv"
+
+
+def grade_kalshi() -> pd.DataFrame:
+    """Grade locked Kalshi picks at the price paid + fee (win (1-cost)/cost, loss -1, void 0)."""
+    from nba import kalshi
+    out = []
+    for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
+        frames = []
+        for f in day.glob("*.kalshi.csv"):
+            try:
+                x = pd.read_csv(f, dtype={"pid": str})
+            except pd.errors.EmptyDataError:
+                continue
+            if len(x):
+                frames.append(x.assign(game=f.name.replace(".kalshi.csv", "")))
+        if not frames:
+            continue
+        pk = pd.concat(frames, ignore_index=True)
+        box = _box(day.name)
+        if box.empty:
+            continue
+        pk = pk[pk.gameId.isin(set(box.gameId))]
+        if pk.empty:
+            continue
+        g = kalshi.grade(pk, box)
+        g["date"] = day.name
+        out.append(g[["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_side", "exp_roi",
+                      "actual", "result", "units"]])
+    led = pd.concat(out, ignore_index=True) if out else pd.DataFrame(
+        columns=["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_side", "exp_roi", "actual", "result", "units"])
+    led.to_csv(KLEDGER, index=False)
+    return led
+
+
+def summarize_k(x: pd.DataFrame) -> str:
+    x = x[x.result != "void"]
+    w, l = (x.result == "win").sum(), (x.result == "loss").sum()
+    if not w + l:
+        return "no graded picks yet"
+    u = x.units.sum()
+    return f"{w}-{l} ({w / (w + l):.1%}) · {u:+.2f}u · ROI {u / (w + l):+.1%} · expected {x.exp_roi.mean():+.1%}"
+
+
 def summarize(led: pd.DataFrame, mask=None) -> dict:
     x = led if mask is None else led[mask]
     x = x[x.result != "void"]
@@ -91,11 +137,21 @@ def fmt(s: dict) -> str:
             f" · model said {s['stated']:.0%}")
 
 
-def report(led: pd.DataFrame) -> str:
+def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
+    lines = []
+    if kled is not None:
+        lines.append("**Kalshi record (real price + fees; $1 per pick)**")
+        if len(kled):
+            last = kled.date.max()
+            lines += [f"- All picks: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
+                      "- By stat: " + " · ".join(f"{s.upper()} {summarize_k(x).split(' (')[0]}" for s, x in kled.groupby("stat"))]
+        else:
+            lines.append("- no graded picks yet (starts Oct 22)")
+    lead = "\n".join(lines) + ("\n" if lines else "")
     if led.empty:
-        return "Record @ -120: no graded leans yet (starts Oct 22)."
+        return lead + "Lean record @ -120 (reference only): no graded leans yet."
     last = led.date.max()
-    lines = ["**Record @ -120 (vs player's own baseline, not book lines; break-even 54.5%)**",
+    lines = [lead + "**Lean record @ -120 (reference only: vs player's own baseline, not real prices)**",
              f"- All leans: {fmt(summarize(led))}",
              f"- 🔥 Strong (65%+): {fmt(summarize(led, led.strong))}",
              f"- Last night ({last}): {fmt(summarize(led, led.date == last))}"]

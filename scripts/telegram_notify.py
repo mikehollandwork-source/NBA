@@ -73,6 +73,14 @@ def game_message(g, r) -> str:
     if len(rest):
         lines.append("Other leans")
         lines += [lean_line(q) for _, q in rest.iterrows()]
+    kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
+    if kp.exists():
+        from nba import kalshi
+        kb = pd.read_parquet(kp)
+        kb = kb[kb.gameId == int(g.event_id)].sort_values("exp_roi", ascending=False) if len(kb) else kb
+        if len(kb):
+            lines.append(f"💰 <b>Kalshi edges</b> (real price + fee, ≥{kalshi.MIN_ROI:.0%} exp.)")
+            lines += [f"💰 {html.escape(q.player)} — {html.escape(kalshi.describe(q))}" for _, q in kb.iterrows()]
     skipped = x[(x.get("projected", True) == False) & (x.proj_min >= 10)]  # noqa: E712
     if len(skipped):
         lines.append("No projection (too volatile / no history): " + ", ".join(html.escape(n) for n in skipped.player))
@@ -116,11 +124,37 @@ def results_messages():
         s = record.summarize(x)
         lines.append(f"Game: {record.fmt(s)}")
         send("\n".join(lines))
-    send(html.escape(record.report(led)).replace("**", ""))
+    kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
+    send(html.escape(record.report(led, kled)).replace("**", ""))
+    st_path.write_text(json.dumps(sorted(done | set(new))))
+
+
+def kalshi_results():
+    from nba import record
+    if not record.KLEDGER.exists():
+        return
+    k = pd.read_csv(record.KLEDGER)
+    if k.empty:
+        return
+    st_path = ROOT / "reports/live/telegram_kalshi_state.json"
+    done = set(json.loads(st_path.read_text())) if st_path.exists() else set()
+    new = [x for x in (k.date + "|" + k.game).unique() if x not in done]
+    for key_ in sorted(new):
+        dte, game = key_.split("|")
+        x = k[(k.date == dte) & (k.game == game)]
+        lines = [f"💰 <b>Kalshi results {html.escape(game)}</b> ({dte})"]
+        for _, q in x.iterrows():
+            icon = {"win": "✅", "loss": "❌", "void": "⚪"}[q.result]
+            rung = f"{q.k}+" if q.side == "YES" else f"under {q.k}"
+            lines.append(f"{icon} {html.escape(q.player)} {q.stat.upper()} {rung} @ {q.price * 100:.0f}¢ → "
+                         f"{'DNP' if q.result == 'void' else format(q.actual, 'g')} ({q.units:+.2f}u)")
+        lines.append("Record: " + record.summarize_k(k))
+        send("\n".join(lines))
     st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
 def main(d: date):
+    kalshi_results()
     results_messages()
     proj = ROOT / f"data/live/projections_{d}.parquet"
     if not proj.exists():

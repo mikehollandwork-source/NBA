@@ -292,6 +292,38 @@ def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="gam
     return pd.concat(out, ignore_index=True)
 
 
+def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None) -> pd.DataFrame:
+    """Kalshi edges for games still before tip (live quotes) -> locked per game in
+    <game>.kalshi.csv; started games use their locked file. Prices are never model inputs."""
+    from nba import kalshi
+    now = now or pd.Timestamp.now(tz="UTC")
+    pre = G[(G.status == "Scheduled") & (pd.to_datetime(G.tip_utc, utc=True) > now)]
+    pk = pd.DataFrame()
+    if len(pre):
+        try:
+            proj = r[r.gameId.isin(pre.event_id.astype(int)) & (r.proj_min >= 10)
+                     & r.projected.astype(str).str.lower().eq("true")]
+            pk = kalshi.picks(kalshi.edges(kalshi.markets(d, pre), proj))
+        except Exception as ex:  # Kalshi down: keep projections working
+            print("Kalshi unavailable:", ex, flush=True)
+            pre = pre.iloc[0:0]
+    out = []
+    for _, g in G.iterrows():
+        path = lock_path(d, g).with_suffix(".kalshi.csv")
+        if g.event_id in set(pre.event_id):
+            x = pk[pk.gameId == int(g.event_id)].copy() if len(pk) else pd.DataFrame()
+            x["locked_at_utc"] = now.isoformat(timespec="seconds")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            x.to_csv(path, index=False)
+            out.append(x)
+        elif path.exists() and path.stat().st_size > 1:
+            try:
+                out.append(pd.read_csv(path, dtype={"pid": str}))
+            except pd.errors.EmptyDataError:
+                pass
+    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -316,12 +348,15 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = volatility_filter(r, season)
     r = apply_locks(r, G, d)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
+    kb = kalshi_board(r, G, d)
+    kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
-    write_sheet(r, G, R, d)
+    write_sheet(r, G, R, d, kb)
     return r
 
 
-def write_sheet(r, G, R, d):
+def write_sheet(r, G, R, d, kb=None):
+    from nba import kalshi
     out_dir = ROOT / "reports" / "live"
     out_dir.mkdir(parents=True, exist_ok=True)
     keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
@@ -362,6 +397,11 @@ def write_sheet(r, G, R, d):
                 L.append("No projection: " + ", ".join(
                     f"{q.player} ({'swing ' + format(q.pra_cv_last, '.2f') if q.no_projection_reason == 'too volatile' else 'no history'})"
                     for _, q in sk.iterrows()))
+            if kb is not None and len(kb):
+                kx = kb[kb.team == t].sort_values("exp_roi", ascending=False)
+                if len(kx):
+                    L.append(f"💰 Kalshi edges (real price + fee, exp. return ≥ {kalshi.MIN_ROI:.0%}, rule not backtested):")
+                    L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.iterrows()]
             o = R[(R.team == t) & (R.status == "Out")]
             if len(o):
                 L.append("OUT: " + ", ".join(o.player))

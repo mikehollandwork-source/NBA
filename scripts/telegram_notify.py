@@ -126,7 +126,8 @@ def results_messages():
         send("\n".join(lines))
     kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
     send(html.escape(record.report(led, kled)).replace("**", ""))
-    st_path.write_text(json.dumps(sorted(done | set(new))))
+    if TOKEN:  # dry runs must not mark anything as sent
+        st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
 def kalshi_results():
@@ -150,7 +151,8 @@ def kalshi_results():
                          f"{'DNP' if q.result == 'void' else format(q.actual, 'g')} ({q.units:+.2f}u)")
         lines.append("Record: " + record.summarize_k(k))
         send("\n".join(lines))
-    st_path.write_text(json.dumps(sorted(done | set(new))))
+    if TOKEN:  # dry runs must not mark anything as sent
+        st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
 def main(d: date):
@@ -204,7 +206,8 @@ def main(d: date):
                 send(game_message(g, r))
             if csv.exists():
                 send_file(csv, f"Updated projections {d}")
-    state_path.write_text(json.dumps(now))
+    if TOKEN:  # dry runs must not mark the board as sent
+        state_path.write_text(json.dumps(now))
 
 
 if __name__ == "__main__":

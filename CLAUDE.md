@@ -46,7 +46,7 @@ Reconciliation: ESPN vs nba.com play-by-play agree ≥99% on every stat 2020-25;
 ## Model (what the live sheet uses)
 - Game-day ensemble = mean of (minutes model × per-minute rate), direct model, and season-avg + deviation model. LightGBM, `drivers.PARAMS`, `random_state=7`. Features in `nba/analysis/groups.py`.
 - Preseason projection = 50/50 blend of preseason LightGBM and last season's per-game average (`preseason.final_projection`); fed to game-day models as `pre_*` prior.
-- Ranges: negative binomial, variance = k·μ^p fit out-of-sample; PTS/REB/AST linked by a Gaussian copula scaled so PRA spread matches reality.
+- Ranges + Kalshi probabilities: `nba/sim.py`, 20,000 sims, one shared draw. Minutes drawn first (empirical actual/projected ratio), then negative binomial PTS/REB/AST with variance k·μ^p × player spread multiplier (last 250 games, shrunk with weight 100), Gaussian copula fit after minutes. Backtest: `reports/phase2/sim_improvements.md` (player-specific stat links tested, dropped). Leans don't use the sims.
 - Live minutes: team total 240; players with no NBA history get 12.6 min (historical early-season average); top-8 keep model minutes, bench squeezed (rule, not backtested).
 - **Volatility baseline:** no projection if last season's PRA swing (SD / avg, ≥20 games) > `VOL_MAX = 0.45` (`nba/config.py`), or no qualifying last season.
 - Teammates-out only activates after a team's 3rd game of the season.
@@ -62,7 +62,7 @@ Reconciliation: ESPN vs nba.com play-by-play agree ≥99% on every stat 2020-25;
 - Biggest inputs: teammates out, minutes/role. Opponent defense, pace, matchup/coverage proxies ≈ no value.
 - Ensemble beats season average in 7/7 seasons: MIN 25%, PRA 12%, PTS 8%, REB/AST ~7% (squared error).
 - Similar-defense signal, head-to-head averages: no edge (placebo-tested). Player-bias correction: small real gain.
-- Known gaps: stars under-projected ~1.9 pts in game 1; ranges not player-specific; preseason sim misses injuries (games played is the largest season-total error).
+- Known gaps: stars under-projected ~1.9 pts in game 1; player spread uses games through 2025-26 only (current-season misses not added yet); preseason sim misses injuries (games played is the largest season-total error).
 
 ## Conventions
 - `main` is the live branch (scheduled Actions run from it; Actions commits there hourly — pull before pushing). Feature work on `phase1-predictability`, merge via PR.

@@ -201,15 +201,16 @@ def normalize_minutes(r: pd.DataFrame, te: pd.DataFrame) -> pd.DataFrame:
     return r
 
 
-def ranges(r: pd.DataFrame, n_sims=4000) -> pd.DataFrame:
-    Pz = pd.read_parquet(PROC / "projections_all_games_oos.parquet")
-    var, C = ss.fit_params(Pz, -1)
-    mu = r[["proj_pts", "proj_reb", "proj_ast"]].to_numpy()
-    sims = ss.draw(np.clip(mu, 0.05, None), var, C, n_sims=n_sims)
+def ranges(r: pd.DataFrame) -> pd.DataFrame:
+    """80% ranges from nba/sim.py (minutes first + player-specific spread, 20,000 sims)."""
+    from nba import sim
+    ok = np.isfinite(r[["proj_pts", "proj_reb", "proj_ast", "proj_min"]].to_numpy(dtype=float)).all(1)
+    sims = sim.simulate(r[ok])
     for j, s in enumerate(["pts", "reb", "ast", "pra"]):
         x = sims[:, :, j] if s != "pra" else sims.sum(2)
         q = np.percentile(x, [10, 50, 90], axis=0)
-        r[f"{s}_p10"], r[f"{s}_p50"], r[f"{s}_p90"] = q
+        for i, c in enumerate(["p10", "p50", "p90"]):
+            r.loc[ok, f"{s}_{c}"] = q[i]
     return r
 
 

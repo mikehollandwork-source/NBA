@@ -109,7 +109,9 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 4. **Pick** the stat with the largest distance from 50%.
 5. **Second calibration** on picked leans only (picking the max of 7 inflates confidence), per stat.
 - Backtest 2019-25 (149k leans, each season tested on calibrations fit to other seasons): stated 55-60% → 57.5% hit; 60-65% → 62.4%; 65-70% → 67.9%; 70%+ → 77.6%.
-- 🔥 = 65%+.
+- **Board = 70%+ leans only**, ranked by model probability (2025: 75.8% hit, ~10/night). Ranking by model + the player's past hit rates at that line was worse in 7/7 seasons (`reports/phase2/ranking_backtest.md`).
+- ⚠️ = star (last season 22+ PTS) under in his first game: these hit 66.7% vs 77.8% stated (n=42).
+- Full projections for every player stay in the CSV.
 - **The reference is the player's own baseline, not a sportsbook line.**
 
 ---
@@ -122,9 +124,9 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 ---
 
 ## 11. Locking, grading, record
-- Every run rewrites a game's projections **only before tip**; at tip they freeze (`reports/live/locked/<date>/<game>.csv`).
+- Runs every 30 minutes. Each run rewrites a game's projections until **1 hour before tip**; the first run inside that hour writes the **final lock** (`reports/live/locked/<date>/<game>.csv`, never changed again). A run that starts within 80 minutes of a lock waits for it inside the job, because GitHub's schedule can be late or skip runs. If no run lands in that hour, the last earlier version stands.
 - After the game is final, each board lean is graded from ESPN's box score: **win +0.833u, loss −1u (-120), push 0, did not play = void.**
-- Record and ROI (all leans, 🔥 strong, last night, by stat) shown on the board and in Telegram. Break-even at -120 = 54.5%.
+- Two records, kept separately: **strongest (70%+, the board)** and **all leans** — each with last night, shown on the board and in Telegram. Break-even at -120 = 54.5%.
 
 ---
 

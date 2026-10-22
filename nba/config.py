@@ -35,3 +35,11 @@ COMBOS = {"pra": ["pts", "reb", "ast"], "pr": ["pts", "reb"],
 # 0.40 -> 27% (keeps ~40%). Players without a qualifying last season get no projection.
 VOL_MAX = 0.45
 VOL_MIN_GAMES = 20
+# Board: only leans with calibrated probability >= STRONG_MIN are shown (2025 backtest: 75.8% hit,
+# ~10/night). Ranking = model probability alone (beat model+history blends 7/7 seasons).
+STRONG_MIN = 0.70
+# Star first-game unders (last-season PTS >= STAR_PTS, player's first game) are flagged:
+# 70%+ ones hit 66.7% vs 77.8% stated (n=42, 2019-25).
+STAR_PTS = 22
+# Final lock = first run at/after tip - LOCK_LEAD_MIN (Actions waits in-job for it).
+LOCK_LEAD_MIN = 60

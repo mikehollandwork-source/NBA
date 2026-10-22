@@ -12,13 +12,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nba.config import ROOT, LIVE_SEASON
+from nba.config import ROOT, LIVE_SEASON, STRONG_MIN
 from nba.ingest import espn
 
 LOCKS = ROOT / "reports" / "live" / "locked"
 LEDGER = ROOT / "reports" / "live" / "record.csv"
 WIN = 100 / 120
-STRONG = 0.65
+STRONG = STRONG_MIN  # board shows only these; record keeps all leans AND strongest separately
 
 
 def _box(d: str) -> pd.DataFrame:
@@ -169,10 +169,12 @@ def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
     if led.empty:
         return lead + "Lean record @ -120 (reference only): no graded leans yet."
     last = led.date.max()
+    strong = led.prob >= STRONG - 0.005  # recomputed from the stated prob (old ledgers used 65%)
     lines = [lead + "**Lean record @ -120 (reference only: vs player's own baseline, not real prices)**",
+             f"- Strongest ({STRONG:.0%}+, the board): {fmt(summarize(led, strong))}",
+             f"  - last night ({last}): {fmt(summarize(led, strong & (led.date == last)))}",
              f"- All leans: {fmt(summarize(led))}",
-             f"- 🔥 Strong (65%+): {fmt(summarize(led, led.strong))}",
-             f"- Last night ({last}): {fmt(summarize(led, led.date == last))}"]
+             f"  - last night ({last}): {fmt(summarize(led, led.date == last))}"]
     by = []
     for s, x in led.groupby("stat"):
         t = summarize(x)

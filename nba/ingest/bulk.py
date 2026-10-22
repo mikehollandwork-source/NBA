@@ -15,7 +15,8 @@ DATASETS = ["nbastatsv3", "cdnnba", "matchups", "shotdetail"]
 
 
 def _run(cmd, cwd=None):
-    subprocess.run(cmd, cwd=cwd, check=True, env={"GIT_LFS_SKIP_SMUDGE": "1", "PATH": "/usr/bin:/bin:/usr/local/bin"})
+    import os
+    subprocess.run(cmd, cwd=cwd, check=True, env={**os.environ, "GIT_LFS_SKIP_SMUDGE": "1"})
 
 
 def fetch(season: int, datasets=DATASETS, playoffs: bool = False) -> dict[str, Path]:

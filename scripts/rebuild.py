@@ -46,6 +46,10 @@ def s1():
 
 def s2():
     import runpy
+    from nba.ingest import bulk
+    for y in SEASONS:  # nba.com mirror files: shot charts (game list), matchups 2017+, CDN play-by-play 2020+
+        ds = ["shotdetail"] + (["matchups"] if y >= 2017 else []) + (["cdnnba"] if y >= 2020 else [])
+        bulk.fetch(y, ds)
     runpy.run_path(str(Path(__file__).parent / "reconcile_all.py"), run_name="__main__")
 
 

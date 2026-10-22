@@ -1,0 +1,110 @@
+game,player,lean_stat,lean_side,lean_ref,lean_prob_cal,actual,res,lock_source
+GSW@LAL,Luka Doncic,pa,under,41.5,0.7238271463040944,35.0,win,game-day model
+MIN@MIA,Giannis Antetokounmpo,pra,under,42.5,0.6954946918057664,42.0,win,game-day model
+GSW@LAL,Al Horford,ast,under,2.5,0.6787953956937207,2.0,win,game-day model
+IND@NOP,Andrew Nembhard,ast,under,7.5,0.6763234407182268,9.0,loss,game-day model
+SAC@LAC,Darius Garland,reb,over,1.5,0.6732880391182494,1.0,loss,game-day model
+GSW@LAL,Draymond Green,ast,under,5.5,0.6704867640873897,8.0,loss,game-day model
+UTA@MEM,Jerami Grant,pra,under,23.5,0.6690181199604385,20.0,win,game-day model
+ATL@ORL,Luguentz Dort,ast,over,0.5,0.666141304992746,0.0,loss,preseason model
+UTA@MEM,Isaiah Collier,ra,under,9.5,0.6647401925581828,6.0,win,game-day model
+MIN@MIA,Davion Mitchell,ast,under,6.5,0.6641572326590771,11.0,loss,game-day model
+CHI@TOR,Norman Powell,ast,under,2.5,0.6563360148426899,1.0,win,game-day model
+UTA@MEM,Cedric Coward,pra,under,21.5,0.6536459052724456,16.0,win,game-day model
+DAL@HOU,Tari Eason,ast,under,1.5,0.6525919057351024,0.0,win,game-day model
+CHI@TOR,Jalen Smith,pra,under,17.5,0.6510691284955463,24.0,loss,game-day model
+ATL@ORL,Nikola Vucevic,reb,under,8.5,0.6502857646980091,1.0,win,preseason model
+MIN@MIA,Klay Thompson,ast,under,1.5,0.6501525350598734,0.0,win,game-day model
+IND@NOP,Ivica Zubac,pra,under,26.5,0.6472552368575186,31.0,loss,game-day model
+IND@NOP,Jarace Walker,ast,under,2.5,0.6457423211312213,2.0,win,game-day model
+UTA@MEM,Cam Spencer,ast,under,5.5,0.6450945853254332,2.0,win,game-day model
+CHA@BKN,Royce O'Neale,ast,under,2.5,0.643306526472298,0.0,win,game-day model
+MIN@MIA,Bobby Portis,pr,under,19.5,0.6424225598989203,11.0,win,game-day model
+CHA@BKN,Grayson Allen,pra,under,22.5,0.6421509606737142,28.0,loss,game-day model
+IND@NOP,Bennedict Mathurin,ast,under,2.5,0.6416107316147592,2.0,win,game-day model
+MIN@MIA,Tim Hardaway Jr.,ast,under,1.5,0.641506362197778,1.0,win,game-day model
+PHX@POR,Toumani Camara,ast,under,2.5,0.6371749225636377,3.0,loss,game-day model
+CHI@TOR,Josh Giddey,ast,under,8.5,0.6356772190693805,6.0,win,game-day model
+SAC@LAC,Derrick Jones Jr.,ast,under,1.5,0.6343966005714559,5.0,loss,game-day model
+CHI@TOR,Tre Jones,ast,under,5.5,0.6319869136534468,0.0,win,game-day model
+CHI@TOR,Isaac Okoro,ast,under,1.5,0.6303164119948383,1.0,win,game-day model
+PHX@POR,Ja Morant,pra,under,29.5,0.6299410318625822,27.0,win,game-day model
+GSW@LAL,Stephen Curry,pa,under,30.5,0.6293333410317731,24.0,win,game-day model
+GSW@LAL,Brandon Williams,pra,under,18.5,0.6249242220332173,21.0,loss,game-day model
+PHX@POR,Scoot Henderson,pa,under,17.5,0.6248093075461278,16.0,win,game-day model
+CHI@TOR,Jakob Poeltl,pra,under,18.5,0.6227544486621602,9.0,win,game-day model
+PHX@POR,Collin Gillespie,ast,under,4.5,0.6197511655300745,2.0,win,game-day model
+IND@NOP,Zion Williamson,pts,under,20.5,0.6196646792957281,22.0,loss,game-day model
+PHX@POR,Donovan Clingan,ra,under,13.5,0.6196622065085252,9.0,win,game-day model
+MIN@MIA,Jaden McDaniels,reb,over,3.5,0.6154426833866292,8.0,win,game-day model
+CHA@BKN,Julius Randle,pa,under,25.5,0.6142830630890612,40.0,loss,game-day model
+GSW@LAL,Sandro Mamukelashvili,pr,under,15.5,0.6141459181794117,9.0,win,game-day model
+MIN@MIA,Rudy Gobert,pra,under,23.5,0.6139877973095561,21.0,win,game-day model
+PHX@POR,Deni Avdija,ast,under,6.5,0.6137855900470999,4.0,win,game-day model
+IND@NOP,Saddiq Bey,ast,under,2.5,0.613567792861647,0.0,win,game-day model
+ATL@ORL,Jalen Johnson,reb,under,10.5,0.6116087646533489,14.0,loss,preseason model
+CHA@BKN,Noah Clowney,ast,under,1.5,0.6096930454664236,1.0,win,game-day model
+CHA@BKN,Moussa Diabate,ra,under,10.5,0.6070602999920925,10.0,win,game-day model
+CHI@TOR,Kawhi Leonard,pts,under,27.5,0.6070272029727933,23.0,win,game-day model
+MIL@WAS,Bilal Coulibaly,reb,over,3.5,0.6061717296499198,2.0,loss,preseason model
+PHX@POR,Jrue Holiday,pra,under,26.5,0.6054382834894845,13.0,win,game-day model
+UTA@MEM,Jaylen Wells,ast,under,1.5,0.6050814543262281,0.0,win,game-day model
+MIL@WAS,Ryan Rollins,reb,under,4.5,0.603595803900176,6.0,loss,preseason model
+ATL@ORL,CJ McCollum,pra,under,25.5,0.6034276249820227,24.0,win,preseason model
+PHX@POR,Jordan Goodwin,pra,under,14.5,0.6023745378943626,7.0,win,game-day model
+DAL@HOU,Reed Sheppard,ast,under,3.5,0.6020629319182234,4.0,loss,game-day model
+IND@NOP,Herbert Jones,ast,under,2.5,0.6018704632563089,0.0,win,game-day model
+CHA@BKN,Brandon Miller,ast,under,3.5,0.6017347698099745,1.0,win,game-day model
+MIL@WAS,Myles Turner,ast,under,1.5,0.6013880803127446,3.0,loss,preseason model
+SAC@LAC,De'Andre Hunter,pa,under,14.5,0.6012053815303019,7.0,win,game-day model
+ATL@ORL,Desmond Bane,reb,over,3.5,0.601104879395585,5.0,win,preseason model
+ATL@ORL,Jalen Suggs,ast,under,5.5,0.6010207255720187,5.0,win,preseason model
+CHI@TOR,RJ Barrett,ast,under,3.5,0.6007752615182841,3.0,win,game-day model
+DAL@HOU,Alperen Sengun,reb,over,8.5,0.5996715402919969,10.0,win,game-day model
+CHA@BKN,Naz Reid,ra,under,8.5,0.5990984370211151,18.0,loss,game-day model
+MIN@MIA,LaMelo Ball,pra,under,31.5,0.5989027689229132,29.0,win,game-day model
+MIL@WAS,Bub Carrington,reb,over,2.5,0.598534926526952,1.0,loss,preseason model
+PHX@POR,Miles Bridges,pra,under,25.5,0.5982249071572843,12.0,win,game-day model
+MIN@MIA,Andrew Wiggins,ast,under,2.5,0.5976393524909861,1.0,win,game-day model
+IND@NOP,Kelly Oubre Jr.,ast,under,1.5,0.5975884198082585,3.0,loss,game-day model
+SAC@LAC,Keegan Murray,ra,over,6.5,0.5962537152143997,4.0,loss,game-day model
+PHX@POR,Dillon Brooks,pr,under,23.5,0.5960799041255753,14.0,win,game-day model
+MIL@WAS,Alex Sarr,reb,under,7.5,0.5954634476752536,9.0,loss,preseason model
+UTA@MEM,Jaren Jackson Jr.,pra,under,26.5,0.5954042452139817,22.0,win,game-day model
+IND@NOP,Jeremiah Fears,ast,under,3.5,0.594882095613657,1.0,win,game-day model
+DAL@HOU,Max Christie,reb,over,2.5,0.5937092576410349,3.0,win,game-day model
+MIL@WAS,Jaime Jaquez Jr.,pra,under,24.5,0.5884474639131992,31.0,loss,preseason model
+GSW@LAL,Austin Reaves,ast,under,5.5,0.5884014494756012,6.0,loss,game-day model
+MIN@MIA,Anthony Edwards,pts,under,28.5,0.5881556240237369,45.0,loss,game-day model
+DAL@HOU,Kevin Durant,ast,under,4.5,0.5866488805973908,3.0,win,game-day model
+ATL@ORL,Wendell Carter Jr.,reb,under,7.5,0.5864044171976657,7.0,win,preseason model
+SAC@LAC,Kris Dunn,ast,under,3.5,0.5856373209586967,7.0,loss,game-day model
+UTA@MEM,Keyonte George,pa,under,29.5,0.585605721510739,27.0,win,game-day model
+IND@NOP,Pascal Siakam,ast,under,3.5,0.5848564997095992,1.0,win,game-day model
+CHI@TOR,Immanuel Quickley,pra,over,25.5,0.5827701343028516,34.0,win,game-day model
+DAL@HOU,Cooper Flagg,pr,over,26.5,0.5827240521580248,37.0,win,game-day model
+ATL@ORL,Franz Wagner,reb,over,4.5,0.5814012775403633,6.0,win,preseason model
+ATL@ORL,Nickeil Alexander-Walker,reb,under,3.5,0.5807315903860188,4.0,loss,preseason model
+DAL@HOU,Jabari Smith Jr.,pra,over,23.5,0.5785438906188795,36.0,win,game-day model
+MIN@MIA,Ayo Dosunmu,reb,under,3.5,0.5782737608194765,5.0,loss,game-day model
+ATL@ORL,Dyson Daniels,pts,over,10.5,0.5782724846317068,20.0,win,preseason model
+MIL@WAS,Kyshawn George,ast,under,4.5,0.5780557632431889,3.0,win,preseason model
+CHA@BKN,Ryan Kalkbrenner,reb,under,5.5,0.5756743279769336,5.0,win,game-day model
+UTA@MEM,Lauri Markkanen,pts,under,26.5,0.5750248133601811,18.0,win,game-day model
+MIL@WAS,Tre Johnson,ast,over,1.5,0.5743360467872588,0.0,loss,preseason model
+CHI@TOR,Scottie Barnes,pr,over,24.5,0.5740665414417065,29.0,win,game-day model
+SAC@LAC,Zach LaVine,pts,under,18.5,0.5740478718304651,28.0,loss,game-day model
+CHA@BKN,Michael Porter Jr.,pa,under,26.5,0.5739521163464272,27.0,loss,game-day model
+DAL@HOU,Naji Marshall,ast,over,2.5,0.5715438023577561,6.0,win,game-day model
+ATL@ORL,Onyeka Okongwu,reb,under,7.5,0.5712858269439021,5.0,win,preseason model
+DAL@HOU,Amen Thompson,ast,under,5.5,0.5710860482621355,4.0,win,game-day model
+MIN@MIA,Bam Adebayo,pa,under,22.5,0.5708144068773175,19.0,win,game-day model
+CHI@TOR,Matas Buzelis,pra,under,23.5,0.565423704006008,23.0,win,game-day model
+ATL@ORL,Paolo Banchero,pts,over,21.5,0.5639189108924726,35.0,win,preseason model
+DAL@HOU,P.J. Washington,pts,under,13.5,0.563082019896124,10.0,win,game-day model
+MIL@WAS,Kyle Kuzma,reb,under,4.5,0.5619024652493911,6.0,loss,preseason model
+MIL@WAS,Anthony Davis,ast,under,2.5,0.5616629714072869,4.0,loss,preseason model
+PHX@POR,Devin Booker,pa,under,31.5,0.5573318109829063,25.0,win,game-day model
+IND@NOP,Trey Murphy III,pa,under,24.5,0.5552468226734446,12.0,win,game-day model
+MIL@WAS,Tyler Herro,ast,over,3.5,0.5316629666869929,9.0,win,preseason model
+GSW@LAL,Quentin Grimes,ast,over,2.5,0.5160841067511186,4.0,win,game-day model

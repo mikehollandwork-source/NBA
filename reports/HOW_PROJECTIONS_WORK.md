@@ -87,10 +87,14 @@ The models were trained on players who played, so they over-give minutes to deep
 
 ---
 
-## 7. The 80% ranges
-- Each stat's game-to-game spread follows a **negative binomial** with variance = k × projection^p, fit on 150k out-of-sample games: PTS k=4.69 p=0.84 · REB 1.36 / 1.01 · AST 1.23 / 1.01.
-- PTS/REB/AST are simulated **together** (4,000 sims) with correlations 0.73 (PTS–REB), 0.46 (PTS–AST), 0.54 (REB–AST) on the latent scale, tuned so PRA's spread matches reality.
-- Range = 10th to 90th percentile. Backtest: 80% ranges contain the result ~80% of the time overall (76% for high-swing players, 84% for steady ones — not yet player-specific).
+## 7. The 80% ranges (numpy simulation, `nba/sim.py`)
+- **20,000 simulated games per player.** Each one:
+  1. draws tonight's **minutes** from the real spread of actual ÷ projected minutes for players with similar projections (captures early exits, foul trouble, blowouts);
+  2. scales the PTS/REB/AST projections to those minutes;
+  3. draws PTS, REB, AST from negative binomials (variance = k × mean^p, fit on 150k out-of-sample games) **scaled by the player's own past miss size** (last 250 games, blended with the league curve at the weight of 100 games);
+  4. links the three with a Gaussian copula (correlation fit after minutes are drawn, tuned so PRA's spread matches reality).
+- Range = 10th to 90th percentile. Backtest 2023-25: 80% ranges contain the result ~81% of the time for steady and swingy players alike (before the player-specific spread: 85% vs 78%).
+- The same draws give the Kalshi rung probabilities. Details: `reports/phase2/sim_improvements.md`.
 
 ---
 
@@ -136,13 +140,13 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 | Error reduction vs season average | 25% | 8% | 7% | 7% | 12% |
 | Typical miss (game-day, all games) | 4.6 | 4.7 | 1.9 | 1.4 | 6.1 |
 
-Known weaknesses: stars run ~1.9 pts low in their first game; ranges aren't player-specific; minutes rule untested; no real book lines yet to measure market edge.
+Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untested; no real book lines yet to measure market edge.
 
 ---
 
 ## 13. Kalshi paper tracking (not picks)
 - Every run before tip pulls Kalshi's player ladders (PTS, REB, AST, PRA — e.g. "Jokic: 25+ points") from Kalshi's free public API.
-- For every rung: our probability P(stat ≥ k) from the same simulation as the ranges, vs Kalshi's price (mid of bid/ask).
+- For every rung: our probability P(stat ≥ k) from the same 20,000-game simulation as the ranges (§7), vs Kalshi's price (mid of bid/ask).
 - "Paper picks" = best rung per player-stat where buying at the ask plus Kalshi's fee (0.07 × price × (1 − price)) has ≥5% expected return. **Shown for tracking only, not as bets** — on Oct 21 this rule went 53-187 (−19% ROI) at real prices.
 - Graded after each game at the real price paid; the record also reports a Brier score for model vs market on every rung (lower = better). If the model never beats Kalshi on that score, there is no edge.
 - Prices are never used as model inputs.

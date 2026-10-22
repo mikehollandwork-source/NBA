@@ -19,7 +19,6 @@ import numpy as np
 import pandas as pd
 import requests
 
-from nba.analysis import season_sim as ss
 from nba.config import PROC
 
 B = "https://api.elections.kalshi.com/trade-api/v2"
@@ -97,15 +96,18 @@ def pre_tip_quotes(mk: pd.DataFrame, cache=None) -> pd.DataFrame:
 
 
 def model_sims(proj: pd.DataFrame) -> dict:
-    """pid -> dict(stat -> simulated outcomes), from locked/live projections."""
-    P = pd.read_parquet(PROC / "projections_all_games_oos.parquet")
-    var, C = ss.fit_params(P, -1)
+    """pid -> dict(stat -> simulated outcomes). Reuses tonight's ranges simulation (nba/sim.py)
+    when available so ranges and rung probabilities come from the same draws."""
+    from nba import sim
+    need = proj[[sim.cached(p) is None for p in proj.pid.astype(str)]]
+    need = need[np.isfinite(need[["proj_pts", "proj_reb", "proj_ast", "proj_min"]].to_numpy(dtype=float)).all(1)]
+    if len(need):
+        sim.simulate(need)
     out = {}
     for _, r in proj.iterrows():
-        mu = np.array([[r.proj_pts, r.proj_reb, r.proj_ast]], float)
-        if not np.isfinite(mu).all():
+        x = sim.cached(r.pid)
+        if x is None:
             continue
-        x = ss.draw(np.clip(mu, 0.05, None), var, C, n_sims=N_SIMS)[:, 0, :]
         out[str(r.pid)] = {"pts": x[:, 0], "reb": x[:, 1], "ast": x[:, 2], "pra": x.sum(1)}
     return out
 

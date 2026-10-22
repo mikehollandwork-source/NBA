@@ -53,18 +53,21 @@ jobs:
         run: |
           git config user.name "nba-projections-bot"
           git config user.email "actions@users.noreply.github.com"
+      - name: Grade finished games (record + ROI @ -120)
+        continue-on-error: true
+        run: python -u scripts/grade.py
       - name: Projections (locks games that have tipped)
         id: live
         continue-on-error: true
         run: python -u scripts/live.py "$D"
-      - name: Telegram
-        if: steps.live.outcome == 'success'
+      - name: Telegram (results always; board if there is a slate)
+        if: always()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python -u scripts/telegram_notify.py "$D"
-      - name: Commit locks + Telegram state
-        if: steps.live.outcome == 'success'
+      - name: Commit locks, record, Telegram state
+        if: always()
         run: |
           git add reports/live
           git diff --cached --quiet || git commit -q -m "Live projections $D"

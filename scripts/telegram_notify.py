@@ -89,17 +89,55 @@ def snapshot(r) -> dict:
     return s
 
 
+def results_messages():
+    """Send ✅/❌ for every newly graded game + the updated record (state in
+    reports/live/telegram_record_state.json)."""
+    from nba import record
+    led_path = record.LEDGER
+    if not led_path.exists():
+        return
+    led = pd.read_csv(led_path)
+    if led.empty:
+        return
+    st_path = ROOT / "reports/live/telegram_record_state.json"
+    done = set(json.loads(st_path.read_text())) if st_path.exists() else set()
+    new = [k for k in (led.date + "|" + led.game).unique() if k not in done]
+    if not new:
+        return
+    for k in sorted(new):
+        dte, game = k.split("|")
+        x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
+        lines = [f"✅ <b>Results {html.escape(game)}</b> ({dte})"]
+        for _, q in x.iterrows():
+            icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
+            tag = "🔥 " if q.strong else ""
+            act = "DNP" if q.result == "void" else f"{q.actual:g}"
+            lines.append(f"{icon} {tag}{html.escape(q.player)} {q.stat.upper()} {q.side} {q.ref:g} → {act}")
+        s = record.summarize(x)
+        lines.append(f"Game: {record.fmt(s)}")
+        send("\n".join(lines))
+    send(html.escape(record.report(led)).replace("**", ""))
+    st_path.write_text(json.dumps(sorted(done | set(new))))
+
+
 def main(d: date):
-    r = pd.read_parquet(ROOT / f"data/live/projections_{d}.parquet")
+    results_messages()
+    proj = ROOT / f"data/live/projections_{d}.parquet"
+    if not proj.exists():
+        print(f"no projections for {d}; results only")
+        return
+    r = pd.read_parquet(proj)
     G = pd.read_parquet(ROOT / f"data/live/games_{d}.parquet")
     csv = ROOT / f"reports/live/game_day_{d}.csv"
     state_path = ROOT / f"reports/live/telegram_state_{d}.json"
     now = snapshot(r)
     if not state_path.exists():
         n_strong = int((r.lean_prob_cal >= STRONG).sum()) if "lean_prob_cal" in r else 0
+        rec = ROOT / "reports/live/record_summary.md"
+        rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
         send(f"🏀 <b>Projections — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} strong leans (🔥 = {STRONG:.0%}+)\n"
              f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
-             f"Players whose PRA swings > {VOL_MAX} get no projection. Locks at tip.")
+             f"Players whose PRA swings > {VOL_MAX} get no projection. Locks at tip.\n\n{rec_txt}")
         for _, g in G.sort_values("tip_utc").iterrows():
             send(game_message(g, r))
         if csv.exists():

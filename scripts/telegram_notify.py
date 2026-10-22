@@ -2,10 +2,11 @@
 
     python scripts/telegram_notify.py 2026-10-22
 
-First run of the day: header + one message per game + full CSV attached.
-Later runs: only what changed since the last send (injury status, leans that
-flipped or moved >= 5 pts, players added/removed, games that just locked),
-plus the updated CSV. State lives in reports/live/telegram_state_<date>.json
+First run of the day: header + one message per game with only the strongest
+leans (STRONG_MIN, 70%+) + full CSV of every player attached.
+Later runs: only what changed among strongest leans (entered/left the list,
+flipped or moved >= 5 pts, injury status) and games that just locked (final
+lock = 1 hour before tip), plus the updated CSV. State lives in reports/live/telegram_state_<date>.json
 (committed, so hourly Actions runs know what was already sent).
 
 Needs secrets TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID; without them it prints
@@ -22,9 +23,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd  # noqa: E402
 import requests  # noqa: E402
 
-from nba.config import ROOT, VOL_MAX  # noqa: E402
+from nba.config import ROOT, VOL_MAX, STRONG_MIN, LOCK_LEAD_MIN  # noqa: E402
 
-STRONG = 0.65  # backtest: stated 65%+ leans hit ~70%+
+STRONG = STRONG_MIN  # backtest 2025: stated 70%+ leans hit 75.8%
 TOKEN, CHAT = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
 API = f"https://api.telegram.org/bot{TOKEN}"
 
@@ -51,9 +52,9 @@ def send_file(path: Path, caption: str):
 def lean_line(q) -> str:
     stat = str(q.lean_stat).upper()
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
-    tag = "🔥 " if round(q.lean_prob_cal, 2) >= STRONG else ""
+    flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
-    return (f"{tag}<b>{html.escape(q.player)}</b>{dtd} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
+    return (f"<b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
             f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f})")
 
 
@@ -61,31 +62,30 @@ def game_message(g, r) -> str:
     tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
     x = r[(r.gameId == int(g.event_id))]
     state = x.lock_state.iloc[0] if len(x) else ""
-    lock = " 🔒" if state == "LOCKED" else ""
-    p = x[x.get("projected", True) == True]  # noqa: E712
+    if state == "LOCKED":
+        at = x.locked_at_utc.iloc[0] if "locked_at_utc" in x else None
+        lock = " · 🔒 locked" + (f" {pd.Timestamp(at).tz_convert('America/New_York'):%-I:%M %p}" if pd.notna(at) else "")
+    else:
+        cut = pd.Timestamp(g.tip_utc) - pd.Timedelta(minutes=LOCK_LEAD_MIN)
+        lock = f" · locks {cut.tz_convert('America/New_York'):%-I:%M %p}"
+    p = x[x.get("projected", True).astype(str).str.lower() == "true"] if "projected" in x else x
     p = p[p.lean_stat.apply(lambda v: isinstance(v, str)) & (p.proj_min >= 10)].sort_values("lean_prob_cal", ascending=False)
     lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
-    strong_mask = p.lean_prob_cal.round(2) >= STRONG  # match the displayed %
-    strong, rest = p[strong_mask], p[~strong_mask]
+    strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     if len(strong):
-        lines.append(f"<b>Strong leans ({STRONG:.0%}+)</b>")
         lines += [lean_line(q) for _, q in strong.iterrows()]
-    if len(rest):
-        lines.append("Other leans")
-        lines += [lean_line(q) for _, q in rest.iterrows()]
+    else:
+        lines.append(f"No leans at {STRONG:.0%}+")
     kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
     if kp.exists():
         from nba import kalshi
         kb = pd.read_parquet(kp)
         if len(kb):
             kb = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
-            kb = kb.sort_values("exp_roi", ascending=False).head(5)
+            kb = kb.sort_values("exp_roi", ascending=False).head(3)
         if len(kb):
             lines.append("📊 <b>Kalshi paper — NOT picks</b> (biggest model vs market gaps)")
             lines += [f"📊 {html.escape(q.player)} — {html.escape(kalshi.describe(q))}" for _, q in kb.iterrows()]
-    skipped = x[(x.get("projected", True) == False) & (x.proj_min >= 10)]  # noqa: E712
-    if len(skipped):
-        lines.append("No projection (too volatile / no history): " + ", ".join(html.escape(n) for n in skipped.player))
     return "\n".join(lines)
 
 
@@ -95,6 +95,9 @@ def snapshot(r) -> dict:
         s[str(q.pid)] = {"player": q.player, "game": int(q.gameId), "status": str(q.get("status", "")),
                          "lean": f"{q.lean_stat}|{q.lean_side}" if isinstance(q.get("lean_stat"), str) else "",
                          "prob": round(float(q.lean_prob_cal), 3) if pd.notna(q.get("lean_prob_cal")) else None,
+                         "strong": bool(pd.notna(q.get("lean_prob_cal")) and round(float(q.lean_prob_cal), 2) >= STRONG
+                                        and float(q.get("proj_min", 0) or 0) >= 10
+                                        and str(q.get("projected", True)).lower() == "true"),
                          "lock": str(q.get("lock_state", ""))}
     return s
 
@@ -117,14 +120,16 @@ def results_messages():
     for k in sorted(new):
         dte, game = k.split("|")
         x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
-        lines = [f"✅ <b>Results {html.escape(game)}</b> ({dte})"]
-        for _, q in x.iterrows():
+        sx = x[x.prob >= STRONG - 0.005]
+        lines = [f"✅ <b>Results {html.escape(game)}</b> ({dte}) — strongest ({STRONG:.0%}+)"]
+        for _, q in sx.iterrows():
             icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
-            tag = "🔥 " if q.strong else ""
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
-            lines.append(f"{icon} {tag}{html.escape(q.player)} {q.stat.upper()} {q.side} {q.ref:g} → {act}")
-        s = record.summarize(x)
-        lines.append(f"Game: {record.fmt(s)}")
+            lines.append(f"{icon} {html.escape(q.player)} {q.stat.upper()} {q.side} {q.ref:g} → {act}")
+        if sx.empty:
+            lines.append(f"no {STRONG:.0%}+ leans this game")
+        lines.append(f"Strongest: {record.fmt(record.summarize(sx))}")
+        lines.append(f"All leans: {record.fmt(record.summarize(x))}")
         send("\n".join(lines))
     kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
     send(html.escape(record.report(led, kled)).replace("**", ""))
@@ -173,12 +178,14 @@ def main(d: date):
     state_path = ROOT / f"reports/live/telegram_state_{d}.json"
     now = snapshot(r)
     if not state_path.exists():
-        n_strong = int((r.lean_prob_cal >= STRONG).sum()) if "lean_prob_cal" in r else 0
+        n_strong = sum(v["strong"] for v in now.values())
         rec = ROOT / "reports/live/record_summary.md"
         rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
-        send(f"🏀 <b>Projections — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} strong leans (🔥 = {STRONG:.0%}+)\n"
+        send(f"🏀 <b>Strongest leans — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} leans at {STRONG:.0%}+\n"
              f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
-             f"Players whose PRA swings > {VOL_MAX} get no projection. Locks at tip.\n\n{rec_txt}")
+             f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "
+             f"Players whose PRA swings > {VOL_MAX} get no projection. Final lock {LOCK_LEAD_MIN} min before tip; "
+             f"full projections in the CSV.\n\n{rec_txt}")
         for _, g in G.sort_values("tip_utc").iterrows():
             send(game_message(g, r))
         if csv.exists():
@@ -188,25 +195,33 @@ def main(d: date):
         changed_games, notes = set(), []
         for pid, n in now.items():
             o = old.get(pid)
-            if o is None:
-                notes.append(f"➕ {n['player']} added"); changed_games.add(n["game"])
-                continue
-            if n["lock"] == "LOCKED" and o["lock"] != "LOCKED":
-                changed_games.add(n["game"]); continue
+            was = bool(o and o.get("strong", o.get("prob") is not None and o["prob"] >= STRONG))
+            if o is not None and n["lock"] == "LOCKED" and o["lock"] != "LOCKED":
+                changed_games.add(n["game"]); continue  # final lock -> resend that game
             if n["lock"] == "LOCKED":
                 continue
-            if n["status"] != o["status"]:
-                notes.append(f"🩹 {n['player']}: {o['status'] or 'Active'} → {n['status'] or 'Active'}"); changed_games.add(n["game"])
-            if n["lean"] != o["lean"] or (n["prob"] is not None and o["prob"] is not None and abs(n["prob"] - o["prob"]) >= 0.05):
-                notes.append(f"↔️ {n['player']}: lean {o['lean'] or '—'} {o['prob'] or ''} → {n['lean'] or '—'} {n['prob'] or ''}")
-                changed_games.add(n["game"])
+            if not (n["strong"] or was):
+                continue  # only the strongest leans are on the board
+            if n["strong"] and not was:
+                notes.append(f"➕ {n['player']}: {n['lean']} {n['prob']:.0%} now on the board"); changed_games.add(n["game"])
+            elif was and not n["strong"]:
+                why = f"{n['lean'] or 'no lean'} {n['prob']:.0%}" if n["prob"] is not None else "removed (ruled out?)"
+                notes.append(f"➖ {n['player']} off the board ({why})"); changed_games.add(n["game"])
+            else:
+                if n["status"] != o["status"]:
+                    notes.append(f"🩹 {n['player']}: {o['status'] or 'Active'} → {n['status'] or 'Active'}"); changed_games.add(n["game"])
+                if n["lean"] != o["lean"] or abs(n["prob"] - o["prob"]) >= 0.05:
+                    notes.append(f"↔️ {n['player']}: {o['lean']} {o['prob']:.0%} → {n['lean']} {n['prob']:.0%}")
+                    changed_games.add(n["game"])
         for pid, o in old.items():
-            if pid not in now and o["lock"] != "LOCKED":
-                notes.append(f"➖ {o['player']} removed (ruled out?)"); changed_games.add(o["game"])
+            was = o.get("strong", o.get("prob") is not None and o["prob"] >= STRONG)
+            if pid not in now and was and o["lock"] != "LOCKED":
+                notes.append(f"➖ {o['player']} off the board (ruled out?)"); changed_games.add(o["game"])
         if not changed_games:
             print("no changes; nothing sent")
         else:
-            send(f"🔄 <b>Update — {pd.Timestamp.now(tz='America/New_York'):%-I:%M %p ET}</b>\n" + "\n".join(html.escape(x) for x in notes[:40]))
+            if notes:
+                send(f"🔄 <b>Update — {pd.Timestamp.now(tz='America/New_York'):%-I:%M %p ET}</b>\n" + "\n".join(html.escape(x) for x in notes[:40]))
             for _, g in G[G.event_id.astype(int).isin(changed_games)].sort_values("tip_utc").iterrows():
                 send(game_message(g, r))
             if csv.exists():

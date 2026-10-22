@@ -1,10 +1,13 @@
-# Hourly from noon ET: projections for today's slate -> lock at tip -> Telegram.
+# Every 30 min from noon ET: projections for today's slate -> Telegram.
+# Final lock = 1 hour before tip. GitHub cron runs can start late or be skipped, so a run
+# that starts within 80 min of a lock waits in-job (scripts/wait_for_lock.py) and runs again
+# right at the lock time (up to 3 locks per job).
 # Cron is UTC: 16:00-03:00 UTC covers noon ET to 11 pm ET (EDT; one hour later in EST).
 name: live-projections
 on:
   schedule:
-    - cron: "5 16-23 * * *"
-    - cron: "5 0-3 * * *"
+    - cron: "5,35 16-23 * * *"
+    - cron: "5,35 0-3 * * *"
   workflow_dispatch:
     inputs:
       date:
@@ -18,7 +21,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -56,27 +59,34 @@ jobs:
       - name: Grade finished games (record + ROI @ -120)
         continue-on-error: true
         run: python -u scripts/grade.py
-      - name: Projections (locks games that have tipped)
+      - name: Projections + Telegram + push (again at each lock time within 80 min)
         id: live
-        continue-on-error: true
-        run: python -u scripts/live.py "$D"
-      - name: Telegram (results always; board if there is a slate)
-        if: always()
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python -u scripts/telegram_notify.py "$D"
-      - name: Commit locks, record, Telegram state
-        if: always()
         run: |
-          git add reports/live
-          git diff --cached --quiet || git commit -q -m "Live projections $D"
-          git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+          ok=1
+          cycle() {
+            python -u scripts/live.py "$D" || ok=0
+            python -u scripts/telegram_notify.py "$D" || echo "telegram failed"
+            git add reports/live
+            git diff --cached --quiet || git commit -q -m "Live projections $D"
+            for i in 1 2 3 4; do
+              git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
+              sleep $((2 ** i))
+            done
+          }
+          cycle
+          for n in 1 2 3; do
+            python -u scripts/wait_for_lock.py "$D" --within 80 || break
+            cycle
+          done
+          [ "$ok" = 1 ] || echo "LIVE_FAILED=1" >> "$GITHUB_ENV"
       - name: Save ESPN cache
         uses: actions/cache/save@v4
         with:
           key: espn-live-${{ github.run_id }}
           path: data/raw/espn/2026
-      - name: Fail if no games / error (visible in Actions)
-        if: steps.live.outcome != 'success'
+      - name: Note if live.py failed or no games today (check log)
+        if: env.LIVE_FAILED == '1'
         run: echo "live.py failed or no games today (check log)"

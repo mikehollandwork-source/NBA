@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS, VOL_MAX, VOL_MIN_GAMES
+from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS, VOL_MAX, VOL_MIN_GAMES, STRONG_MIN, STAR_PTS, LOCK_LEAD_MIN
 from nba.ingest import espn, espn_athletes
 from nba.analysis import features, drivers, season_sim as ss
 from nba.analysis.groups import all_features
@@ -245,6 +245,10 @@ def add_leans(r: pd.DataFrame, te: pd.DataFrame, season: int) -> pd.DataFrame:
     for c in keep:
         r[c] = x[c].to_numpy()
     r.loc[r.lean_prob_cal.isna(), "lean_stat"] = None
+    # star first-game under: model overstates these (70%+ hit 66.7% vs 77.8% stated, n=42)
+    r["star_g1_under"] = ((x.pts_lastszn.to_numpy() >= STAR_PTS) & (x.gp.to_numpy() < 1)
+                          & (r.lean_side.to_numpy() == "under"))
+    r["strong"] = r.lean_prob_cal.round(2) >= STRONG_MIN
     return r
 
 
@@ -263,22 +267,49 @@ def lock_path(d: date, g) -> Path:
     return LOCKS / str(d) / f"{g.away}@{g.home}.csv"
 
 
-def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="game-day model") -> pd.DataFrame:
-    """Lock rule: before tip (status Scheduled and now < tip) a game's projections are
-    (re)written to reports/live/locked/<date>/<away>@<home>.csv. Once the game has
-    started, that file is never touched again and the sheet shows the locked rows.
+def _is_final(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        x = pd.read_csv(path, usecols=lambda c: c == "lock_final", nrows=1)
+    except (pd.errors.EmptyDataError, ValueError):
+        return False
+    return len(x) > 0 and "lock_final" in x and str(x.lock_final.iloc[0]).lower() == "true"
+
+
+def writable_games(G: pd.DataFrame, d: date, now) -> set:
+    """Games whose lock file may still be (re)written: scheduled, before tip, not final yet."""
+    out = set()
+    for _, g in G.iterrows():
+        if g.status == "Scheduled" and now < pd.Timestamp(g.tip_utc) and not _is_final(lock_path(d, g)):
+            out.add(g.event_id)
+    return out
+
+
+def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="game-day model",
+                writable: set | None = None) -> pd.DataFrame:
+    """Lock rule (LOCK_LEAD_MIN = 60):
+    - runs before tip - 60 min rewrite reports/live/locked/<date>/<away>@<home>.csv (pre-lock);
+    - the first run at/after tip - 60 min (and before tip) writes the FINAL lock (lock_final=True);
+    - a final file is never touched again; if no run lands in that hour, the last pre-lock file
+      becomes the lock at tip. `now` = run start (when the injury/roster data was pulled).
     A game with no pre-tip file is marked 'no pre-tip projection' and is not scored."""
     now = now or pd.Timestamp.now(tz="UTC")
+    writable = writable_games(G, d, now) if writable is None else writable
     out = []
     for _, g in G.iterrows():
         tip = pd.Timestamp(g.tip_utc)
+        cutoff = tip - pd.Timedelta(minutes=LOCK_LEAD_MIN)
         path = lock_path(d, g)
         rows = r[r.gameId == int(g.event_id)].copy()
-        if g.status == "Scheduled" and now < tip:
+        if g.event_id in writable:
+            final = now >= cutoff
             rows["locked_at_utc"] = now.isoformat(timespec="seconds")
             rows["lock_source"] = source
             rows["model_commit"] = _git_rev()
-            rows["lock_state"] = "pre-tip (updates until tip)"
+            rows["lock_final"] = final
+            rows["lock_state"] = "LOCKED" if final else \
+                f"pre-lock (final at {cutoff.tz_convert('America/New_York'):%-I:%M %p} ET)"
             path.parent.mkdir(parents=True, exist_ok=True)
             rows.to_csv(path, index=False)
             out.append(rows)
@@ -292,12 +323,13 @@ def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="gam
     return pd.concat(out, ignore_index=True)
 
 
-def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None) -> pd.DataFrame:
-    """Kalshi edges for games still before tip (live quotes) -> locked per game in
-    <game>.kalshi.csv; started games use their locked file. Prices are never model inputs."""
+def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, writable: set | None = None) -> pd.DataFrame:
+    """Kalshi edges for games whose projections are still writable (same lock rule as
+    apply_locks) -> <game>.kalshi.csv; locked games use their file. Prices are never model inputs."""
     from nba import kalshi
     now = now or pd.Timestamp.now(tz="UTC")
-    pre = G[(G.status == "Scheduled") & (pd.to_datetime(G.tip_utc, utc=True) > now)]
+    writable = writable_games(G, d, now) if writable is None else writable
+    pre = G[G.event_id.isin(writable)]
     pk = pd.DataFrame()
     if len(pre):
         try:
@@ -327,6 +359,7 @@ def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None) -> pd.Data
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
+    now = pd.Timestamp.now(tz="UTC")  # run start = when rosters/injuries are pulled; used for locks
     done = completed_games(season, d)
     G, R = slate(d)
     if G.empty:
@@ -346,9 +379,10 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = add_leans(r, te, season)
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
     r = volatility_filter(r, season)
-    r = apply_locks(r, G, d)
+    writable = writable_games(G, d, now)  # decided before any file is written
+    r = apply_locks(r, G, d, now=now, writable=writable)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
-    kb = kalshi_board(r, G, d)
+    kb = kalshi_board(r, G, d, now=now, writable=writable)
     kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
     write_sheet(r, G, R, d, kb)
@@ -360,18 +394,21 @@ def write_sheet(r, G, R, d, kb=None):
     out_dir = ROOT / "reports" / "live"
     out_dir.mkdir(parents=True, exist_ok=True)
     keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
-    skipped = r[(r.proj_min >= 10) & ~r.projected]
     cols = ["team", "opp", "player", "status", "pra_cv_last", "proj_min", "proj_pts", "pts_p10", "pts_p90", "proj_reb", "reb_p10", "reb_p90",
             "proj_ast", "ast_p10", "ast_p90", "proj_pra", "pra_p10", "pra_p90", "proj_fg3m", "proj_stl", "proj_blk", "proj_tov",
-            "lean_stat", "lean_side", "lean_ref", "lean_prob_cal"]
+            "lean_stat", "lean_side", "lean_ref", "lean_prob_cal", "strong", "star_g1_under"]
+    keep = keep.copy()
+    for c in ("strong", "star_g1_under"):
+        if c not in keep:
+            keep[c] = False
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
-    L = [f"# Game-day projections — {d:%a %b %-d, %Y}", "",
-         "Full game-day model (same as the backtests): no betting lines used. 80% range = 10th–90th percentile.",
-         "Teammates-out adjusts automatically once a team has played 3+ games this season.",
-         "Team minutes = 240: top-8 keep model minutes, bench squeezed (rule, not backtested).",
-         f"Baseline: no projection if last season's PRA swing (SD/avg) > {VOL_MAX} or no qualifying last season (<{VOL_MIN_GAMES} games).",
-         "Lean = the stat the model leans on hardest vs the player's OWN baseline (season avg after 5 games, else last season), "
-         "with calibrated hit probability (backtest 2019-25: stated 70%+ -> 77.6% hit). The reference is NOT a sportsbook line.", ""]
+    L = [f"# Strongest leans — {d:%a %b %-d, %Y}", "",
+         f"Only leans the model rates **{STRONG_MIN:.0%}+** (2025 backtest: 75.8% hit; ranked by model probability — "
+         "blending in past hit rates made it worse in 7/7 seasons). Lean = the stat the model leans on hardest vs the "
+         "player's OWN baseline (season avg after 5 games, else last season) — NOT a sportsbook line.",
+         f"⚠️ = star first-game under (model overstates these: 66.7% hit vs 77.8% stated, n=42).",
+         f"Locks: final {LOCK_LEAD_MIN} min before tip. Full projections for every player: game_day_{d}.csv.",
+         f"No projection if last season's PRA swing > {VOL_MAX} or <{VOL_MIN_GAMES} games last season.", ""]
     rec = ROOT / "reports" / "live" / "record_summary.md"
     if rec.exists():
         L += [rec.read_text(), ""]
@@ -383,27 +420,26 @@ def write_sheet(r, G, R, d, kb=None):
         if len(st) and "locked_at_utc" in st and pd.notna(st.locked_at_utc.iloc[0]):
             when = " at " + pd.Timestamp(st.locked_at_utc.iloc[0]).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         L.append(f"## {g.away} @ {g.home} — {tip} · {state}{when if state == 'LOCKED' else ''}")
-        for t in (g.away, g.home):
-            x = keep[keep.team == t]
-            L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM | Swing | Lean", "|---|---|---|---|---|---|---|---|---|"]
+        x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
+        x = x.sort_values("lean_prob_cal", ascending=False)
+        if len(x):
+            L += ["Player | Team | Lean | Model | Proj", "|---|---|---|---|---|"]
             for _, q in x.iterrows():
-                nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "") + (" *" if q.no_nba_history else "")
-                L.append(f"{nm} | {q.proj_min:.0f} | {q.proj_pts:.1f} ({q.pts_p10:.0f}–{q.pts_p90:.0f}) | {q.proj_reb:.1f} | "
-                         f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f} | {q.pra_cv_last:.2f} | "
-                         + (f"**{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** ({q.lean_prob_cal:.0%})"
-                            if isinstance(q.get("lean_stat"), str) else "—"))
-            sk = skipped[skipped.team == t]
-            if len(sk):
-                L.append("No projection: " + ", ".join(
-                    f"{q.player} ({'swing ' + format(q.pra_cv_last, '.2f') if q.no_projection_reason == 'too volatile' else 'no history'})"
-                    for _, q in sk.iterrows()))
-            if kb is not None and len(kb):
-                kx = kb[(kb.team == t) & kb.paper_pick.astype(str).str.lower().eq("true")].sort_values("exp_roi", ascending=False)
-                if len(kx):
-                    L.append("📊 Kalshi paper — NOT picks (model vs real price + fee; on Oct 21 this rule went -19%):")
-                    L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.head(5).iterrows()]
-            o = R[(R.team == t) & (R.status == "Out")]
-            if len(o):
-                L.append("OUT: " + ", ".join(o.player))
-            L.append("")
+                nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
+                flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
+                proj = q.get(f"proj_{q.lean_stat}", float("nan"))
+                L.append(f"{nm}{flag} | {q.team} | **{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** | "
+                         f"{q.lean_prob_cal:.0%} | {proj:.1f}")
+        else:
+            L.append(f"No leans at {STRONG_MIN:.0%}+.")
+        if kb is not None and len(kb):
+            kx = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
+            kx = kx.sort_values("exp_roi", ascending=False)
+            if len(kx):
+                L.append("📊 Kalshi paper — NOT picks (on Oct 21 this rule went -19%):")
+                L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.head(3).iterrows()]
+        o = R[R.team.isin([g.away, g.home]) & (R.status == "Out")]
+        if len(o):
+            L.append("OUT: " + ", ".join(o.player))
+        L.append("")
     (out_dir / f"game_day_{d}.md").write_text("\n".join(L))

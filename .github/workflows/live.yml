@@ -1,0 +1,79 @@
+# Hourly from noon ET: projections for today's slate -> lock at tip -> Telegram.
+# Cron is UTC: 16:00-03:00 UTC covers noon ET to 11 pm ET (EDT; one hour later in EST).
+name: live-projections
+on:
+  schedule:
+    - cron: "5 16-23 * * *"
+    - cron: "5 0-3 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Game date YYYY-MM-DD (default: today ET)"
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: live-projections
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Restore data + models
+        uses: actions/cache/restore@v4
+        with:
+          key: nba-data-v1-none
+          restore-keys: nba-data-v1-
+          fail-on-cache-miss: true
+          path: |
+            data/processed
+            data/models
+            data/raw/bulk/shotdetail_*
+            data/raw/bulk/matchups_2025
+            data/raw/bbref
+      - name: Restore this season's ESPN box-score cache
+        uses: actions/cache/restore@v4
+        with:
+          key: espn-live-none
+          restore-keys: espn-live-
+          path: data/raw/espn/2026
+      - name: Set date (input, else today in US Eastern)
+        run: |
+          D="${{ github.event.inputs.date }}"
+          [ -n "$D" ] || D="$(TZ=America/New_York date +%F)"
+          echo "D=$D" >> "$GITHUB_ENV"
+      - name: Configure git
+        run: |
+          git config user.name "nba-projections-bot"
+          git config user.email "actions@users.noreply.github.com"
+      - name: Projections (locks games that have tipped)
+        id: live
+        continue-on-error: true
+        run: python -u scripts/live.py "$D"
+      - name: Telegram
+        if: steps.live.outcome == 'success'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -u scripts/telegram_notify.py "$D"
+      - name: Commit locks + Telegram state
+        if: steps.live.outcome == 'success'
+        run: |
+          git add reports/live
+          git diff --cached --quiet || git commit -q -m "Live projections $D"
+          git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}"
+      - name: Save ESPN cache
+        uses: actions/cache/save@v4
+        with:
+          key: espn-live-${{ github.run_id }}
+          path: data/raw/espn/2026
+      - name: Fail if no games / error (visible in Actions)
+        if: steps.live.outcome != 'success'
+        run: echo "live.py failed or no games today (check log)"

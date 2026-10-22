@@ -422,7 +422,8 @@ def write_sheet(r, G, R, d, kb=None):
         if c not in keep:
             keep[c] = False
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
-    L = [f"# Strongest leans — {d:%a %b %-d, %Y}", "",
+    L = [f"# Picks — {d:%a %b %-d, %Y}", "",
+         "**✅ PICK** = our model's lean at 70%+. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet).", "",
          f"Only leans the model rates **{STRONG_MIN:.0%}+** (2025 backtest: 75.8% hit; ranked by model probability — "
          "blending in past hit rates made it worse in 7/7 seasons). Lean = the stat the model leans on hardest vs the "
          "player's OWN baseline (season avg after 5 games, else last season) — NOT a sportsbook line.",
@@ -443,21 +444,22 @@ def write_sheet(r, G, R, d, kb=None):
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
         if len(x):
-            L += ["Player | Team | Lean | Model | Proj", "|---|---|---|---|---|"]
+            L += ["✅ PICKS (vs player's own average, not a sportsbook line)", "",
+                  "Player | Team | Pick | Model | Proj", "|---|---|---|---|---|"]
             for _, q in x.iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
                 flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
                 proj = q.get(f"proj_{q.lean_stat}", float("nan"))
-                L.append(f"{nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
+                L.append(f"✅ {nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
                          f"{q.lean_prob_cal:.0%} | {proj:.1f}")
         else:
-            L.append(f"No leans at {STRONG_MIN:.0%}+.")
+            L.append(f"✅ PICKS: none at {STRONG_MIN:.0%}+ this game.")
         if kb is not None and len(kb):
             kx = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
             kx = kx.sort_values("exp_roi", ascending=False)
             if len(kx):
-                L.append("📊 Kalshi paper — NOT picks (on Oct 21 this rule went -19%):")
-                L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.head(3).iterrows()]
+                L.append("🚫 NOT PICKS — Kalshi paper tracking only (do not bet; this rule went -19% on its Oct 21 test):")
+                L += [f"- 🚫 NOT A PICK · {q.player} — {kalshi.describe(q)}" for _, q in kx.head(3).iterrows()]
         o = R[R.team.isin([g.away, g.home]) & (R.status == "Out")]
         if len(o):
             L.append("OUT: " + ", ".join(o.player))

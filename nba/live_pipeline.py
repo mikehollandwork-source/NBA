@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS, VOL_MAX, VOL_MIN_GAMES, STRONG_MIN, STAR_PTS, LOCK_LEAD_MIN
+from nba.config import PROC, ROOT, LIVE_SEASON, SEASON_WINDOWS, VOL_MAX, VOL_MIN_GAMES, STRONG_MIN, STAR_PTS, LOCK_LEAD_MIN, STAT_NAME
 from nba.ingest import espn, espn_athletes
 from nba.analysis import features, drivers, season_sim as ss
 from nba.analysis.groups import all_features
@@ -428,7 +428,7 @@ def write_sheet(r, G, R, d, kb=None):
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
                 flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
                 proj = q.get(f"proj_{q.lean_stat}", float("nan"))
-                L.append(f"{nm}{flag} | {q.team} | **{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** | "
+                L.append(f"{nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
                          f"{q.lean_prob_cal:.0%} | {proj:.1f}")
         else:
             L.append(f"No leans at {STRONG_MIN:.0%}+.")

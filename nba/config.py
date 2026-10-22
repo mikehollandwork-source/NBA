@@ -43,3 +43,6 @@ STRONG_MIN = 0.70
 STAR_PTS = 22
 # Final lock = first run at/after tip - LOCK_LEAD_MIN (Actions waits in-job for it).
 LOCK_LEAD_MIN = 60
+# Plain-English stat names for the board/Telegram (lean stats).
+STAT_NAME = {"pts": "Points", "reb": "Rebounds", "ast": "Assists", "pra": "Pts+Reb+Ast",
+             "pr": "Pts+Reb", "pa": "Pts+Ast", "ra": "Reb+Ast"}

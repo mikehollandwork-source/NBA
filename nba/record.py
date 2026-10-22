@@ -156,30 +156,31 @@ def fmt(s: dict) -> str:
 
 
 def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
+    """✅ Picks record first; Kalshi paper tracking (🚫 not picks) after."""
     lines = []
+    if led.empty:
+        lines.append("**✅ PICKS record @ -120:** no graded picks yet.")
+    else:
+        last = led.date.max()
+        strong = led.prob >= STRONG - 0.005  # recomputed from the stated prob (old ledgers used 65%)
+        lines += ["**✅ PICKS record @ -120 (vs player's own average, not real prices)**",
+                  f"- Picks ({STRONG:.0%}+): {fmt(summarize(led, strong))}",
+                  f"  - last night ({last}): {fmt(summarize(led, strong & (led.date == last)))}",
+                  f"- All leans (reference, not picks): {fmt(summarize(led))}",
+                  f"  - last night ({last}): {fmt(summarize(led, led.date == last))}"]
+        by = []
+        for s_, x in led[strong].groupby("stat"):
+            t = summarize(x)
+            if t["w"] + t["l"]:
+                by.append(f"{s_.upper()} {t['w']}-{t['l']}")
+        if by:
+            lines.append("- Picks by stat: " + " · ".join(by))
     if kled is not None:
-        lines.append("**Kalshi PAPER tracking (not picks; real price + fee, $1 each)**")
+        lines.append("**🚫 NOT PICKS — Kalshi paper tracking (testing only; real price + fee, $1 each)**")
         if len(kled):
             last = kled.date.max()
-            lines += [f"- Paper picks: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
+            lines += [f"- Paper record: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
                       f"- Model vs market: {model_vs_market(kled)}"]
         else:
-            lines.append("- nothing graded yet (starts Oct 22)")
-    lead = "\n".join(lines) + ("\n" if lines else "")
-    if led.empty:
-        return lead + "Lean record @ -120 (reference only): no graded leans yet."
-    last = led.date.max()
-    strong = led.prob >= STRONG - 0.005  # recomputed from the stated prob (old ledgers used 65%)
-    lines = [lead + "**Lean record @ -120 (reference only: vs player's own baseline, not real prices)**",
-             f"- Strongest ({STRONG:.0%}+, the board): {fmt(summarize(led, strong))}",
-             f"  - last night ({last}): {fmt(summarize(led, strong & (led.date == last)))}",
-             f"- All leans: {fmt(summarize(led))}",
-             f"  - last night ({last}): {fmt(summarize(led, led.date == last))}"]
-    by = []
-    for s, x in led.groupby("stat"):
-        t = summarize(x)
-        if t["w"] + t["l"]:
-            by.append(f"{s.upper()} {t['w']}-{t['l']}")
-    if by:
-        lines.append("- By stat: " + " · ".join(by))
+            lines.append("- nothing graded yet (Oct 21 test: 53-187, -19%)")
     return "\n".join(lines)

@@ -54,7 +54,7 @@ def lean_line(q) -> str:
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
-    return (f"<b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
+    return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
             f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f})")
 
 
@@ -75,7 +75,7 @@ def game_message(g, r) -> str:
     if len(strong):
         lines += [lean_line(q) for _, q in strong.iterrows()]
     else:
-        lines.append(f"No leans at {STRONG:.0%}+")
+        lines.append(f"✅ PICKS: none at {STRONG:.0%}+ this game")
     kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
     if kp.exists():
         from nba import kalshi
@@ -84,8 +84,8 @@ def game_message(g, r) -> str:
             kb = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
             kb = kb.sort_values("exp_roi", ascending=False).head(3)
         if len(kb):
-            lines.append("📊 <b>Kalshi paper — NOT picks</b> (biggest model vs market gaps)")
-            lines += [f"📊 {html.escape(q.player)} — {html.escape(kalshi.describe(q))}" for _, q in kb.iterrows()]
+            lines.append("🚫 <b>NOT PICKS — Kalshi paper tracking only</b> (do not bet; -19% on its Oct 21 test)")
+            lines += [f"🚫 NOT A PICK · {html.escape(q.player)} — {html.escape(kalshi.describe(q))}" for _, q in kb.iterrows()]
     return "\n".join(lines)
 
 
@@ -121,15 +121,15 @@ def results_messages():
         dte, game = k.split("|")
         x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
         sx = x[x.prob >= STRONG - 0.005]
-        lines = [f"✅ <b>Results {html.escape(game)}</b> ({dte}) — strongest ({STRONG:.0%}+)"]
+        lines = [f"🏁 <b>PICK results {html.escape(game)}</b> ({dte}, {STRONG:.0%}+)"]
         for _, q in sx.iterrows():
             icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
             lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} {q.ref:g} → {act}")
         if sx.empty:
             lines.append(f"no {STRONG:.0%}+ leans this game")
-        lines.append(f"Strongest: {record.fmt(record.summarize(sx))}")
-        lines.append(f"All leans: {record.fmt(record.summarize(x))}")
+        lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
+        lines.append(f"All leans (reference, not picks): {record.fmt(record.summarize(x))}")
         send("\n".join(lines))
     kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
     send(html.escape(record.report(led, kled)).replace("**", ""))
@@ -152,7 +152,7 @@ def kalshi_results():
         x = k[(k.date == dte) & (k.game == game) & k.paper_pick.astype(str).str.lower().eq("true")]
         if x.empty:
             continue
-        lines = [f"📊 <b>Kalshi paper results {html.escape(game)}</b> ({dte}, not picks)"]
+        lines = [f"🚫 <b>NOT PICKS — Kalshi paper results {html.escape(game)}</b> ({dte})"]
         for _, q in x.iterrows():
             icon = {"win": "✅", "loss": "❌", "void": "⚪"}[q.result]
             rung = f"{q.k}+" if q.side == "YES" else f"under {q.k}"
@@ -181,7 +181,8 @@ def main(d: date):
         n_strong = sum(v["strong"] for v in now.values())
         rec = ROOT / "reports/live/record_summary.md"
         rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
-        send(f"🏀 <b>Strongest leans — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} leans at {STRONG:.0%}+\n"
+        send(f"🏀 <b>Picks — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} picks ({STRONG:.0%}+)\n"
+             f"✅ PICK = our model's lean at {STRONG:.0%}+. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet).\n"
              f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
              f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "
              f"Players whose PRA swings > {VOL_MAX} get no projection. Final lock {LOCK_LEAD_MIN} min before tip; "

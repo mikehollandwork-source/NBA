@@ -337,6 +337,9 @@ def write_sheet(r, G, R, d):
          f"Baseline: no projection if last season's PRA swing (SD/avg) > {VOL_MAX} or no qualifying last season (<{VOL_MIN_GAMES} games).",
          "Lean = the stat the model leans on hardest vs the player's OWN baseline (season avg after 5 games, else last season), "
          "with calibrated hit probability (backtest 2019-25: stated 70%+ -> 77.6% hit). The reference is NOT a sportsbook line.", ""]
+    rec = ROOT / "reports" / "live" / "record_summary.md"
+    if rec.exists():
+        L += [rec.read_text(), ""]
     for _, g in G.sort_values("tip_utc").iterrows():
         tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         st = r[r.gameId == int(g.event_id)]

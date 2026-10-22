@@ -138,5 +138,12 @@ Known weaknesses: stars run ~1.9 pts low in their first game; ranges aren't play
 
 ---
 
-## 13. Where it lives in the code
-`nba/analysis/features.py` (inputs) · `groups.py` (input groups) · `drivers.py` (model settings) · `preseason.py` · `projection.py` · `lean.py` · `nba/live_pipeline.py` (tonight) · `nba/record.py` (grading) · `scripts/telegram_notify.py`
+## 13. Kalshi paper tracking (not picks)
+- Every run before tip pulls Kalshi's player ladders (PTS, REB, AST, PRA — e.g. "Jokic: 25+ points") from Kalshi's free public API.
+- For every rung: our probability P(stat ≥ k) from the same simulation as the ranges, vs Kalshi's price (mid of bid/ask).
+- "Paper picks" = best rung per player-stat where buying at the ask plus Kalshi's fee (0.07 × price × (1 − price)) has ≥5% expected return. **Shown for tracking only, not as bets** — on Oct 21 this rule went 53-187 (−19% ROI) at real prices.
+- Graded after each game at the real price paid; the record also reports a Brier score for model vs market on every rung (lower = better). If the model never beats Kalshi on that score, there is no edge.
+- Prices are never used as model inputs.
+
+## 14. Where it lives in the code
+`nba/analysis/features.py` (inputs) · `groups.py` (input groups) · `drivers.py` (model settings) · `preseason.py` · `projection.py` · `lean.py` · `nba/live_pipeline.py` (tonight) · `nba/record.py` (grading) · `nba/kalshi.py` (paper tracking) · `scripts/telegram_notify.py`

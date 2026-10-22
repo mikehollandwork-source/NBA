@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from nba import record  # noqa: E402
 
 led = record.grade_all()
-txt = record.report(led)
+kled = record.grade_kalshi()
+txt = record.report(led, kled)
 (record.ROOT / "reports" / "live" / "record_summary.md").write_text(txt + "\n")
 print(txt)

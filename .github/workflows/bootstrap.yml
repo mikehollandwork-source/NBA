@@ -1,0 +1,34 @@
+# One-time (or after model changes): rebuild 10 seasons of data + train live models,
+# then save them to the Actions cache for the hourly job. ~3-4 h.
+name: bootstrap-data
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Rebuild data (ESPN, nba.com mirror, Basketball-Reference backfill)
+        env:
+          BBREF_OPTIONAL: "1"   # if Cloudflare blocks the runner, skip those 326 old games instead of failing
+        run: python -u scripts/rebuild.py
+      - name: Train live models
+        run: python -u -c "from nba import live_pipeline; live_pipeline.train_models()"
+      - name: Save data cache
+        uses: actions/cache/save@v4
+        with:
+          key: nba-data-v1-${{ github.run_id }}
+          path: |
+            data/processed
+            data/models
+            data/raw/bulk/shotdetail_*
+            data/raw/bulk/matchups_2025
+            data/raw/bbref

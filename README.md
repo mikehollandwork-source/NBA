@@ -35,3 +35,10 @@ python scripts/score_live.py 2026-10-21  # after games are final: accuracy vs bo
 ```
 First run trains and caches models in `data/models/` (~10 min); `--retrain` refreshes them.
 Uses ESPN box scores for this season, current rosters and the ESPN injury report. No betting lines.
+
+## Automation: GitHub Actions + Telegram
+1. Create a bot: message **@BotFather** on Telegram → `/newbot` → copy the token.
+2. Get your chat ID: send any message to your bot, then open `https://api.telegram.org/bot<TOKEN>/getUpdates` and copy `chat.id` (for a group/channel, add the bot first; channel IDs start with `-100`).
+3. GitHub repo → Settings → Secrets and variables → Actions → add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
+4. Actions tab → **bootstrap-data** → Run workflow (once, ~3-4 h).
+5. **live-projections** then runs hourly from noon ET; you can also run it manually with a date.

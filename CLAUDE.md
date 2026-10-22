@@ -29,6 +29,12 @@ python scripts/score_live.py YYYY-MM-DD  # after games are final
 Rebuild order matters (see `scripts/rebuild.py` docstring): ESPN boxes → reconcile/BBRef backfill → bios → features → preseason model → features again (adds preseason prior) → out-of-sample projections (used for range calibration) → live models.
 Full research reruns: `python scripts/run_phase2.py [features|testA|testB|project|disagree|similar|season|preseason]` (hours; not needed for daily use).
 
+## Automation (GitHub Actions → Telegram)
+- `.github/workflows/bootstrap.yml` (manual): rebuilds data + trains models (~3-4 h), saves Actions cache `nba-data-v1-*`. Re-run after model/data-code changes, or when the season changes (cache paths include `matchups_2025` — bump to the previous season each year).
+- `.github/workflows/live.yml`: hourly 16:05–03:05 UTC (noon–11 pm ET in EDT). Runs `scripts/live.py` (date = today ET), `scripts/telegram_notify.py`, commits `reports/live` (locks + Telegram state) back to `main`.
+- Telegram: first run of the day posts the full board (strong leans ≥65% marked 🔥, listed first) + CSV; later runs post only changes (status, lean flips/±5 pts, added/removed players, new locks). Secrets: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`. Without them the notifier dry-runs (prints).
+- `BBREF_OPTIONAL=1` in bootstrap: if Basketball-Reference blocks the runner, the 326 old games are dropped instead of failing (slightly different training data — note it if it happens).
+
 ## Data sources
 | Source | Use |
 |---|---|
@@ -55,6 +61,6 @@ Reconciliation: ESPN vs nba.com play-by-play agree ≥99% on every stat 2020-25;
 - Known gaps: stars under-projected ~1.9 pts in game 1; ranges not player-specific; preseason sim misses injuries (games played is the largest season-total error).
 
 ## Conventions
-- Work on branch `phase1-predictability`; push with `git push -u origin phase1-predictability`. No PRs unless asked.
+- `main` is the live branch (scheduled Actions run from it; Actions commits there hourly — pull before pushing). Feature work on `phase1-predictability`, merge via PR.
 - New analyses go in `nba/analysis/`, reports in `reports/phase2/`, live sheets in `reports/live/`.
 - Don't use `pgrep -f <name>` wait loops (they match themselves) — use background tasks / Monitor.

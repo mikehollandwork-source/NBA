@@ -316,6 +316,7 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = volatility_filter(r, season)
     r = apply_locks(r, G, d)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
+    G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
     write_sheet(r, G, R, d)
     return r
 

@@ -110,9 +110,16 @@ def _patch_blank_games(e: pd.DataFrame, og: pd.DataFrame, season: int) -> tuple[
     ids = e[e.dnp == 0].assign(k=e.player.map(_full_key)).groupby(["team", "k"]).agg(
         espn_id=("espn_id", "first"), pos=("pos", lambda x: x.mode().iloc[0] if len(x) else ""))
     patched = []
+    import os
     for gid in blank:
         g = og[og.gameId == gid].iloc[0]
-        b = bbref.box(g.date, g.htm, g.vtm)
+        try:
+            b = bbref.box(g.date, g.htm, g.vtm)
+        except RuntimeError:
+            if os.environ.get("BBREF_OPTIONAL") != "1":
+                raise
+            print(f"WARNING: Basketball-Reference unavailable for {gid}; game dropped", flush=True)
+            continue
         b["k"] = b.player.map(_full_key)
         b = b.join(ids, on=["team", "k"])
         b["espn_id"] = b.espn_id.fillna("bbref_" + b.k)
@@ -120,7 +127,7 @@ def _patch_blank_games(e: pd.DataFrame, og: pd.DataFrame, season: int) -> tuple[
         b = b.assign(gameId=gid, event_id=meta.event_id, game_date=meta.game_date, dnp=0, dnp_reason="",
                      season=season, ln=b.player.map(norm_last), pos=b.pos.fillna(""), source="bbref")
         patched.append(b.drop(columns="k"))
-    e = pd.concat([e[~e.gameId.isin(blank)], pd.concat(patched)], ignore_index=True)
+    e = pd.concat([e[~e.gameId.isin(blank)]] + ([pd.concat(patched)] if patched else []), ignore_index=True)
     return e, len(blank)
 
 

@@ -13,7 +13,8 @@ Order matters (same order that produced the committed results):
   6  pregame features again (+ preseason prior)
   7  out-of-sample game projections, all games data/processed/projections_all_games_oos.parquet
      (used for calibrated ranges in the live sheets)
-  8  live models are trained on first `scripts/live.py` run (data/models/)
+  8  lean calibration (which stat the model leans on per player)
+  9  live models are trained on first `scripts/live.py` run (data/models/)
 """
 import sys
 import time
@@ -91,4 +92,14 @@ step("6 features (+ prior)", [PROC / "features_all.parquet"], s6)
 if FORCE or "pre_pts" not in pd.read_parquet(PROC / "features_all.parquet", columns=None).columns:
     step("6b features (+ prior)", [], s6)
 step("7 OOS projections, all games", [PROC / "projections_all_games_oos.parquet"], s7)
+
+
+def s8():
+    import json
+    from nba.analysis import lean
+    R, _, _ = lean.backtest_calibrated()
+    json.dump(lean.fit_pick_calibration(R), open(PROC / "lean_pick_calibration.json", "w"))
+
+
+step("8 lean calibration", [PROC / "lean_pick_calibration.json"], s8)
 print("ready: python scripts/live.py YYYY-MM-DD")

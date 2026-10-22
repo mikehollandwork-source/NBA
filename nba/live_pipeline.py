@@ -226,6 +226,28 @@ def volatility_filter(r: pd.DataFrame, season: int) -> pd.DataFrame:
     return r
 
 
+def add_leans(r: pd.DataFrame, te: pd.DataFrame, season: int) -> pd.DataFrame:
+    """Per player: the stat the model leans on hardest vs his own baseline
+    (nba/analysis/lean.py; backtested + calibrated out-of-sample)."""
+    from nba.analysis import lean
+    hist = lean.baselines(pd.read_parquet(PROC / "projections_all_games_oos.parquet"))
+    x = r[["season", "pid", "gameId"]].copy()
+    x["gp"] = te.gp.to_numpy()
+    for st in lean.STATS:
+        x[f"{st}_ensemble"] = r[f"proj_{st}"].to_numpy()
+        x[f"{st}_szn"] = te[f"{st}_szn"].to_numpy()
+    x = lean.baselines(x)
+    x = lean.pick(lean.probabilities(x, fit=hist))
+    cal = json.load(open(PROC / "lean_pick_calibration.json"))
+    x = lean.apply_pick_calibration(x, cal)
+    keep = ["lean_stat", "lean_side", "lean_ref", "lean_prob_cal"] + [f"{st}_ref" for st in lean.STATS] \
+        + [f"{st}_p_over" for st in lean.STATS]
+    for c in keep:
+        r[c] = x[c].to_numpy()
+    r.loc[r.lean_prob_cal.isna(), "lean_stat"] = None
+    return r
+
+
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -243,7 +265,9 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     f = features.build([season - 1, season], out_path=PROC / "features_live.parquet")
     te = f[(f.season == season) & f.gameId.isin(pend.gameId) & f.pid.isin(pend.pid)].copy()
     M = train_models(retrain)
-    r = ranges(normalize_minutes(predict(M, te).reset_index(drop=True), te.reset_index(drop=True)))
+    te = te.reset_index(drop=True)
+    r = ranges(normalize_minutes(predict(M, te).reset_index(drop=True), te))
+    r = add_leans(r, te, season)
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
     r = volatility_filter(r, season)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
@@ -257,23 +281,27 @@ def write_sheet(r, G, R, d):
     keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
     skipped = r[(r.proj_min >= 10) & ~r.projected]
     cols = ["team", "opp", "player", "status", "pra_cv_last", "proj_min", "proj_pts", "pts_p10", "pts_p90", "proj_reb", "reb_p10", "reb_p90",
-            "proj_ast", "ast_p10", "ast_p90", "proj_pra", "pra_p10", "pra_p90", "proj_fg3m", "proj_stl", "proj_blk", "proj_tov"]
+            "proj_ast", "ast_p10", "ast_p90", "proj_pra", "pra_p10", "pra_p90", "proj_fg3m", "proj_stl", "proj_blk", "proj_tov",
+            "lean_stat", "lean_side", "lean_ref", "lean_prob_cal"]
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Game-day projections — {d:%a %b %-d, %Y}", "",
          "Full game-day model (same as the backtests): no betting lines used. 80% range = 10th–90th percentile.",
          "Teammates-out adjusts automatically once a team has played 3+ games this season.",
          "Team minutes = 240: top-8 keep model minutes, bench squeezed (rule, not backtested).",
-         f"Baseline: no projection if last season's PRA swing (SD/avg) > {VOL_MAX} or no qualifying last season (<{VOL_MIN_GAMES} games).", ""]
+         f"Baseline: no projection if last season's PRA swing (SD/avg) > {VOL_MAX} or no qualifying last season (<{VOL_MIN_GAMES} games).",
+         "Lean = the stat the model leans on hardest vs the player's OWN baseline (season avg after 5 games, else last season), "
+         "with calibrated hit probability (backtest 2019-25: stated 70%+ -> 77.6% hit). The reference is NOT a sportsbook line.", ""]
     for _, g in G.sort_values("tip_utc").iterrows():
         tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         L.append(f"## {g.away} @ {g.home} — {tip}")
         for t in (g.away, g.home):
             x = keep[keep.team == t]
-            L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM | PRA swing", "|---|---|---|---|---|---|---|---|"]
+            L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM | Swing | Lean", "|---|---|---|---|---|---|---|---|---|"]
             for _, q in x.iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "") + (" *" if q.no_nba_history else "")
                 L.append(f"{nm} | {q.proj_min:.0f} | {q.proj_pts:.1f} ({q.pts_p10:.0f}–{q.pts_p90:.0f}) | {q.proj_reb:.1f} | "
-                         f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f} | {q.pra_cv_last:.2f}")
+                         f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f} | {q.pra_cv_last:.2f} | "
+                         + (f"**{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** ({q.lean_prob_cal:.0%})" if q.lean_stat else "—"))
             sk = skipped[skipped.team == t]
             if len(sk):
                 L.append("No projection: " + ", ".join(

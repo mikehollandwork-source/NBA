@@ -201,3 +201,18 @@ Out-of-sample projections 2019-25 (130k games), by last-season swing:
 | 0.30 | 16% | 23% | 84% |
 
 The filter mostly removes low-usage players (they swing most). Ranges are not player-specific yet: 80% coverage is 76% for the most volatile fifth and 84% for the steadiest. Setting: `VOL_MAX` in `nba/config.py`.
+
+---
+
+# Per-player lean (which stat the model points to)
+`nba/analysis/lean.py`. For PTS/REB/AST/PRA/PR/PA/RA: reference = half-point line at the 50/50 point of a distribution centred on the player's OWN baseline (season-to-date after 5 games, else last season). Model P(over/under) from the calibrated distribution + per-stat recalibration, then a second calibration on the picked leans (winner's-curse fix). All fit leave-one-season-out, 2019-25 (149k leans).
+
+| Stated | Leans | Hit |
+|---|---|---|
+| 55–60% | 26k | 57.5% |
+| 60–65% | 45k | 62.4% |
+| 65–70% | 33k | 67.9% |
+| 70%+ | 44k | 77.6% |
+
+Top-lean stat hits 67% vs 60% for a player's other stats. Stable by season (68–70% at stated ≥60%). By stat: PRA strongest (73%). Early season: unders vs last-season baseline hit 66% (game 1) / 70% (games 2-5); game-1 overs slightly overstated (65% stated, 61.5% hit).
+**Not a sportsbook test** — books set sharper lines than a player's own average; edge vs real lines still unknown.

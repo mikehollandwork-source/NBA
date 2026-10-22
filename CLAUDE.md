@@ -1,0 +1,58 @@
+# NBA player projection system — instructions for Claude
+
+## Working with this user
+- Verdict first, then reasoning. No filler. If an idea is weak, say so and give a probability; give one concrete alternative.
+- **Ask before assuming.** When a request is ambiguous (thresholds, data sources, scope), ask with options and a recommendation before building.
+- Rank options by likelihood of success. State confidence when uncertain.
+- The user reads on a phone: short tables, outcome first.
+- Every result must be out-of-sample (walk-forward by season, prior games only). Always run a control / placebo before calling something an edge.
+
+## Hard rules
+- **No betting lines or third-party projections as model inputs — ever.** Lines are allowed only in `nba/analysis/lines_backtest.py` for evaluation. ESPN summaries contain odds; `nba/ingest/espn.py` strips them (`KEEP_KEYS`).
+- User's pricing assumption when no odds exist: **-120 both sides** (break-even 54.55%).
+- No real historical prop lines are in the repo yet (no free source found). Proxy-line results (season/L10 averages) are **not** edge estimates — see FINDINGS §4.
+
+## Environment facts
+- stats.nba.com is blocked from cloud IPs → nba.com data comes from the public mirror `github.com/shufinskiy/nba_data` (sparse git clone in `nba/ingest/bulk.py`; raw downloads 403).
+- Basketball-Reference rejects Python `requests` (Cloudflare) → `nba/ingest/bbref.py` uses `curl`, 1 request / 3.5 s.
+- ESPN team codes differ from nba.com: GS/GSW, NY/NYK, SA/SAS, NO/NOP, UTAH/UTA, WSH/WAS. Always map to nba.com codes (`live_pipeline.TEAM`).
+- Season label = starting year (2025 = 2025-26). `LIVE_SEASON = 2026` in `nba/config.py`.
+- `data/` is gitignored. A new session has **no data and no trained models** — rebuild first.
+
+## Rebuild from scratch (new session)
+```bash
+pip install -r requirements.txt          # pinned versions; SessionStart hook also does this
+python scripts/rebuild.py                # ~2.5-3 h fresh; skips finished steps; --force to redo
+python scripts/live.py YYYY-MM-DD        # first run trains + caches models in data/models/ (~10 min)
+python scripts/score_live.py YYYY-MM-DD  # after games are final
+```
+Rebuild order matters (see `scripts/rebuild.py` docstring): ESPN boxes → reconcile/BBRef backfill → bios → features → preseason model → features again (adds preseason prior) → out-of-sample projections (used for range calibration) → live models.
+Full research reruns: `python scripts/run_phase2.py [features|testA|testB|project|disagree|similar|season|preseason]` (hours; not needed for daily use).
+
+## Data sources
+| Source | Use |
+|---|---|
+| ESPN site API | Box scores (truth), schedule, rosters, injury report, player bios |
+| shufinskiy/nba_data | nba.com play-by-play (CDN 2020+), shot charts 2016+, defender matchups 2017+ |
+| Basketball-Reference | 326 games ESPN left blank (2016-18) |
+Reconciliation: ESPN vs nba.com play-by-play agree ≥99% on every stat 2020-25; all official games matched every season.
+
+## Model (what the live sheet uses)
+- Game-day ensemble = mean of (minutes model × per-minute rate), direct model, and season-avg + deviation model. LightGBM, `drivers.PARAMS`, `random_state=7`. Features in `nba/analysis/groups.py`.
+- Preseason projection = 50/50 blend of preseason LightGBM and last season's per-game average (`preseason.final_projection`); fed to game-day models as `pre_*` prior.
+- Ranges: negative binomial, variance = k·μ^p fit out-of-sample; PTS/REB/AST linked by a Gaussian copula scaled so PRA spread matches reality.
+- Live minutes: team total 240; players with no NBA history get 12.6 min (historical early-season average); top-8 keep model minutes, bench squeezed (rule, not backtested).
+- **Volatility baseline:** no projection if last season's PRA swing (SD / avg, ≥20 games) > `VOL_MAX = 0.45` (`nba/config.py`), or no qualifying last season.
+- Teammates-out only activates after a team's 3rd game of the season.
+
+## Key findings (details: `reports/phase2/FINDINGS.md`)
+- Predictability (10 seasons, stable): MIN > FGA > PRA > PR > PA > RA > PTS > REB > AST > TOV > 3PM > STL > BLK.
+- Biggest inputs: teammates out, minutes/role. Opponent defense, pace, matchup/coverage proxies ≈ no value.
+- Ensemble beats season average in 7/7 seasons: MIN 25%, PRA 12%, PTS 8%, REB/AST ~7% (squared error).
+- Similar-defense signal, head-to-head averages: no edge (placebo-tested). Player-bias correction: small real gain.
+- Known gaps: stars under-projected ~1.9 pts in game 1; ranges not player-specific; preseason sim misses injuries (games played is the largest season-total error).
+
+## Conventions
+- Work on branch `phase1-predictability`; push with `git push -u origin phase1-predictability`. No PRs unless asked.
+- New analyses go in `nba/analysis/`, reports in `reports/phase2/`, live sheets in `reports/live/`.
+- Don't use `pgrep -f <name>` wait loops (they match themselves) — use background tasks / Monitor.

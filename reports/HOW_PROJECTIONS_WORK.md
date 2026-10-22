@@ -106,7 +106,7 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 1. **Baseline** = season-to-date average once he has 5+ games, otherwise last season's average.
 2. **Reference line** = the half-point line where a distribution centred on that baseline is closest to 50/50 (fixes the "average lines favour the under" skew).
 3. **Probability** of over/under that line from our projection's distribution, then recalibrated per stat (logistic, fit on other seasons).
-4. **Pick** the stat with the largest distance from 50%.
+4. **Pick** the stat with the largest distance from 50%. Each stat's swing is already in its probability (more swing → wider distribution → closer to 50%). Picking the least-swing stat instead was worse (top 5/night 75.6% vs 77.3%, 2019-25; `reports/phase2/ranking_backtest.md`).
 5. **Second calibration** on picked leans only (picking the max of 7 inflates confidence), per stat.
 - Backtest 2019-25 (149k leans, each season tested on calibrations fit to other seasons): stated 55-60% → 57.5% hit; 60-65% → 62.4%; 65-70% → 67.9%; 70%+ → 77.6%.
 - **Board = 70%+ leans only**, ranked by model probability (2025: 75.8% hit, ~10/night). Ranking by model + the player's past hit rates at that line was worse in 7/7 seasons (`reports/phase2/ranking_backtest.md`).

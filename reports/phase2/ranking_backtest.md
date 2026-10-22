@@ -24,3 +24,18 @@ Grade vs the player's own baseline line at -120. History uses prior games only.
 - Random leans hit 64%: the reference is a soft line (player's own baseline). These are not edges vs sportsbooks.
 
 Decision: board shows leans with model probability ≥ 70% (`STRONG_MIN`), ranked by model probability.
+
+## Stat choice: biggest edge vs least swing (2026-10-22)
+Which of a player's 7 stats should be his lean? Same leans, 2019-25, board-eligible players,
+swing = last season's SD/avg of each stat (20+ games).
+
+| Rule | All leans hit | Top 5/night hit | 2025 top 5 |
+|---|---|---|---|
+| **Biggest edge (current)** | **64.2%** | **77.3%** | **78.3%** |
+| Edge ÷ swing | 63.4% | 76.4% | 76.6% |
+| Biggest edge among 3 steadiest stats | 60.6% | 75.6% | 75.3% |
+| Least swing stat | 59.1% | 75.6% | 74.6% |
+
+- "Least swing" picks Pts+Reb+Ast 87% of the time (sums swing least relative to their size), whether or not the model sees anything there.
+- Swing is already priced in: a high-swing stat gets a wider distribution, which pulls its probability toward 50%, so it only wins the pick when the projection gap is large enough to beat the noise.
+- Least-swing leans that reached 70%+ hit 77.8% (vs 75.4%) but there were 58% fewer of them; at a fixed board size the current rule wins.

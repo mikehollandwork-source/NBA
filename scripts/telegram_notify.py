@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd  # noqa: E402
 import requests  # noqa: E402
 
-from nba.config import ROOT, VOL_MAX, STRONG_MIN, LOCK_LEAD_MIN  # noqa: E402
+from nba.config import ROOT, VOL_MAX, STRONG_MIN, LOCK_LEAD_MIN, STAT_NAME  # noqa: E402
 
 STRONG = STRONG_MIN  # backtest 2025: stated 70%+ leans hit 75.8%
 TOKEN, CHAT = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
@@ -50,7 +50,7 @@ def send_file(path: Path, caption: str):
 
 
 def lean_line(q) -> str:
-    stat = str(q.lean_stat).upper()
+    stat = STAT_NAME.get(q.lean_stat, str(q.lean_stat).upper())
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
@@ -125,7 +125,7 @@ def results_messages():
         for _, q in sx.iterrows():
             icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
-            lines.append(f"{icon} {html.escape(q.player)} {q.stat.upper()} {q.side} {q.ref:g} → {act}")
+            lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} {q.ref:g} → {act}")
         if sx.empty:
             lines.append(f"no {STRONG:.0%}+ leans this game")
         lines.append(f"Strongest: {record.fmt(record.summarize(sx))}")

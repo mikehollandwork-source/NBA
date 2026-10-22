@@ -143,9 +143,20 @@ def picks(e: pd.DataFrame, min_roi: float = MIN_ROI) -> pd.DataFrame:
     return x.drop_duplicates(["pid", "stat"]).reset_index(drop=True)
 
 
+def paper(e: pd.DataFrame, min_roi: float = MIN_ROI) -> pd.DataFrame:
+    """Keep every priced rung (for model-vs-market scoring) and flag the would-be
+    picks (best rung per player-stat with exp. return >= min_roi). Paper only."""
+    e = e.copy()
+    e["market_p"] = (e.yes_bid + e.yes_ask) / 2
+    best = e[e.exp_roi >= min_roi].sort_values("exp_roi", ascending=False).drop_duplicates(["pid", "stat"]).index
+    e["paper_pick"] = e.index.isin(best)
+    return e
+
+
 def describe(q) -> str:
     rung = f"{q.k}+" if q.side == "YES" else f"under {q.k}"
-    return f"{q.stat.upper()} {rung} @ {q.price * 100:.0f}¢ · model {q.p_side:.0%} · exp {q.exp_roi:+.0%}"
+    mkt = (1 - q.market_p) if q.side == "NO" and "market_p" in q else q.get("market_p", float("nan"))
+    return f"{q.stat.upper()} {rung} @ {q.price * 100:.0f}¢ · model {q.p_side:.0%} vs market {mkt:.0%} · exp {q.exp_roi:+.0%}"
 
 
 def grade(pk: pd.DataFrame, box: pd.DataFrame) -> pd.DataFrame:

@@ -30,6 +30,7 @@ mk = kalshi.markets(d, G)
 mk = mk[mk.player_key.isin(L.player.map(kalshi.key))]
 print("rungs for our players:", len(mk), flush=True)
 mk = kalshi.pre_tip_quotes(mk)
+mk.to_parquet(ROOT / f"data/live/kalshi_quotes_{d}.parquet", index=False)
 e = kalshi.edges(mk, L)
 pk = kalshi.picks(e)
 gr = kalshi.grade(pk, record._box(d))

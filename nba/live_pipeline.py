@@ -303,7 +303,7 @@ def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None) -> pd.Data
         try:
             proj = r[r.gameId.isin(pre.event_id.astype(int)) & (r.proj_min >= 10)
                      & r.projected.astype(str).str.lower().eq("true")]
-            pk = kalshi.picks(kalshi.edges(kalshi.markets(d, pre), proj))
+            pk = kalshi.paper(kalshi.edges(kalshi.markets(d, pre), proj))  # ALL priced rungs, paper flag
         except Exception as ex:  # Kalshi down: keep projections working
             print("Kalshi unavailable:", ex, flush=True)
             pre = pre.iloc[0:0]
@@ -398,10 +398,10 @@ def write_sheet(r, G, R, d, kb=None):
                     f"{q.player} ({'swing ' + format(q.pra_cv_last, '.2f') if q.no_projection_reason == 'too volatile' else 'no history'})"
                     for _, q in sk.iterrows()))
             if kb is not None and len(kb):
-                kx = kb[kb.team == t].sort_values("exp_roi", ascending=False)
+                kx = kb[(kb.team == t) & kb.paper_pick.astype(str).str.lower().eq("true")].sort_values("exp_roi", ascending=False)
                 if len(kx):
-                    L.append(f"💰 Kalshi edges (real price + fee, exp. return ≥ {kalshi.MIN_ROI:.0%}, rule not backtested):")
-                    L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.iterrows()]
+                    L.append("📊 Kalshi paper — NOT picks (model vs real price + fee; on Oct 21 this rule went -19%):")
+                    L += [f"- {q.player} — {kalshi.describe(q)}" for _, q in kx.head(5).iterrows()]
             o = R[(R.team == t) & (R.status == "Out")]
             if len(o):
                 L.append("OUT: " + ", ".join(o.player))

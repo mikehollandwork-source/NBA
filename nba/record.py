@@ -101,15 +101,33 @@ def grade_kalshi() -> pd.DataFrame:
             continue
         g = kalshi.grade(pk, box)
         g["date"] = day.name
-        out.append(g[["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_side", "exp_roi",
-                      "actual", "result", "units"]])
+        if "paper_pick" not in g:
+            g["paper_pick"] = True
+        if "market_p" not in g:
+            g["market_p"] = (g.yes_bid + g.yes_ask) / 2
+        g["yes_hit"] = (g.actual >= g.k).astype(float).where(g.result != "void")
+        out.append(g[["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_model", "market_p",
+                      "p_side", "exp_roi", "paper_pick", "actual", "yes_hit", "result", "units"]])
     led = pd.concat(out, ignore_index=True) if out else pd.DataFrame(
-        columns=["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_side", "exp_roi", "actual", "result", "units"])
+        columns=["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_model", "market_p", "p_side",
+                 "exp_roi", "paper_pick", "actual", "yes_hit", "result", "units"])
     led.to_csv(KLEDGER, index=False)
     return led
 
 
+def model_vs_market(x: pd.DataFrame) -> str:
+    """Brier score on every priced rung (lower = better probabilities)."""
+    x = x.dropna(subset=["yes_hit", "p_model", "market_p"])
+    if x.empty:
+        return "no graded rungs yet"
+    bm, bk = ((x.p_model - x.yes_hit) ** 2).mean(), ((x.market_p - x.yes_hit) ** 2).mean()
+    who = "model better" if bm < bk else "market better"
+    return f"Brier model {bm:.4f} vs Kalshi {bk:.4f} ({who}) · {len(x)} rungs"
+
+
 def summarize_k(x: pd.DataFrame) -> str:
+    if "paper_pick" in x:
+        x = x[x.paper_pick.astype(str).str.lower().eq("true")]
     x = x[x.result != "void"]
     w, l = (x.result == "win").sum(), (x.result == "loss").sum()
     if not w + l:
@@ -140,13 +158,13 @@ def fmt(s: dict) -> str:
 def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
     lines = []
     if kled is not None:
-        lines.append("**Kalshi record (real price + fees; $1 per pick)**")
+        lines.append("**Kalshi PAPER tracking (not picks; real price + fee, $1 each)**")
         if len(kled):
             last = kled.date.max()
-            lines += [f"- All picks: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
-                      "- By stat: " + " · ".join(f"{s.upper()} {summarize_k(x).split(' (')[0]}" for s, x in kled.groupby("stat"))]
+            lines += [f"- Paper picks: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
+                      f"- Model vs market: {model_vs_market(kled)}"]
         else:
-            lines.append("- no graded picks yet (starts Oct 22)")
+            lines.append("- nothing graded yet (starts Oct 22)")
     lead = "\n".join(lines) + ("\n" if lines else "")
     if led.empty:
         return lead + "Lean record @ -120 (reference only): no graded leans yet."

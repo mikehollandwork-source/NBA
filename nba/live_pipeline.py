@@ -278,6 +278,25 @@ def _is_final(path: Path) -> bool:
     return len(x) > 0 and "lock_final" in x and str(x.lock_final.iloc[0]).lower() == "true"
 
 
+def _match_types(locked: pd.DataFrame, r: pd.DataFrame) -> pd.DataFrame:
+    """CSV round-trip loses dtypes (dates come back as text, ids as numbers); cast a locked
+    file's columns to tonight's dtypes so the two can be combined and saved as parquet."""
+    for c in locked.columns.intersection(r.columns):
+        t = r[c].dtype
+        try:
+            if pd.api.types.is_datetime64_any_dtype(t):
+                locked[c] = pd.to_datetime(locked[c]).astype(t)
+            elif pd.api.types.is_bool_dtype(t):
+                locked[c] = locked[c].astype(str).str.lower().eq("true")
+            elif pd.api.types.is_numeric_dtype(t):
+                locked[c] = pd.to_numeric(locked[c], errors="coerce")
+            elif pd.api.types.is_string_dtype(t) or t == object:
+                locked[c] = locked[c].where(locked[c].isna(), locked[c].astype(str))
+        except (ValueError, TypeError):
+            pass
+    return locked
+
+
 def writable_games(G: pd.DataFrame, d: date, now) -> set:
     """Games whose lock file may still be (re)written: scheduled, before tip, not final yet."""
     out = set()
@@ -315,7 +334,7 @@ def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="gam
             rows.to_csv(path, index=False)
             out.append(rows)
         elif path.exists():
-            locked = pd.read_csv(path)
+            locked = _match_types(pd.read_csv(path), r)
             locked["lock_state"] = "LOCKED"
             out.append(locked)
         else:

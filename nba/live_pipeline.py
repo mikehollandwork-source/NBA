@@ -248,6 +248,50 @@ def add_leans(r: pd.DataFrame, te: pd.DataFrame, season: int) -> pd.DataFrame:
     return r
 
 
+LOCKS = ROOT / "reports" / "live" / "locked"
+
+
+def _git_rev() -> str:
+    import subprocess
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    except Exception:
+        return ""
+
+
+def lock_path(d: date, g) -> Path:
+    return LOCKS / str(d) / f"{g.away}@{g.home}.csv"
+
+
+def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="game-day model") -> pd.DataFrame:
+    """Lock rule: before tip (status Scheduled and now < tip) a game's projections are
+    (re)written to reports/live/locked/<date>/<away>@<home>.csv. Once the game has
+    started, that file is never touched again and the sheet shows the locked rows.
+    A game with no pre-tip file is marked 'no pre-tip projection' and is not scored."""
+    now = now or pd.Timestamp.now(tz="UTC")
+    out = []
+    for _, g in G.iterrows():
+        tip = pd.Timestamp(g.tip_utc)
+        path = lock_path(d, g)
+        rows = r[r.gameId == int(g.event_id)].copy()
+        if g.status == "Scheduled" and now < tip:
+            rows["locked_at_utc"] = now.isoformat(timespec="seconds")
+            rows["lock_source"] = source
+            rows["model_commit"] = _git_rev()
+            rows["lock_state"] = "pre-tip (updates until tip)"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            rows.to_csv(path, index=False)
+            out.append(rows)
+        elif path.exists():
+            locked = pd.read_csv(path)
+            locked["lock_state"] = "LOCKED"
+            out.append(locked)
+        else:
+            rows["lock_state"] = "no pre-tip projection"
+            out.append(rows)
+    return pd.concat(out, ignore_index=True)
+
+
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -270,6 +314,7 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = add_leans(r, te, season)
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
     r = volatility_filter(r, season)
+    r = apply_locks(r, G, d)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     write_sheet(r, G, R, d)
     return r
@@ -293,7 +338,12 @@ def write_sheet(r, G, R, d):
          "with calibrated hit probability (backtest 2019-25: stated 70%+ -> 77.6% hit). The reference is NOT a sportsbook line.", ""]
     for _, g in G.sort_values("tip_utc").iterrows():
         tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
-        L.append(f"## {g.away} @ {g.home} — {tip}")
+        st = r[r.gameId == int(g.event_id)]
+        state = st.lock_state.iloc[0] if len(st) and "lock_state" in st else ""
+        when = ""
+        if len(st) and "locked_at_utc" in st and pd.notna(st.locked_at_utc.iloc[0]):
+            when = " at " + pd.Timestamp(st.locked_at_utc.iloc[0]).tz_convert("America/New_York").strftime("%-I:%M %p ET")
+        L.append(f"## {g.away} @ {g.home} — {tip} · {state}{when if state == 'LOCKED' else ''}")
         for t in (g.away, g.home):
             x = keep[keep.team == t]
             L += [f"**{t}** | MIN | PTS (80%) | REB | AST | PRA (80%) | 3PM | Swing | Lean", "|---|---|---|---|---|---|---|---|---|"]
@@ -301,7 +351,8 @@ def write_sheet(r, G, R, d):
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "") + (" *" if q.no_nba_history else "")
                 L.append(f"{nm} | {q.proj_min:.0f} | {q.proj_pts:.1f} ({q.pts_p10:.0f}–{q.pts_p90:.0f}) | {q.proj_reb:.1f} | "
                          f"{q.proj_ast:.1f} | {q.proj_pra:.1f} ({q.pra_p10:.0f}–{q.pra_p90:.0f}) | {q.proj_fg3m:.1f} | {q.pra_cv_last:.2f} | "
-                         + (f"**{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** ({q.lean_prob_cal:.0%})" if q.lean_stat else "—"))
+                         + (f"**{q.lean_stat.upper()} {q.lean_side} {q.lean_ref:.1f}** ({q.lean_prob_cal:.0%})"
+                            if isinstance(q.get("lean_stat"), str) else "—"))
             sk = skipped[skipped.team == t]
             if len(sk):
                 L.append("No projection: " + ", ".join(

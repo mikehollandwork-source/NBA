@@ -44,6 +44,7 @@ Reconciliation: ESPN vs nba.com play-by-play agree ≥99% on every stat 2020-25;
 - Live minutes: team total 240; players with no NBA history get 12.6 min (historical early-season average); top-8 keep model minutes, bench squeezed (rule, not backtested).
 - **Volatility baseline:** no projection if last season's PRA swing (SD / avg, ≥20 games) > `VOL_MAX = 0.45` (`nba/config.py`), or no qualifying last season.
 - Teammates-out only activates after a team's 3rd game of the season.
+- **Locking:** each run (re)writes a game's projections to `reports/live/locked/<date>/<away>@<home>.csv` only while the game is Scheduled and before tip; after tip the file is never overwritten. Scoring (`score_live.py`) uses locked files only. `scripts/live.py` auto-commits `reports/live` — push after each run so locks survive new sessions. 2026-10-21 locks were backfilled (last version generated before each tip).
 - **Lean column:** per player, the stat with the strongest calibrated over/under probability vs his OWN baseline (`nba/analysis/lean.py`; needs `data/processed/lean_pick_calibration.json` from `lean.backtest_calibrated()`). Backtest: stated 70%+ → 77.6% hit. Not a book-line test.
 
 ## Key findings (details: `reports/phase2/FINDINGS.md`)

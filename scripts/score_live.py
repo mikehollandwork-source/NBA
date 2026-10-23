@@ -13,7 +13,7 @@ from nba.config import LIVE_SEASON, ROOT  # noqa: E402
 from nba.ingest import espn  # noqa: E402
 
 d = date.fromisoformat(sys.argv[1])
-files = sorted(f for f in (ROOT / "reports" / "live" / "locked" / str(d)).glob("*.csv") if not f.name.endswith(".kalshi.csv"))
+files = sorted(f for f in (ROOT / "reports" / "live" / "locked" / str(d)).glob("*.csv") if not f.name.endswith((".kalshi.csv", ".winner.csv")))
 if not files:
     sys.exit(f"no locked projections for {d}")
 L = pd.concat([pd.read_csv(f, dtype={"pid": str}).assign(game=f.stem) for f in files], ignore_index=True)

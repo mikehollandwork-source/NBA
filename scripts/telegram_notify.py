@@ -71,6 +71,13 @@ def game_message(g, r) -> str:
     p = x[x.get("projected", True).astype(str).str.lower() == "true"] if "projected" in x else x
     p = p[p.lean_stat.apply(lambda v: isinstance(v, str)) & (p.proj_min >= 10)].sort_values("lean_prob_cal", ascending=False)
     lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
+    wp = ROOT / f"data/live/winners_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
+    if wp.exists():
+        from nba.live_pipeline import winner_line
+        wb = pd.read_parquet(wp)
+        wb = wb[wb.event_id.astype(str) == str(g.event_id)] if len(wb) else wb
+        if len(wb):
+            lines.append(html.escape(winner_line(wb.iloc[0])))
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     if len(strong):
         lines += [lean_line(q) for _, q in strong.iterrows()]
@@ -130,9 +137,17 @@ def results_messages():
             lines.append(f"no {STRONG:.0%}+ leans this game")
         lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
         lines.append(f"All leans (reference, not picks): {record.fmt(record.summarize(x))}")
+        if record.WLEDGER.exists():
+            wl = pd.read_csv(record.WLEDGER)
+            wl = wl[(wl.date == dte) & (wl.game == game)]
+            for _, q in wl.iterrows():
+                icon = "✅" if q.result == "win" else "❌"
+                lines.append(f"📈 Prediction (not a pick): {q.pick_team} {q.p_pick:.0%} → {icon} "
+                             f"final {game.split('@')[0]} {q.away_pts}-{q.home_pts} {game.split('@')[1]}")
         send("\n".join(lines))
     kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
-    send(html.escape(record.report(led, kled)).replace("**", ""))
+    wled = pd.read_csv(record.WLEDGER) if record.WLEDGER.exists() else None
+    send(html.escape(record.report(led, kled, wled)).replace("**", ""))
     if TOKEN:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
@@ -182,7 +197,8 @@ def main(d: date):
         rec = ROOT / "reports/live/record_summary.md"
         rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
         send(f"🏀 <b>Picks — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} picks ({STRONG:.0%}+)\n"
-             f"✅ PICK = our model's lean at {STRONG:.0%}+. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet).\n"
+             f"✅ PICK = our model's lean at {STRONG:.0%}+. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet). "
+             f"📈 PREDICTION = game-winner model (tracked, not a pick).\n"
              f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
              f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "
              f"Players whose PRA swings > {VOL_MAX} get no projection. Final lock {LOCK_LEAD_MIN} min before tip; "

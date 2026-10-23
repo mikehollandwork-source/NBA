@@ -376,6 +376,39 @@ def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, writable: 
     return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
 
 
+def winners_board(G: pd.DataFrame, R: pd.DataFrame, season: int, d: date, now=None,
+                  writable: set | None = None) -> pd.DataFrame:
+    """Game-winner PREDICTIONS (not picks; nba/analysis/winners.py). Same lock rule as the
+    projections -> <game>.winner.csv. Failures never block the board."""
+    now = now or pd.Timestamp.now(tz="UTC")
+    writable = writable_games(G, d, now) if writable is None else writable
+    pre = G[G.event_id.isin(writable)]
+    W = pd.DataFrame()
+    if len(pre):
+        try:
+            from nba.analysis import winners
+            W = winners.live_predict(pre, R, season, d)
+        except Exception as ex:
+            print("winner model unavailable:", ex, flush=True)
+    out = []
+    for _, g in G.iterrows():
+        path = lock_path(d, g).with_suffix(".winner.csv")
+        x = W[W.event_id == g.event_id].copy() if len(W) else pd.DataFrame()
+        if len(x):
+            x["locked_at_utc"] = now.isoformat(timespec="seconds")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            x.to_csv(path, index=False)
+            out.append(x)
+        elif path.exists():
+            out.append(pd.read_csv(path))
+    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+
+
+def winner_line(w) -> str:
+    return (f"📈 PREDICTION (not a pick): {w.pick_team} {w.p_pick:.0%} to win · "
+            f"projected {w.pick_team} by {abs(w.proj_margin_home):.1f}")
+
+
 # ---------------------------------------------------------------- run
 def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFrame:
     LIVE.mkdir(parents=True, exist_ok=True)
@@ -404,12 +437,14 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     kb = kalshi_board(r, G, d, now=now, writable=writable)
     kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
+    wb = winners_board(G, R, season, d, now=now, writable=writable)
+    wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
-    write_sheet(r, G, R, d, kb)
+    write_sheet(r, G, R, d, kb, wb)
     return r
 
 
-def write_sheet(r, G, R, d, kb=None):
+def write_sheet(r, G, R, d, kb=None, wb=None):
     from nba import kalshi
     out_dir = ROOT / "reports" / "live"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -423,7 +458,8 @@ def write_sheet(r, G, R, d, kb=None):
             keep[c] = False
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Picks — {d:%a %b %-d, %Y}", "",
-         "**✅ PICK** = our model's lean at 70%+. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet).", "",
+         "**✅ PICK** = our model's lean at 70%+. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "
+         "**📈 PREDICTION** = game-winner model (tracked, not a pick; backtest 2019-25: 65.8% winners, calibrated).", "",
          f"Only leans the model rates **{STRONG_MIN:.0%}+** (2025 backtest: 75.8% hit; ranked by model probability — "
          "blending in past hit rates made it worse in 7/7 seasons). Lean = the stat the model leans on hardest vs the "
          "player's OWN baseline (season avg after 5 games, else last season) — NOT a sportsbook line.",
@@ -441,6 +477,8 @@ def write_sheet(r, G, R, d, kb=None):
         if len(st) and "locked_at_utc" in st and pd.notna(st.locked_at_utc.iloc[0]):
             when = " at " + pd.Timestamp(st.locked_at_utc.iloc[0]).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         L.append(f"## {g.away} @ {g.home} — {tip} · {state}{when if state == 'LOCKED' else ''}")
+        if wb is not None and len(wb) and (wb.event_id.astype(str) == str(g.event_id)).any():
+            L.append(winner_line(wb[wb.event_id.astype(str) == str(g.event_id)].iloc[0]))
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
         if len(x):

@@ -76,8 +76,8 @@ def lean_line(q) -> str:
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
-    return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
-            f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f})")
+    return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {float(q.pub_line):g} · "
+            f"<b>{q.lean_prob_cal:.0%}</b> · {html.escape(str(q.pub_price))} · edge {float(q.pub_ev):+.0%}")
 
 
 def game_message(g, r) -> str:
@@ -101,10 +101,15 @@ def game_message(g, r) -> str:
         if len(wb):
             lines.append(html.escape(winner_line(wb.iloc[0])))
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
-    if len(strong):
-        lines += [lean_line(q) for _, q in strong.iterrows()]
+    pub = strong[strong["pub"].astype(str).str.lower().eq("true")] if "pub" in strong else strong.iloc[0:0]
+    if len(pub):
+        lines += [lean_line(q) for _, q in pub.sort_values("pub_ev", ascending=False).iterrows()]
     else:
-        lines.append(f"✅ PICKS: none at {STRONG:.0%}+ this game")
+        lines.append("✅ PICKS: none available at a price we beat")
+    held = strong.drop(pub.index)
+    if len(held):
+        lines.append(f"⏸ Held (no market line or price too high): {len(held)} — "
+                     + ", ".join(html.escape(n) for n in held.player))
     kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
     if kp.exists():
         from nba import kalshi
@@ -126,7 +131,8 @@ def snapshot(r) -> dict:
                          "prob": round(float(q.lean_prob_cal), 3) if pd.notna(q.get("lean_prob_cal")) else None,
                          "strong": bool(pd.notna(q.get("lean_prob_cal")) and round(float(q.lean_prob_cal), 2) >= STRONG
                                         and float(q.get("proj_min", 0) or 0) >= 10
-                                        and str(q.get("projected", True)).lower() == "true"),
+                                        and str(q.get("projected", True)).lower() == "true"
+                                        and str(q.get("pub", "")).lower() == "true"),  # published picks only
                          "lock": str(q.get("lock_state", ""))}
     return s
 
@@ -149,15 +155,19 @@ def results_messages():
     for k in sorted(new):
         dte, game = k.split("|")
         x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
-        sx = x[x.prob >= STRONG - 0.005]
-        lines = [f"🏁 <b>PICK results {html.escape(game)}</b> ({dte}, {STRONG:.0%}+)"]
+        sx = record.pub_view(x)
+        lines = [f"🏁 <b>PICK results {html.escape(game)}</b> ({dte}, real line + price)"]
         for _, q in sx.iterrows():
             icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
-            lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} {q.ref:g} → {act}")
+            lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} "
+                         f"{float(q.pub_line):g} ({html.escape(str(q.pub_price))}) → {act} ({q.units:+.2f}u)")
         if sx.empty:
-            lines.append(f"no {STRONG:.0%}+ leans this game")
-        lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
+            lines.append("no published picks this game")
+        else:
+            lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
+        lines.append(f"{STRONG:.0%}+ leans vs own average (reference): "
+                     f"{record.fmt(record.summarize(x[x.prob >= STRONG - 0.005]))}")
         lines.append(f"All leans (reference, not picks): {record.fmt(record.summarize(x))}")
         if record.WLEDGER.exists():
             wl = pd.read_csv(record.WLEDGER)
@@ -218,8 +228,9 @@ def main(d: date):
         n_strong = sum(v["strong"] for v in now.values())
         rec = ROOT / "reports/live/record_summary.md"
         rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
-        send(f"🏀 <b>Picks — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} picks ({STRONG:.0%}+)\n"
-             f"✅ PICK = our model's lean at {STRONG:.0%}+. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet). "
+        send(f"🏀 <b>Picks — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} picks so far "
+             f"({STRONG:.0%}+, on Kalshi/DraftKings at a price we beat; DraftKings checked at each lock)\n"
+             f"✅ PICK = our 70%+ lean, offered at the same or a better line at a price we beat. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet). "
              f"📈 PREDICTION = game-winner model (tracked, not a pick).\n"
              f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
              f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "

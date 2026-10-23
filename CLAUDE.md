@@ -8,7 +8,8 @@
 - Every result must be out-of-sample (walk-forward by season, prior games only). Always run a control / placebo before calling something an edge.
 
 ## Hard rules
-- **No betting lines or third-party projections as model inputs — ever.** Lines are allowed only in `nba/analysis/lines_backtest.py` for evaluation. ESPN summaries contain odds; `nba/ingest/espn.py` strips them (`KEEP_KEYS`).
+- **No betting lines or third-party projections as model inputs — ever.** Lines are allowed only in `nba/analysis/lines_backtest.py` for evaluation.
+- **Exception (user's choice, 2026-10-23): published picks are market-checked.** `nba/markets.py`: a 70%+ lean is a ✅ PICK only if Kalshi (every run, free) or DraftKings (The Odds API, `ODDS_API_KEY` secret; pulled only at each game's final lock, only the needed markets, skipped when credits < 25) offers the same or a better line at a price our calibrated probability beats (positive EV after Kalshi's fee). Prices only filter and grade picks — never model inputs. Picks are graded at that market line and real price (`pub_*` columns, `record.pub_view`); 70%+ leans vs own average @ -120 stay as a reference record. Other 70%+ leans show as ⏸ Held. ESPN summaries contain odds; `nba/ingest/espn.py` strips them (`KEEP_KEYS`).
 - User's pricing assumption when no odds exist: **-120 both sides** (break-even 54.55%).
 - No real historical prop lines are in the repo yet (no free source found). Proxy-line results (season/L10 averages) are **not** edge estimates — see FINDINGS §4.
 

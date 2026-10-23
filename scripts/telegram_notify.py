@@ -26,7 +26,9 @@ import requests  # noqa: E402
 from nba.config import ROOT, VOL_MAX, STRONG_MIN, LOCK_LEAD_MIN, STAT_NAME  # noqa: E402
 
 STRONG = STRONG_MIN  # backtest 2025: stated 70%+ leans hit 75.8%
-TOKEN, CHAT = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+# strip: secrets pasted with a trailing newline break the API URL (404)
+TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip() or None
+CHAT = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip() or None
 API = f"https://api.telegram.org/bot{TOKEN}"
 
 

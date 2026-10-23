@@ -12,15 +12,15 @@ PHI,CLE,VJ Edgecombe,Active,0.3,33.8,13.8,6.0,22.0,5.4,2.0,9.0,2.9,1.0,5.0,22.4,
 PHI,CLE,Joel Embiid,Active,0.3,33.6,23.4,14.0,34.0,8.2,4.0,13.0,4.4,2.0,8.0,35.0,23.0,50.0,1.9,0.9,1.1,2.6,pa,under,30.5,0.7,False,False
 PHI,CLE,Anfernee Simons,Active,0.4,23.6,11.3,4.0,20.0,2.2,0.0,5.0,1.8,0.0,4.0,15.2,7.0,25.0,2.2,0.4,0.1,1.0,ast,under,2.5,0.7,True,False
 PHI,CLE,Kentavious Caldwell-Pope,Active,0.4,22.4,7.9,2.0,15.0,2.8,1.0,6.0,2.0,0.0,4.0,12.3,5.0,21.0,1.4,0.6,0.3,1.1,ast,under,2.5,0.7,False,False
-DEN,OKC,Jamal Murray,Active,0.3,34.4,24.3,13.0,36.0,4.9,2.0,8.0,6.7,3.0,11.0,35.2,23.0,50.0,2.6,0.8,0.4,2.0,ra,under,11.5,0.6,False,True
-DEN,OKC,Nikola Jokic,Active,0.2,34.2,26.2,15.0,38.0,12.6,7.0,18.0,8.2,4.0,13.0,44.2,33.0,62.0,1.4,1.2,0.8,3.5,ra,under,23.5,0.8,True,True
-DEN,OKC,Christian Braun,Active,0.4,31.2,11.0,5.0,18.0,5.1,2.0,8.0,2.3,0.0,4.0,18.9,10.0,27.0,0.9,0.6,0.3,0.9,ast,under,2.5,0.6,False,False
-DEN,OKC,DeMar DeRozan,Active,0.4,30.5,16.3,8.0,26.0,3.2,1.0,6.0,3.5,1.0,6.0,22.9,13.0,33.0,0.6,1.0,0.3,1.1,pra,under,24.5,0.6,False,False
-DEN,OKC,Cameron Johnson,Active,0.4,30.2,10.7,4.0,18.0,4.0,1.0,7.0,2.1,0.0,4.0,17.4,9.0,25.0,1.6,0.7,0.4,0.9,ast,under,2.5,0.6,False,False
-DEN,OKC,Aaron Gordon,Active,0.4,24.8,13.3,6.0,22.0,5.6,2.0,9.0,2.1,0.0,4.0,20.9,11.0,32.0,1.3,0.5,0.3,0.8,ast,under,2.5,0.7,False,False
-DEN,OKC,Marvin Bagley III,Active,0.4,17.7,8.2,1.0,16.0,5.7,1.0,11.0,1.0,0.0,3.0,13.8,4.0,26.0,0.5,0.4,0.5,0.8,ast,under,1.5,0.7,True,False
+DEN,OKC,Jamal Murray,Active,0.3,34.4,24.3,13.0,36.0,4.9,2.0,8.0,6.4,3.0,10.0,35.2,23.0,49.0,2.6,0.8,0.4,2.0,ra,under,11.5,0.6,False,True
+DEN,OKC,Nikola Jokic,Active,0.2,34.2,25.7,15.0,38.0,12.6,7.0,18.0,8.2,4.0,13.0,43.9,32.0,62.0,1.4,1.2,0.8,3.5,ra,under,23.5,0.8,True,True
+DEN,OKC,Christian Braun,Active,0.4,31.2,11.3,5.0,18.0,5.1,2.0,8.0,2.3,0.0,4.0,18.9,11.0,27.0,0.9,0.6,0.3,0.9,ast,under,2.5,0.6,False,False
+DEN,OKC,DeMar DeRozan,Active,0.4,30.5,16.3,8.0,25.0,3.1,1.0,6.0,3.5,1.0,6.0,22.8,13.0,33.0,0.6,0.9,0.3,1.1,pa,under,21.5,0.6,False,False
+DEN,OKC,Cameron Johnson,Active,0.4,30.2,11.1,5.0,18.0,4.0,1.0,7.0,2.1,0.0,4.0,17.6,9.0,26.0,1.6,0.7,0.4,0.9,ast,under,2.5,0.6,False,False
+DEN,OKC,Aaron Gordon,Active,0.4,25.1,13.5,6.0,22.0,5.7,2.0,9.0,2.0,0.0,4.0,21.1,11.0,32.0,1.3,0.5,0.3,0.8,ast,under,2.5,0.7,False,False
+DEN,OKC,Marvin Bagley III,Active,0.4,17.7,8.2,1.0,16.0,5.7,1.0,11.0,1.0,0.0,2.0,13.8,4.0,26.0,0.5,0.4,0.5,0.8,ast,under,1.5,0.7,True,False
 OKC,DEN,Shai Gilgeous-Alexander,Active,0.2,34.3,31.0,20.0,43.0,5.1,2.0,8.0,5.7,3.0,9.0,41.9,29.0,55.0,2.0,1.9,1.0,2.5,reb,over,3.5,0.7,False,False
-OKC,DEN,Jalen Williams,Active,0.2,31.9,16.1,8.0,25.0,5.8,3.0,9.0,4.4,1.0,8.0,25.7,16.0,37.0,0.7,1.3,0.5,2.1,ast,under,5.5,0.7,True,False
+OKC,DEN,Jalen Williams,Active,0.2,31.9,16.1,8.0,25.0,5.8,3.0,9.0,4.4,2.0,8.0,25.7,16.0,37.0,0.7,1.3,0.5,2.1,ast,under,5.5,0.7,True,False
 OKC,DEN,Chet Holmgren,Active,0.3,31.0,15.8,8.0,24.0,8.9,4.0,14.0,1.8,0.0,4.0,25.7,16.0,38.0,0.9,0.8,1.7,1.8,ra,under,10.5,0.6,False,False
-OKC,DEN,Ajay Mitchell,Active,0.3,22.4,10.6,4.0,18.0,3.3,1.0,6.0,3.2,1.0,6.0,17.4,7.0,27.0,0.7,0.9,0.2,1.2,pa,under,16.5,0.7,False,False
+OKC,DEN,Ajay Mitchell,Active,0.3,22.4,10.6,4.0,18.0,3.3,1.0,6.0,3.2,1.0,6.0,17.4,8.0,27.0,0.7,0.9,0.2,1.2,pa,under,16.5,0.7,False,False
 OKC,DEN,Isaiah Hartenstein,Active,0.4,21.7,6.7,2.0,12.0,7.8,3.0,13.0,2.7,0.0,6.0,16.5,8.0,27.0,0.1,0.9,0.8,1.4,pra,under,21.5,0.7,True,False

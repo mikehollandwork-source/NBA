@@ -433,10 +433,12 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
     r = volatility_filter(r, season)
     writable = writable_games(G, d, now)  # decided before any file is written
-    r = apply_locks(r, G, d, now=now, writable=writable)
-    r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     kb = kalshi_board(r, G, d, now=now, writable=writable)
     kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
+    from nba import markets  # publish a pick only if Kalshi/DraftKings offer the line at a price we beat
+    r = markets.check(r, G, kb, writable, now, STRONG_MIN, LOCK_LEAD_MIN)
+    r = apply_locks(r, G, d, now=now, writable=writable)
+    r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     wb = winners_board(G, R, season, d, now=now, writable=writable)
     wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
@@ -458,7 +460,7 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
             keep[c] = False
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Picks — {d:%a %b %-d, %Y}", "",
-         "**✅ PICK** = our model's lean at 70%+. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "
+         "**✅ PICK** = our model's lean at 70%+ that Kalshi or DraftKings offers at the same or a better line, at a price our probability beats. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "
          "**📈 PREDICTION** = game-winner model (tracked, not a pick; backtest 2019-25: 65.8% winners, calibrated).", "",
          f"Only leans the model rates **{STRONG_MIN:.0%}+** (2025 backtest: 75.8% hit; ranked by model probability — "
          "blending in past hit rates made it worse in 7/7 seasons). Lean = the stat the model leans on hardest vs the "
@@ -481,17 +483,22 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
             L.append(winner_line(wb[wb.event_id.astype(str) == str(g.event_id)].iloc[0]))
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
-        if len(x):
-            L += ["✅ PICKS (vs player's own average, not a sportsbook line)", "",
-                  "Player | Team | Pick | Model | Proj", "|---|---|---|---|---|"]
-            for _, q in x.iterrows():
+        pub = x[x["pub"].astype(str).str.lower().eq("true")] if "pub" in x else x.iloc[0:0]
+        held = x.drop(pub.index)
+        if len(pub):
+            L += ["✅ PICKS (70%+ and available on Kalshi/DraftKings at a price we beat)", "",
+                  "Player | Pick | Model | Market price | Edge", "|---|---|---|---|---|"]
+            for _, q in pub.sort_values("pub_ev", ascending=False).iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
                 flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
-                proj = q.get(f"proj_{q.lean_stat}", float("nan"))
-                L.append(f"✅ {nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
-                         f"{q.lean_prob_cal:.0%} | {proj:.1f}")
+                L.append(f"✅ {nm}{flag} ({q.team}) | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} "
+                         f"{float(q.pub_line):g}** | {q.lean_prob_cal:.0%} | {q.pub_price} | {float(q.pub_ev):+.0%}")
         else:
-            L.append(f"✅ PICKS: none at {STRONG_MIN:.0%}+ this game.")
+            L.append("✅ PICKS: none available at a price we beat.")
+        if len(held):
+            L.append("⏸ Held (70%+ but no market line or price too high): " + ", ".join(
+                f"{q.player} {STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}"
+                for _, q in held.iterrows()))
         if kb is not None and len(kb):
             kx = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
             kx = kx.sort_values("exp_roi", ascending=False)

@@ -17,7 +17,7 @@ G = pd.read_parquet(ROOT / f"data/live/games_{d.replace('-', '')}.parquet") if (
     else pd.read_parquet(ROOT / f"data/live/games_{d}.parquet")
 G["away"], G["home"] = G.away.map(lambda x: TEAM.get(x, x)), G.home.map(lambda x: TEAM.get(x, x))
 L = pd.concat([pd.read_csv(f, dtype={"pid": str}) for f in (record.LOCKS / d).glob("*.csv")
-               if not f.name.endswith(".kalshi.csv")], ignore_index=True)
+               if not f.name.endswith((".kalshi.csv", ".winner.csv"))], ignore_index=True)
 L["team"] = L.team.map(lambda x: TEAM.get(x, x))
 t = load_games([int(d[:4]) - 1], qualified_only=False)
 v = t.groupby("pid").agg(g=("gameId", "size"), mu=("pra", "mean"), sd=("pra", "std"))

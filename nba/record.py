@@ -37,7 +37,7 @@ def _box(d: str) -> pd.DataFrame:
 def grade_all() -> pd.DataFrame:
     rows = []
     for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
-        files = [f for f in day.glob("*.csv") if not f.name.endswith(".kalshi.csv")]
+        files = [f for f in day.glob("*.csv") if not f.name.endswith((".kalshi.csv", ".winner.csv"))]
         if not files:
             continue
         L = pd.concat([pd.read_csv(f, dtype={"pid": str}).assign(game=f.stem) for f in files], ignore_index=True)
@@ -115,6 +115,48 @@ def grade_kalshi() -> pd.DataFrame:
     return led
 
 
+WLEDGER = ROOT / "reports" / "live" / "winner_record.csv"
+
+
+def grade_winners() -> pd.DataFrame:
+    """Grade locked game-winner predictions (not picks) once final: straight-up result."""
+    rows = []
+    for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
+        files = list(day.glob("*.winner.csv"))
+        if not files:
+            continue
+        box = _box(day.name)
+        if box.empty:
+            continue
+        pts = box.groupby(["gameId", "team"]).pts.sum()
+        for f in files:
+            w = pd.read_csv(f).iloc[0]
+            gid = int(w.event_id)
+            if gid not in box.gameId.values:
+                continue
+            hp, ap = pts.get((gid, w.home)), pts.get((gid, w.away))
+            if hp is None or ap is None or hp == ap:
+                continue
+            winner = w.home if hp > ap else w.away
+            rows.append({"date": day.name, "game": f.name.replace(".winner.csv", ""), "pick_team": w.pick_team,
+                         "p_pick": float(w.p_pick), "proj_margin_home": float(w.proj_margin_home),
+                         "home_pts": int(hp), "away_pts": int(ap), "winner": winner,
+                         "result": "win" if winner == w.pick_team else "loss"})
+    led = pd.DataFrame(rows, columns=["date", "game", "pick_team", "p_pick", "proj_margin_home", "home_pts",
+                                      "away_pts", "winner", "result"])
+    led.to_csv(WLEDGER, index=False)
+    return led
+
+
+def summarize_w(x: pd.DataFrame) -> str:
+    if x.empty:
+        return "none graded yet"
+    w, l = (x.result == "win").sum(), (x.result == "loss").sum()
+    y = (x.result == "win").astype(float)
+    brier = ((x.p_pick - y) ** 2).mean()
+    return f"{w}-{l} ({w / (w + l):.0%}) · model said {x.p_pick.mean():.0%} · Brier {brier:.3f} (coin flip 0.250)"
+
+
 def model_vs_market(x: pd.DataFrame) -> str:
     """Brier score on every priced rung (lower = better probabilities)."""
     x = x.dropna(subset=["yes_hit", "p_model", "market_p"])
@@ -155,7 +197,7 @@ def fmt(s: dict) -> str:
             f" · model said {s['stated']:.0%}")
 
 
-def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
+def report(led: pd.DataFrame, kled: pd.DataFrame | None = None, wled: pd.DataFrame | None = None) -> str:
     """✅ Picks record first; Kalshi paper tracking (🚫 not picks) after."""
     lines = []
     if led.empty:
@@ -175,6 +217,10 @@ def report(led: pd.DataFrame, kled: pd.DataFrame | None = None) -> str:
                 by.append(f"{s_.upper()} {t['w']}-{t['l']}")
         if by:
             lines.append("- Picks by stat: " + " · ".join(by))
+    if wled is not None:
+        lines.append("**📈 Game-winner PREDICTIONS (tracked, not picks; straight up)**")
+        lines.append(f"- Record: {summarize_w(wled)}" + (f" · last night: {summarize_w(wled[wled.date == wled.date.max()])}"
+                                                        if len(wled) else ""))
     if kled is not None:
         lines.append("**🚫 NOT PICKS — Kalshi paper tracking (testing only; real price + fee, $1 each)**")
         if len(kled):

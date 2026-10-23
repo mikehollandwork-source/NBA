@@ -8,6 +8,7 @@ from nba import record  # noqa: E402
 
 led = record.grade_all()
 kled = record.grade_kalshi()
-txt = record.report(led, kled)
+wled = record.grade_winners()
+txt = record.report(led, kled, wled)
 (record.ROOT / "reports" / "live" / "record_summary.md").write_text(txt + "\n")
 print(txt)

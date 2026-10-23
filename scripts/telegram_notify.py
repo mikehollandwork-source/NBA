@@ -32,6 +32,22 @@ CHAT = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip() or None
 API = f"https://api.telegram.org/bot{TOKEN}"
 
 
+def _check(r, what: str):
+    """Print Telegram's reason (never the token) and stop on errors other than formatting."""
+    if r.ok:
+        return True
+    try:
+        desc = r.json().get("description", r.text[:200])
+    except ValueError:
+        desc = r.text[:200]
+    print(f"Telegram {what} failed ({r.status_code}): {desc}", flush=True)
+    if "chat not found" in desc.lower():
+        print("-> check TELEGRAM_CHAT_ID and send your bot a message first (bots can't start chats)", flush=True)
+    if "can't parse entities" in desc.lower():
+        return False  # caller retries as plain text
+    raise SystemExit(f"Telegram {what} failed: {desc}")
+
+
 def send(text: str):
     if not TOKEN:
         print("---- [dry run] ----\n" + text)
@@ -39,7 +55,11 @@ def send(text: str):
     for chunk in [text[i:i + 3900] for i in range(0, len(text), 3900)]:
         r = requests.post(f"{API}/sendMessage", data={"chat_id": CHAT, "text": chunk, "parse_mode": "HTML",
                                                        "disable_web_page_preview": True}, timeout=30)
-        r.raise_for_status()
+        if not _check(r, "sendMessage"):  # formatting problem: send the same text without HTML
+            plain = html.unescape(chunk.replace("<b>", "").replace("</b>", ""))
+            _check(requests.post(f"{API}/sendMessage", data={"chat_id": CHAT, "text": plain,
+                                                              "disable_web_page_preview": True}, timeout=30),
+                   "sendMessage (plain)")
 
 
 def send_file(path: Path, caption: str):
@@ -47,8 +67,8 @@ def send_file(path: Path, caption: str):
         print(f"---- [dry run] file {path.name}: {caption}")
         return
     with open(path, "rb") as f:
-        requests.post(f"{API}/sendDocument", data={"chat_id": CHAT, "caption": caption},
-                      files={"document": (path.name, f)}, timeout=60).raise_for_status()
+        _check(requests.post(f"{API}/sendDocument", data={"chat_id": CHAT, "caption": caption},
+                             files={"document": (path.name, f)}, timeout=60), "sendDocument")
 
 
 def lean_line(q) -> str:

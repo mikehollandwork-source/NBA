@@ -7,8 +7,6 @@ inputs. Our probability is the calibrated lean probability at the player's own-a
 A better line keeps that probability as a floor (over: market line ≤ ours; under: market line ≥ ours).
 
 Kalshi: free; every rung from the live ladder (PTS/REB/AST/PRA only), every run.
-Polymarket: free, no fees on these markets; player Points/Rebounds/Assists O/U inside each game event
-(gamma-api slug nba-<away>-<home>-<date>), every run. Over = YES at best ask, under = NO at 1 - best bid.
 DraftKings: The Odds API (needs ODDS_API_KEY). Costs credits, so it is pulled only at a game's final
 lock (1 hour before tip), only for the stats our picks need, and skipped when credits run low.
 """
@@ -68,49 +66,6 @@ def kalshi_offers(kb: pd.DataFrame) -> pd.DataFrame:
     o = o[o.ok].drop(columns="ok")
     o["venue"] = "Kalshi"
     o["payout"] = (1 - o.cost) / o.cost      # profit per 1u staked if it wins
-    return o
-
-
-PM = "https://gamma-api.polymarket.com/events"
-PM_STAT = {"points": "pts", "rebounds": "reb", "assists": "ast"}
-
-
-def pm_offers(game, roster: pd.DataFrame) -> pd.DataFrame:
-    """Polymarket player props for one game (free; zero-fee markets)."""
-    day = pd.Timestamp(game.tip_utc).tz_convert("America/New_York").date()
-    try:
-        ev = requests.get(PM, params={"slug": f"nba-{game.away.lower()}-{game.home.lower()}-{day}"}, timeout=30).json()
-    except Exception as ex:
-        print("Polymarket unavailable:", ex, flush=True)
-        return pd.DataFrame()
-    if not ev:
-        return pd.DataFrame()
-    by_name = dict(zip(roster.player.map(name_key), roster.pid.astype(str)))
-    rows = []
-    for m in ev[0].get("markets", []):
-        stat = PM_STAT.get(m.get("sportsMarketType"))
-        q = str(m.get("question", ""))
-        if stat is None or ":" not in q or m.get("line") is None or not m.get("acceptingOrders") or m.get("closed"):
-            continue
-        pid = by_name.get(name_key(q.split(":")[0]))
-        if pid is None:
-            continue
-        fee = float((m.get("feeSchedule") or {}).get("rate", 0) or 0)  # 0 on these markets
-        line = float(m["line"])
-        ask, bid = m.get("bestAsk"), m.get("bestBid")
-        if ask and 0 < float(ask) < 1:
-            c = float(ask) + fee * float(ask) * (1 - float(ask))
-            rows.append({"pid": pid, "stat": stat, "side": "over", "line": line, "cost": c,
-                         "price_txt": f"PM o{line:g} @ {float(ask) * 100:.0f}¢", "liquidity": m.get("liquidityNum")})
-        if bid and 0 < float(bid) < 1:
-            c = (1 - float(bid)) + fee * float(bid) * (1 - float(bid))
-            rows.append({"pid": pid, "stat": stat, "side": "under", "line": line, "cost": c,
-                         "price_txt": f"PM u{line:g} @ {(1 - float(bid)) * 100:.0f}¢", "liquidity": m.get("liquidityNum")})
-    o = pd.DataFrame(rows)
-    if len(o):
-        o["venue"] = "Polymarket"
-        o["payout"] = (1 - o.cost) / o.cost
-        o["volume"] = np.nan
     return o
 
 
@@ -215,12 +170,10 @@ def check(r: pd.DataFrame, G: pd.DataFrame, kb: pd.DataFrame, writable: set, now
                     print("Odds API events unavailable:", ex, flush=True)
                     events = pd.DataFrame()
             dk = dk_offers(g, set(rows.lean_stat), r[r.gameId == int(g.event_id)], events)
-        pm = pm_offers(g, r[r.gameId == int(g.event_id)])
-        offers = pd.concat([x for x in (ko, pm, dk) if len(x)], ignore_index=True) if (len(ko) or len(pm) or len(dk)) \
-            else pd.DataFrame()
+        offers = pd.concat([ko, dk], ignore_index=True) if len(dk) else ko
         for i, q in rows.iterrows():
             b = best_offer(q, offers)
-            r.loc[i, "pub_checked"] = "Kalshi+Polymarket+DK" if (final and ODDS_KEY) else "Kalshi+Polymarket"
+            r.loc[i, "pub_checked"] = "Kalshi+DK" if (final and ODDS_KEY) else "Kalshi"
             if b is not None and b.ev > 0:
                 r.loc[i, "pub"] = True
                 r.loc[i, "pub_venue"], r.loc[i, "pub_price"] = b.venue, b.price_txt

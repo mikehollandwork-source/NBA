@@ -400,8 +400,12 @@ def winners_board(G: pd.DataFrame, R: pd.DataFrame, season: int, d: date, now=No
             x.to_csv(path, index=False)
             out.append(x)
         elif path.exists():
-            out.append(pd.read_csv(path))
-    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+            out.append(pd.read_csv(path, dtype={"event_id": str}))
+    if not out:
+        return pd.DataFrame()
+    wb = pd.concat(out, ignore_index=True)
+    wb["event_id"] = wb.event_id.astype(str)  # new rows are str, CSV round-trip gives int
+    return wb
 
 
 def winner_line(w) -> str:
@@ -432,13 +436,18 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = add_leans(r, te, season)
     r = r.merge(R[["pid", "status", "note", "injury"]], on="pid", how="left")
     r = volatility_filter(r, season)
+    G.to_parquet(LIVE / f"games_{d}.parquet", index=False)  # first: wait_for_lock needs it even if a later step fails
     writable = writable_games(G, d, now)  # decided before any file is written
     r = apply_locks(r, G, d, now=now, writable=writable)
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     kb = kalshi_board(r, G, d, now=now, writable=writable)
     kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
-    wb = winners_board(G, R, season, d, now=now, writable=writable)
-    wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)
+    try:
+        wb = winners_board(G, R, season, d, now=now, writable=writable)
+        wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)
+    except Exception as ex:  # predictions are extras: never block projections/locks
+        print("winner board failed:", ex, flush=True)
+        wb = pd.DataFrame()
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)
     write_sheet(r, G, R, d, kb, wb)
     return r

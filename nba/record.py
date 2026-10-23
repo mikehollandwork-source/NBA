@@ -34,25 +34,6 @@ def _box(d: str) -> pd.DataFrame:
     return b
 
 
-def _result(actual, dnp, side, line, win_units):
-    """(result, units) for one bet at `line`; win pays win_units per 1u staked."""
-    if pd.isna(actual) or dnp == 1:
-        return "void", 0.0
-    if actual == line:
-        return "push", 0.0
-    hit = actual > line if side == "over" else actual < line
-    return ("win", win_units) if hit else ("loss", -1.0)
-
-
-def pub_view(led: pd.DataFrame) -> pd.DataFrame:
-    """Published picks as a ledger graded at the market line and real price."""
-    if "pub" not in led:
-        return led.iloc[0:0]
-    x = led[led.pub.astype(str).str.lower().eq("true")].copy()
-    x["result"], x["units"] = x.pub_result, x.pub_units
-    return x
-
-
 def grade_all() -> pd.DataFrame:
     rows = []
     for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
@@ -76,21 +57,19 @@ def grade_all() -> pd.DataFrame:
                     on=["pid", "gameId"], how="left")
         for _, q in m.iterrows():
             actual = q.get(q.lean_stat)
-            res, profit = _result(actual, q.dnp, q.lean_side, q.lean_ref, WIN)
-            pub = str(q.get("pub", "")).lower() == "true"
-            pres, pprofit = _result(actual, q.dnp, q.lean_side, float(q.pub_line), float(q.pub_payout)) \
-                if pub else ("", 0.0)
+            if pd.isna(actual) or q.dnp == 1:
+                res, profit = "void", 0.0
+            elif actual == q.lean_ref:
+                res, profit = "push", 0.0
+            else:
+                hit = actual > q.lean_ref if q.lean_side == "over" else actual < q.lean_ref
+                res, profit = ("win", WIN) if hit else ("loss", -1.0)
             rows.append({"date": day.name, "game": q.game, "player": q.player, "team": q.team,
                          "stat": q.lean_stat, "side": q.lean_side, "ref": q.lean_ref,
                          "prob": round(float(q.lean_prob_cal), 3), "strong": bool(q.lean_prob_cal >= STRONG - 0.005),
-                         "actual": actual, "result": res, "units": round(profit, 4),
-                         "pub": pub, "pub_venue": q.get("pub_venue") if pub else "",
-                         "pub_line": q.get("pub_line") if pub else np.nan, "pub_price": q.get("pub_price") if pub else "",
-                         "pub_ev": q.get("pub_ev") if pub else np.nan, "pub_result": pres,
-                         "pub_units": round(pprofit, 4)})
+                         "actual": actual, "result": res, "units": round(profit, 4)})
     led = pd.DataFrame(rows, columns=["date", "game", "player", "team", "stat", "side", "ref", "prob", "strong",
-                                      "actual", "result", "units", "pub", "pub_venue", "pub_line", "pub_price",
-                                      "pub_ev", "pub_result", "pub_units"])
+                                      "actual", "result", "units"])
     led.to_csv(LEDGER, index=False)
     return led
 
@@ -222,18 +201,14 @@ def report(led: pd.DataFrame, kled: pd.DataFrame | None = None, wled: pd.DataFra
     """✅ Picks record first; Kalshi paper tracking (🚫 not picks) after."""
     lines = []
     if led.empty:
-        lines.append("**✅ PICKS record:** no graded picks yet.")
+        lines.append("**✅ PICKS record @ -120:** no graded picks yet.")
     else:
         last = led.date.max()
         strong = led.prob >= STRONG - 0.005  # recomputed from the stated prob (old ledgers used 65%)
-        pv = pub_view(led)
-        lines += ["**✅ PICKS record (market-checked since Oct 23: real line + real price)**",
-                  f"- Picks: {fmt(summarize(pv)) if len(pv) else 'none graded yet'}"
-                  + (f" · last night: {fmt(summarize(pv, pv.date == last))}" if len(pv) else ""),
-                  "**Reference (vs player's own average @ -120, not real prices)**",
-                  f"- {STRONG:.0%}+ leans: {fmt(summarize(led, strong))}",
+        lines += ["**✅ PICKS record @ -120 (vs player's own average, not real prices)**",
+                  f"- Picks ({STRONG:.0%}+): {fmt(summarize(led, strong))}",
                   f"  - last night ({last}): {fmt(summarize(led, strong & (led.date == last)))}",
-                  f"- All leans: {fmt(summarize(led))}",
+                  f"- All leans (reference, not picks): {fmt(summarize(led))}",
                   f"  - last night ({last}): {fmt(summarize(led, led.date == last))}"]
         by = []
         for s_, x in led[strong].groupby("stat"):

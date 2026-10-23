@@ -113,7 +113,6 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 4. **Pick** the stat with the largest distance from 50%. Each stat's swing is already in its probability (more swing → wider distribution → closer to 50%). Picking the least-swing stat instead was worse (top 5/night 75.6% vs 77.3%, 2019-25; `reports/phase2/ranking_backtest.md`).
 5. **Second calibration** on picked leans only (picking the max of 7 inflates confidence), per stat.
 - Backtest 2019-25 (149k leans, each season tested on calibrations fit to other seasons): stated 55-60% → 57.5% hit; 60-65% → 62.4%; 65-70% → 67.9%; 70%+ → 77.6%.
-- **Published picks are market-checked (since Oct 23):** a 70%+ lean becomes a ✅ PICK only if Kalshi or DraftKings offers the same or a better line at a price our probability beats (after Kalshi's fee). It's graded at that line and real price. Kalshi has only Points/Rebounds/Assists/Pts+Reb+Ast, so combo picks need DraftKings (checked at each game's lock). The rest show as ⏸ Held. Prices never feed the model.
 - **Board = 70%+ leans only**, ranked by model probability (2025: 75.8% hit, ~10/night). Ranking by model + the player's past hit rates at that line was worse in 7/7 seasons (`reports/phase2/ranking_backtest.md`).
 - ⚠️ = star (last season 22+ PTS) under in his first game: these hit 66.7% vs 77.8% stated (n=42).
 - Full projections for every player stay in the CSV.

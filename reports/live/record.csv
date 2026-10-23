@@ -24,3 +24,14 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units
 2026-10-22,DEN@OKC,Chet Holmgren,OKC,ra,under,10.5,0.589,False,19.0,loss,-1.0
 2026-10-22,DEN@OKC,Jalen Williams,OKC,ast,under,5.5,0.709,True,3.0,win,0.8333
 2026-10-22,DEN@OKC,Ajay Mitchell,OKC,pa,under,16.5,0.67,False,12.0,win,0.8333
+2026-10-23,CHI@MIL,Norman Powell,CHI,ast,under,2.5,0.647,False,1.0,win,0.8333
+2026-10-23,CHI@MIL,Myles Turner,MIL,reb,over,4.5,0.606,False,3.0,loss,-1.0
+2026-10-23,CHI@MIL,Kyle Kuzma,MIL,ra,over,6.5,0.657,False,13.0,win,0.8333
+2026-10-23,CHI@MIL,Tre Jones,CHI,ast,under,5.5,0.891,True,8.0,loss,-1.0
+2026-10-23,CHI@MIL,Tyler Herro,MIL,ast,over,3.5,0.807,True,4.0,win,0.8333
+2026-10-23,CHI@MIL,Jalen Smith,CHI,ast,over,0.5,0.713,True,1.0,win,0.8333
+2026-10-23,CHI@MIL,Isaac Okoro,CHI,reb,under,2.5,0.724,True,3.0,loss,-1.0
+2026-10-23,CHI@MIL,Jaime Jaquez Jr.,MIL,pr,over,19.5,0.674,False,30.0,win,0.8333
+2026-10-23,CHI@MIL,Ryan Rollins,MIL,pa,under,22.5,0.635,False,17.0,win,0.8333
+2026-10-23,CHI@MIL,Matas Buzelis,CHI,pra,over,23.5,0.613,False,15.0,loss,-1.0
+2026-10-23,CHI@MIL,Josh Giddey,CHI,pa,under,25.5,0.679,False,15.0,win,0.8333

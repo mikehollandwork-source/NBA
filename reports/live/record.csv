@@ -1,26 +1,26 @@
-date,game,player,team,stat,side,ref,prob,strong,actual,result,units
-2026-10-22,CLE@PHI,LeBron James,PHI,reb,over,5.5,0.637,False,10.0,win,0.8333
-2026-10-22,CLE@PHI,Kentavious Caldwell-Pope,PHI,ast,under,2.5,0.661,False,2.0,win,0.8333
-2026-10-22,CLE@PHI,Joel Embiid,PHI,pa,under,30.5,0.655,False,25.0,win,0.8333
-2026-10-22,CLE@PHI,Donovan Mitchell,CLE,pts,under,27.5,0.595,False,32.0,loss,-1.0
-2026-10-22,CLE@PHI,Jaylen Brown,PHI,pr,under,35.5,0.651,False,29.0,win,0.8333
-2026-10-22,CLE@PHI,James Harden,CLE,ast,under,7.5,0.565,False,5.0,win,0.8333
-2026-10-22,CLE@PHI,Jarrett Allen,CLE,pa,under,16.5,0.621,False,14.0,win,0.8333
-2026-10-22,CLE@PHI,Sam Merrill,CLE,ast,under,2.5,0.688,False,2.0,win,0.8333
-2026-10-22,CLE@PHI,Anfernee Simons,PHI,ast,under,2.5,0.717,True,0.0,win,0.8333
-2026-10-22,CLE@PHI,Tyrese Maxey,PHI,ast,under,6.5,0.651,False,6.0,win,0.8333
-2026-10-22,CLE@PHI,Evan Mobley,CLE,ast,under,3.5,0.632,False,2.0,win,0.8333
-2026-10-22,CLE@PHI,Jaylon Tyson,CLE,pr,under,17.5,0.6,False,9.0,win,0.8333
-2026-10-22,CLE@PHI,VJ Edgecombe,PHI,ast,under,3.5,0.67,False,6.0,loss,-1.0
-2026-10-22,DEN@OKC,Aaron Gordon,DEN,ast,under,2.5,0.66,False,1.0,win,0.8333
-2026-10-22,DEN@OKC,Nikola Jokic,DEN,ra,under,23.5,0.765,True,12.0,win,0.8333
-2026-10-22,DEN@OKC,Cameron Johnson,DEN,ast,under,2.5,0.649,False,1.0,win,0.8333
-2026-10-22,DEN@OKC,Jamal Murray,DEN,ra,under,11.5,0.602,False,13.0,loss,-1.0
-2026-10-22,DEN@OKC,DeMar DeRozan,DEN,pa,under,21.5,0.593,False,13.0,win,0.8333
-2026-10-22,DEN@OKC,Isaiah Hartenstein,OKC,pra,under,21.5,0.72,True,14.0,win,0.8333
-2026-10-22,DEN@OKC,Marvin Bagley III,DEN,ast,under,1.5,0.72,True,1.0,win,0.8333
-2026-10-22,DEN@OKC,Shai Gilgeous-Alexander,OKC,reb,over,3.5,0.69,False,2.0,loss,-1.0
-2026-10-22,DEN@OKC,Christian Braun,DEN,ast,under,2.5,0.607,False,1.0,win,0.8333
-2026-10-22,DEN@OKC,Chet Holmgren,OKC,ra,under,10.5,0.589,False,19.0,loss,-1.0
-2026-10-22,DEN@OKC,Jalen Williams,OKC,ast,under,5.5,0.709,True,3.0,win,0.8333
-2026-10-22,DEN@OKC,Ajay Mitchell,OKC,pa,under,16.5,0.67,False,12.0,win,0.8333
+date,game,player,team,stat,side,ref,prob,strong,actual,result,units,pub,pub_venue,pub_line,pub_price,pub_ev,pub_result,pub_units
+2026-10-22,CLE@PHI,LeBron James,PHI,reb,over,5.5,0.637,False,10.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Kentavious Caldwell-Pope,PHI,ast,under,2.5,0.661,False,2.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Joel Embiid,PHI,pa,under,30.5,0.655,False,25.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Donovan Mitchell,CLE,pts,under,27.5,0.595,False,32.0,loss,-1.0,False,,,,,,0.0
+2026-10-22,CLE@PHI,Jaylen Brown,PHI,pr,under,35.5,0.651,False,29.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,James Harden,CLE,ast,under,7.5,0.565,False,5.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Jarrett Allen,CLE,pa,under,16.5,0.621,False,14.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Sam Merrill,CLE,ast,under,2.5,0.688,False,2.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Anfernee Simons,PHI,ast,under,2.5,0.717,True,0.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Tyrese Maxey,PHI,ast,under,6.5,0.651,False,6.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Evan Mobley,CLE,ast,under,3.5,0.632,False,2.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,Jaylon Tyson,CLE,pr,under,17.5,0.6,False,9.0,win,0.8333,False,,,,,,0.0
+2026-10-22,CLE@PHI,VJ Edgecombe,PHI,ast,under,3.5,0.67,False,6.0,loss,-1.0,False,,,,,,0.0
+2026-10-22,DEN@OKC,Aaron Gordon,DEN,ast,under,2.5,0.66,False,1.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Nikola Jokic,DEN,ra,under,23.5,0.765,True,12.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Cameron Johnson,DEN,ast,under,2.5,0.649,False,1.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Jamal Murray,DEN,ra,under,11.5,0.602,False,13.0,loss,-1.0,False,,,,,,0.0
+2026-10-22,DEN@OKC,DeMar DeRozan,DEN,pa,under,21.5,0.593,False,13.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Isaiah Hartenstein,OKC,pra,under,21.5,0.72,True,14.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Marvin Bagley III,DEN,ast,under,1.5,0.72,True,1.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Shai Gilgeous-Alexander,OKC,reb,over,3.5,0.69,False,2.0,loss,-1.0,False,,,,,,0.0
+2026-10-22,DEN@OKC,Christian Braun,DEN,ast,under,2.5,0.607,False,1.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Chet Holmgren,OKC,ra,under,10.5,0.589,False,19.0,loss,-1.0,False,,,,,,0.0
+2026-10-22,DEN@OKC,Jalen Williams,OKC,ast,under,5.5,0.709,True,3.0,win,0.8333,False,,,,,,0.0
+2026-10-22,DEN@OKC,Ajay Mitchell,OKC,pa,under,16.5,0.67,False,12.0,win,0.8333,False,,,,,,0.0

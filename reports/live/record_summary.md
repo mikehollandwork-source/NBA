@@ -1,7 +1,9 @@
-**✅ PICKS record @ -120 (vs player's own average, not real prices)**
-- Picks (70%+): 5-0 (100.0%) · +4.17u · ROI +83.3% · model said 73%
+**✅ PICKS record (market-checked since Oct 23: real line + real price)**
+- Picks: none graded yet
+**Reference (vs player's own average @ -120, not real prices)**
+- 70%+ leans: 5-0 (100.0%) · +4.17u · ROI +83.3% · model said 73%
   - last night (2026-10-22): 5-0 (100.0%) · +4.17u · ROI +83.3% · model said 73%
-- All leans (reference, not picks): 20-5 (80.0%) · +11.67u · ROI +46.7% · model said 65%
+- All leans: 20-5 (80.0%) · +11.67u · ROI +46.7% · model said 65%
   - last night (2026-10-22): 20-5 (80.0%) · +11.67u · ROI +46.7% · model said 65%
 - Picks by stat: AST 3-0 · PRA 1-0 · RA 1-0
 **📈 Game-winner PREDICTIONS (tracked, not picks; straight up)**

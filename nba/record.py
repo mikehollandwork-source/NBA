@@ -54,7 +54,8 @@ def grade_all() -> pd.DataFrame:
         files = [f for f in day.glob("*.csv") if not f.name.endswith((".kalshi.csv", ".winner.csv"))]
         if not files:
             continue
-        if not len(bf) or day.name not in set(bf.date):   # DK closing lines for days before DK columns existed
+        has_snap = (ROOT / "reports" / "live" / "dk_lines" / f"{day.name}.csv").exists()
+        if not has_snap and (not len(bf) or day.name not in set(bf.date)):  # DK closing lines for days before DK columns existed
             new = espn_props.backfill(day.name, files)
             if len(new):
                 bf = pd.concat([bf, new], ignore_index=True)
@@ -74,6 +75,14 @@ def grade_all() -> pd.DataFrame:
         L = L[L.gameId.isin(final_games)]
         m = L.merge(box[["pid", "gameId", "dnp", "pts", "reb", "ast", "pra", "pr", "pa", "ra"]],
                     on=["pid", "gameId"], how="left")
+        snap_f = ROOT / "reports" / "live" / "dk_lines" / f"{day.name}.csv"
+        if "dk_line" not in m and snap_f.exists() and "locked_at_utc" in m:
+            # lock files written before DK lines were attached pre-lock: use the DK line logged by the SAME run
+            sn = pd.read_csv(snap_f, dtype={"pid": str})
+            sn = sn.rename(columns={"run_utc": "locked_at_utc"})[["locked_at_utc", "gameId", "pid", "lean_stat",
+                                                                  "dk_line", "dk_price"]]
+            m = m.merge(sn.drop_duplicates(["locked_at_utc", "gameId", "pid", "lean_stat"]),
+                        on=["locked_at_utc", "gameId", "pid", "lean_stat"], how="left")
         if "dk_line" not in m and len(bf):
             b = bf[bf.date == day.name][["gameId", "pid", "stat", "dk_line", "dk_price"]].rename(columns={"stat": "lean_stat"})
             m = m.merge(b, on=["gameId", "pid", "lean_stat"], how="left")

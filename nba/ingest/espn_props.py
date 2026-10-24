@@ -18,12 +18,20 @@ TYPES = {"Total Points": "pts", "Total Rebounds": "reb", "Total Assists": "ast",
 
 def fetch(event_id) -> pd.DataFrame:
     """-> pid, stat, line, over, under (American odds as int), updated."""
+    items, page, pages = [], 1, 1
     try:
-        r = requests.get(URL.format(e=event_id), params={"limit": 1000}, timeout=30)
-        items = r.json().get("items", []) if r.ok else []
+        while page <= pages:  # ESPN pages at 1,000 items; busy games have 1,200+ (page 2 was being missed)
+            r = requests.get(URL.format(e=event_id), params={"limit": 1000, "page": page}, timeout=30)
+            if not r.ok:
+                break
+            j = r.json()
+            items += j.get("items", [])
+            pages = int(j.get("pageCount", 1) or 1)
+            page += 1
     except Exception as ex:
         print("ESPN props unavailable:", ex, flush=True)
-        return pd.DataFrame()
+        if not items:
+            return pd.DataFrame()
     grp = {}
     for x in items:
         stat = TYPES.get(x.get("type", {}).get("name"))

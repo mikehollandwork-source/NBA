@@ -408,9 +408,19 @@ def winners_board(G: pd.DataFrame, R: pd.DataFrame, season: int, d: date, now=No
     return wb
 
 
-def winner_line(w) -> str:
-    return (f"📈 PREDICTION (not a pick): {w.pick_team} {w.p_pick:.0%} to win · "
-            f"projected {w.pick_team} by {abs(w.proj_margin_home):.1f}")
+def team_totals(r: pd.DataFrame, game_id) -> dict:
+    """Sum of projected player points per team (reference only: backtest 64.8% winners vs 65.9% for the
+    margin model, and it runs high early in the season)."""
+    x = r[r.gameId == int(game_id)]
+    return x.groupby("team").proj_pts.sum().round(0).to_dict() if len(x) and "proj_pts" in x else {}
+
+
+def winner_line(w, totals: dict | None = None) -> str:
+    s = (f"📈 PREDICTION (not a pick): {w.pick_team} {w.p_pick:.0%} to win · "
+         f"projected {w.pick_team} by {abs(w.proj_margin_home):.1f}")
+    if totals and w.away in totals and w.home in totals:
+        s += f" · player-sum totals (ref): {w.away} {totals[w.away]:.0f}, {w.home} {totals[w.home]:.0f}"
+    return s
 
 
 # ---------------------------------------------------------------- run
@@ -487,7 +497,7 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
             when = " at " + pd.Timestamp(st.locked_at_utc.iloc[0]).tz_convert("America/New_York").strftime("%-I:%M %p ET")
         L.append(f"## {g.away} @ {g.home} — {tip} · {state}{when if state == 'LOCKED' else ''}")
         if wb is not None and len(wb) and (wb.event_id.astype(str) == str(g.event_id)).any():
-            L.append(winner_line(wb[wb.event_id.astype(str) == str(g.event_id)].iloc[0]))
+            L.append(winner_line(wb[wb.event_id.astype(str) == str(g.event_id)].iloc[0], team_totals(r, g.event_id)))
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
         if len(x):

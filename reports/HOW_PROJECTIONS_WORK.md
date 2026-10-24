@@ -155,6 +155,7 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - Projected point margin from: home edge (~2.6 pts), each team's strength (this season's margin blended with last season's), last-10 trend, rest and back-to-backs, and the **value of rotation players who are out** (from the injury report at the lock).
 - numpy draws 20,000 margins around that projection (spread 13.4 pts); win % = share where the team wins.
 - Backtest 2019-25: 65.9% of winners right, best of every baseline (team rating 64.9%, Elo 64.3%, home team 55.2%), well calibrated (70-75% → 73.6% won). Opening week runs ~3-4 pts over-confident.
+- Each prediction also shows **player-sum team totals** (sum of every player's projected points) for reference only: as a winner method it picked 64.8% in 2020-25 backtests vs 65.9% for the margin model, and it ran ~11 pts high per team in opening week.
 - Locked with the same 1-hour rule; graded straight up (no price). Details: `reports/phase2/winners_backtest.md`.
 
 ## 15. Where it lives in the code

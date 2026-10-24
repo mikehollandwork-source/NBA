@@ -1,5 +1,7 @@
-"""DraftKings player props from ESPN's public core API (provider 100 = DraftKings). DISPLAY ONLY:
-shown next to our picks so the board matches what the sportsbook offers; never a model input.
+"""DraftKings player props from ESPN's public core API (provider 100 = DraftKings). Never a model input.
+User rule (2026-10-24): a 70%+ lean is a ✅ PICK only if DraftKings' main line is the same as ours or
+better (under: DK line >= ours; over: DK line <= ours); it is graded at DK's line and odds frozen at the
+lock. Past days are backfilled from DK's closing line (ESPN keeps recent games only).
 
 Each player/stat/line comes as two prices; the first is the OVER (verified 2026-10-24 on 1,132
 lines from Oct 22-23: when the first price was the favorite players went over 49% vs 42%).
@@ -63,7 +65,60 @@ def attach(r: pd.DataFrame, G: pd.DataFrame, writable: set) -> pd.DataFrame:
             r.loc[i, "dk_line"] = b.line
             r.loc[i, "dk_price"] = b.over if q.lean_side == "over" else b.under
             r.loc[i, "dk_updated"] = b.updated
+    r["dk_ok"] = ok_mask(r)
     return r
+
+
+def ok_mask(r: pd.DataFrame) -> pd.Series:
+    """DK line is ours or better for the lean's side."""
+    if "dk_line" not in r:
+        return pd.Series(False, index=r.index)
+    line = pd.to_numeric(r.dk_line, errors="coerce")
+    ok = ((r.lean_side == "under") & (line >= r.lean_ref)) | ((r.lean_side == "over") & (line <= r.lean_ref))
+    return ok & line.notna() & pd.to_numeric(r.get("dk_price"), errors="coerce").notna()
+
+
+def payout(american) -> float:
+    a = float(american)
+    return 100 / -a if a < 0 else a / 100
+
+
+def log_snapshot(r: pd.DataFrame, d, now, strong_min: float):
+    """Append DK line/price for every 70%+ lean at this run (morning-vs-lock comparison later)."""
+    from nba.config import ROOT
+    x = r[(r.lean_prob_cal.round(2) >= strong_min) & r.get("dk_line", pd.Series(dtype=float)).notna()]
+    if x.empty:
+        return
+    out = ROOT / "reports" / "live" / "dk_lines" / f"{d}.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    snap = x[["gameId", "pid", "player", "lean_stat", "lean_side", "lean_ref", "lean_prob_cal", "dk_line", "dk_price"]].copy()
+    snap.insert(0, "run_utc", pd.Timestamp(now).isoformat(timespec="seconds"))
+    snap.to_csv(out, mode="a", header=not out.exists(), index=False)
+
+
+def backfill(day: str, lock_files) -> pd.DataFrame:
+    """DK CLOSING line/price for each lean in lock files that predate the DK columns."""
+    rows = []
+    for f in lock_files:
+        L = pd.read_csv(f, dtype={"pid": str})
+        if "dk_line" in L or "gameId" not in L or "lean_stat" not in L:
+            continue
+        L = L[L.lean_stat.notna()]
+        if L.empty:
+            continue
+        dk = fetch(int(L.gameId.iloc[0]))
+        if dk.empty:
+            continue
+        for _, q in L.iterrows():
+            m = dk[(dk.pid == str(q.pid)) & (dk.stat == q.lean_stat)]
+            if m.empty:
+                continue
+            m = m.assign(gap=(m.over.abs() - 100).abs() + (m.under.abs() - 100).abs()).sort_values("gap")
+            b = m.iloc[0]
+            rows.append({"date": day, "gameId": int(q.gameId), "pid": str(q.pid), "stat": q.lean_stat,
+                         "dk_line": b.line, "dk_price": b.over if q.lean_side == "over" else b.under,
+                         "source": "DK closing (backfill)"})
+    return pd.DataFrame(rows)
 
 
 def describe(q) -> str:

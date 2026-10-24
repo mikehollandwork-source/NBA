@@ -16,12 +16,12 @@ HOU,SAS,Jabari Smith Jr.,Active,0.3,35.3,19.1,11.0,28.0,6.1,3.0,10.0,1.6,0.0,3.0
 HOU,SAS,Alperen Sengun,Active,0.3,33.7,21.0,12.0,31.0,9.5,5.0,14.0,5.4,2.0,9.0,36.4,24.0,48.0,0.7,1.4,0.7,2.8,pr,over,28.5,0.6,False,False
 HOU,SAS,Reed Sheppard,Day-To-Day,0.4,18.9,9.2,3.0,16.0,2.2,0.0,4.0,2.6,0.0,5.0,13.8,6.0,23.0,2.2,1.5,0.5,1.2,pr,under,15.5,0.7,True,False
 SAS,HOU,Victor Wembanyama,Active,0.3,32.9,23.7,14.0,35.0,12.1,7.0,18.0,3.6,1.0,6.0,38.1,26.0,53.0,1.9,1.3,2.7,3.4,ast,over,2.5,0.7,False,False
-SAS,HOU,De'Aaron Fox,Day-To-Day,0.3,32.4,17.6,10.0,26.0,5.2,2.0,8.0,6.4,3.0,10.0,29.9,19.0,40.0,1.3,1.3,0.3,2.6,ra,over,9.5,0.7,True,False
+SAS,HOU,De'Aaron Fox,Active,0.3,32.4,17.6,10.0,26.0,5.2,2.0,8.0,6.4,3.0,10.0,29.9,19.0,40.0,1.3,1.3,0.3,2.6,ra,over,9.5,0.7,True,False
 SAS,HOU,Devin Vassell,Active,0.3,31.7,12.5,6.0,20.0,4.0,1.0,7.0,2.0,0.0,4.0,18.1,10.0,27.0,2.2,1.0,0.4,1.2,ast,under,2.5,0.7,False,False
 SAS,HOU,Stephon Castle,Active,0.3,31.4,18.7,9.0,29.0,6.2,2.0,10.0,5.2,2.0,9.0,30.2,18.0,43.0,2.5,1.5,0.3,3.4,ast,under,7.5,0.8,True,False
 SAS,HOU,Dylan Harper,Active,0.4,31.3,17.4,9.0,27.0,5.6,2.0,9.0,4.8,2.0,8.0,28.1,17.0,39.0,0.9,1.1,0.4,2.4,pra,over,17.5,0.8,True,False
 SAS,HOU,Julian Champagnie,Active,0.4,27.2,9.3,3.0,16.0,4.9,2.0,8.0,1.3,0.0,3.0,15.2,8.0,24.0,2.3,0.8,0.7,0.9,pra,under,17.5,0.6,False,False
-SAS,HOU,Keldon Johnson,Day-To-Day,0.3,20.9,11.0,4.0,19.0,4.9,2.0,9.0,1.2,0.0,3.0,16.8,8.0,27.0,1.1,0.6,0.1,1.1,ast,under,1.5,0.7,False,False
+SAS,HOU,Keldon Johnson,Active,0.3,20.9,11.0,4.0,19.0,4.9,2.0,9.0,1.2,0.0,3.0,16.8,8.0,27.0,1.1,0.6,0.1,1.1,ast,under,1.5,0.7,False,False
 ATL,CHA,Dyson Daniels,Active,0.3,33.1,14.3,7.0,22.0,6.5,3.0,10.0,5.2,2.0,9.0,24.6,17.0,36.0,0.6,1.9,0.4,2.0,pts,over,10.5,0.7,False,False
 ATL,CHA,Nickeil Alexander-Walker,Active,0.3,32.6,21.8,12.0,32.0,3.4,1.0,6.0,3.4,1.0,6.0,29.3,18.0,40.0,2.9,1.3,0.6,2.4,reb,under,3.5,0.6,False,False
 ATL,CHA,Jalen Johnson,Active,0.3,32.3,20.0,11.0,30.0,9.7,5.0,15.0,6.3,3.0,10.0,36.7,24.0,49.0,1.7,1.2,0.4,3.8,ast,under,7.5,0.7,False,False

@@ -113,6 +113,7 @@ For PTS, REB, AST, PRA, PR, PA, RA:
 4. **Pick** the stat with the largest distance from 50%. Each stat's swing is already in its probability (more swing → wider distribution → closer to 50%). Picking the least-swing stat instead was worse (top 5/night 75.6% vs 77.3%, 2019-25; `reports/phase2/ranking_backtest.md`).
 5. **Second calibration** on picked leans only (picking the max of 7 inflates confidence), per stat.
 - Backtest 2019-25 (149k leans, each season tested on calibrations fit to other seasons): stated 55-60% → 57.5% hit; 60-65% → 62.4%; 65-70% → 67.9%; 70%+ → 77.6%.
+- **DraftKings line shown for reference:** next to each pick, the board shows DraftKings' current line and odds for that stat (from ESPN's public data) at the time of the run, frozen at the lock. It often differs from our own-average line. It is never used by the model or the grading.
 - **Board = 70%+ leans only**, ranked by model probability (2025: 75.8% hit, ~10/night). Ranking by model + the player's past hit rates at that line was worse in 7/7 seasons (`reports/phase2/ranking_backtest.md`).
 - ⚠️ = star (last season 22+ PTS) under in his first game: these hit 66.7% vs 77.8% stated (n=42).
 - Full projections for every player stay in the CSV.

@@ -452,6 +452,11 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
     kb = kalshi_board(r, G, d, now=now, writable=writable)
     kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
+    from nba.ingest import espn_props  # DraftKings line/odds for display only (never a model input)
+    try:
+        r = espn_props.attach(r, G, writable)
+    except Exception as ex:
+        print("DraftKings props unavailable:", ex, flush=True)
     try:
         wb = winners_board(G, R, season, d, now=now, writable=writable)
         wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)
@@ -465,6 +470,7 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
 
 def write_sheet(r, G, R, d, kb=None, wb=None):
     from nba import kalshi
+    from nba.ingest import espn_props
     out_dir = ROOT / "reports" / "live"
     out_dir.mkdir(parents=True, exist_ok=True)
     keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
@@ -501,14 +507,14 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
         if len(x):
-            L += ["✅ PICKS (vs player's own average, not a sportsbook line)", "",
-                  "Player | Team | Pick | Model | Proj", "|---|---|---|---|---|"]
+            L += ["✅ PICKS (vs player's own average, not a sportsbook line; DraftKings line/odds at this run shown for reference)", "",
+                  "Player | Team | Pick | Model | Proj | DraftKings now", "|---|---|---|---|---|---|"]
             for _, q in x.iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
                 flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
                 proj = q.get(f"proj_{q.lean_stat}", float("nan"))
                 L.append(f"✅ {nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
-                         f"{q.lean_prob_cal:.0%} | {proj:.1f}")
+                         f"{q.lean_prob_cal:.0%} | {proj:.1f} | {espn_props.describe(q)}")
         else:
             L.append(f"✅ PICKS: none at {STRONG_MIN:.0%}+ this game.")
         if kb is not None and len(kb):

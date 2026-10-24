@@ -448,17 +448,17 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     r = volatility_filter(r, season)
     G.to_parquet(LIVE / f"games_{d}.parquet", index=False)  # first: wait_for_lock needs it even if a later step fails
     writable = writable_games(G, d, now)  # decided before any file is written
-    r = apply_locks(r, G, d, now=now, writable=writable)
-    r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
-    kb = kalshi_board(r, G, d, now=now, writable=writable)
-    kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
-    from nba.ingest import espn_props  # DraftKings line/odds for display only (never a model input)
-    try:
+    from nba.ingest import espn_props  # DraftKings line/odds (never a model input); BEFORE locking so the
+    try:                                 # lock file freezes the DK line/price the pick is graded at
         r = espn_props.attach(r, G, writable)
         espn_props.log_snapshot(r[r.gameId.isin(G[G.event_id.isin(writable)].event_id.astype("int64"))], d, now,
                                 STRONG_MIN)  # morning-vs-lock line comparison
     except Exception as ex:
         print("DraftKings props unavailable:", ex, flush=True)
+    r = apply_locks(r, G, d, now=now, writable=writable)
+    r.to_parquet(LIVE / f"projections_{d}.parquet", index=False)
+    kb = kalshi_board(r, G, d, now=now, writable=writable)
+    kb.to_parquet(LIVE / f"kalshi_{d}.parquet", index=False)
     try:
         wb = winners_board(G, R, season, d, now=now, writable=writable)
         wb.to_parquet(LIVE / f"winners_{d}.parquet", index=False)

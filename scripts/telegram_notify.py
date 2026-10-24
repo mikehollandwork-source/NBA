@@ -76,8 +76,9 @@ def lean_line(q) -> str:
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
+    from nba.ingest import espn_props
     return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
-            f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f})")
+            f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f}) · {espn_props.describe(q)}")
 
 
 def game_message(g, r) -> str:

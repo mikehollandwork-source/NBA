@@ -97,24 +97,24 @@ UTA,NOP,Jaren Jackson Jr.,Active,0.3,30.4,18.5,10.0,28.0,5.9,3.0,9.0,2.0,0.0,4.0
 UTA,NOP,Isaiah Collier,Active,0.4,18.5,9.0,3.0,16.0,2.4,0.0,5.0,5.1,2.0,9.0,16.2,7.0,26.0,0.7,1.0,0.2,1.9,ra,under,9.5,0.7,True,False
 GSW,MEM,Stephen Curry,Active,0.3,28.1,24.1,12.0,37.0,3.4,1.0,6.0,3.5,1.0,6.0,29.7,18.0,45.0,3.9,1.1,0.4,3.1,ast,under,4.5,0.7,True,False
 GSW,MEM,Draymond Green,Active,0.3,24.7,8.0,3.0,14.0,5.8,2.0,9.0,5.4,2.0,9.0,19.5,10.0,28.0,1.0,1.0,0.6,2.2,pa,over,12.5,0.6,False,False
-GSW,MEM,Brandin Podziemski,Day-To-Day,0.4,20.5,10.5,3.0,19.0,4.0,1.0,7.0,2.7,0.0,5.0,17.6,8.0,28.0,1.8,0.9,0.2,1.5,ra,under,8.5,0.7,True,False
-GSW,MEM,Brandon Williams,Active,0.4,18.8,12.5,4.0,21.0,3.1,1.0,6.0,3.4,1.0,7.0,18.9,8.0,30.0,1.0,0.9,0.3,2.1,ast,under,3.5,0.6,False,False
+GSW,MEM,Brandin Podziemski,Active,0.4,20.5,10.5,3.0,18.0,4.0,1.0,7.0,2.7,0.0,5.0,17.6,7.0,27.0,1.8,0.9,0.2,1.5,ra,under,8.5,0.7,True,False
+GSW,MEM,Brandon Williams,Active,0.4,18.8,12.5,4.0,22.0,3.1,1.0,6.0,3.4,1.0,7.0,18.9,8.0,30.0,1.0,0.9,0.3,2.1,ast,under,3.5,0.6,False,False
 MEM,GSW,Jaylen Wells,Active,0.4,28.3,12.1,5.0,19.0,3.8,1.0,7.0,1.1,0.0,3.0,17.6,9.0,25.0,1.7,1.0,0.2,1.3,ast,under,1.5,0.7,False,False
-MEM,GSW,Cedric Coward,Day-To-Day,0.3,27.6,10.4,4.0,17.0,6.2,2.0,11.0,2.2,0.0,4.0,18.8,10.0,29.0,1.2,0.7,0.5,1.6,pa,under,15.5,0.7,False,False
+MEM,GSW,Cedric Coward,Day-To-Day,0.3,27.6,10.4,4.0,17.0,6.2,2.0,11.0,2.2,0.0,4.0,18.8,10.0,28.0,1.2,0.7,0.5,1.6,pa,under,15.5,0.7,False,False
 MEM,GSW,Jerami Grant,Active,0.4,25.3,13.9,6.0,23.0,2.6,1.0,5.0,2.0,0.0,4.0,17.9,9.0,29.0,1.9,0.7,0.6,2.1,pr,under,21.5,0.7,True,False
 LAC,LAL,Darius Garland,Active,0.3,32.7,21.9,13.0,32.0,2.6,1.0,5.0,5.4,2.0,9.0,28.5,19.0,41.0,2.7,1.3,0.2,3.6,ast,under,6.5,0.7,False,False
 LAC,LAL,Kris Dunn,Active,0.4,28.1,7.4,3.0,13.0,3.9,1.0,7.0,4.5,1.0,8.0,16.5,9.0,23.0,1.5,1.6,0.4,1.6,reb,over,2.5,0.7,False,False
-LAC,LAL,Derrick Jones Jr.,Active,0.4,27.6,8.3,3.0,15.0,4.5,2.0,8.0,2.5,0.0,5.0,16.6,8.0,24.0,0.9,1.0,0.7,1.0,ra,over,4.5,0.8,True,False
-LAL,LAC,Luka Doncic,Active,0.2,35.9,30.1,18.0,43.0,7.8,4.0,12.0,7.7,4.0,12.0,44.2,31.0,60.0,3.8,2.2,0.5,4.5,pa,under,41.5,0.7,False,False
+LAC,LAL,Derrick Jones Jr.,Active,0.4,27.6,8.3,3.0,15.0,4.5,2.0,8.0,2.5,1.0,5.0,16.6,8.0,24.0,0.9,1.0,0.7,1.0,ra,over,4.5,0.8,True,False
+LAL,LAC,Luka Doncic,Active,0.2,35.9,30.1,18.0,43.0,7.8,4.0,12.0,7.7,4.0,12.0,44.2,31.0,61.0,3.8,2.2,0.5,4.5,pa,under,41.5,0.7,False,False
 LAL,LAC,Austin Reaves,Active,0.3,34.9,21.1,12.0,31.0,4.6,2.0,8.0,5.4,2.0,9.0,32.5,20.0,43.0,1.8,1.2,0.6,3.4,pr,under,27.5,0.6,False,False
 LAL,LAC,Quentin Grimes,Active,0.4,26.1,10.3,3.0,18.0,2.9,1.0,5.0,2.8,1.0,5.0,16.1,7.0,26.0,1.1,0.7,0.4,1.6,pr,under,16.5,0.7,False,False
-LAL,LAC,Sandro Mamukelashvili,Active,0.4,19.1,7.9,2.0,14.0,4.3,1.0,8.0,1.5,0.0,4.0,13.3,6.0,22.0,0.8,0.8,0.4,0.8,pr,under,15.5,0.7,True,False
-POR,SAC,Deni Avdija,Active,0.3,31.0,20.3,11.0,31.0,7.5,3.0,12.0,5.2,2.0,9.0,33.0,20.0,46.0,1.8,1.0,0.5,3.6,pa,under,30.5,0.7,True,False
-POR,SAC,Toumani Camara,Active,0.3,29.3,11.4,5.0,19.0,4.2,2.0,7.0,2.1,0.0,4.0,19.4,10.0,26.0,2.5,1.3,0.4,1.6,ast,under,2.5,0.6,False,False
-POR,SAC,Ja Morant,Active,0.3,26.9,15.1,7.0,24.0,3.7,1.0,6.0,6.2,3.0,10.0,25.7,14.0,37.0,1.0,1.1,0.3,2.4,pa,under,26.5,0.7,True,False
+LAL,LAC,Sandro Mamukelashvili,Active,0.4,19.1,7.9,2.0,14.0,4.3,1.0,8.0,1.5,0.0,3.0,13.3,6.0,22.0,0.8,0.8,0.4,0.8,pr,under,15.5,0.7,True,False
+POR,SAC,Deni Avdija,Active,0.3,31.0,20.3,10.0,31.0,7.5,3.0,12.0,5.2,2.0,9.0,33.0,20.0,46.0,1.8,1.0,0.5,3.6,pa,under,30.5,0.7,True,False
+POR,SAC,Toumani Camara,Active,0.3,29.3,11.4,5.0,19.0,4.2,1.0,7.0,2.1,0.0,4.0,19.4,10.0,26.0,2.5,1.3,0.4,1.6,ast,under,2.5,0.6,False,False
+POR,SAC,Ja Morant,Active,0.3,26.9,15.1,7.0,24.0,3.7,1.0,7.0,6.2,3.0,10.0,25.7,14.0,37.0,1.0,1.1,0.3,2.4,pa,under,26.5,0.7,True,False
 POR,SAC,Donovan Clingan,Active,0.3,24.9,10.9,4.0,18.0,9.4,4.0,15.0,1.8,0.0,4.0,21.5,12.0,33.0,1.3,0.7,1.3,1.3,ra,under,13.5,0.7,True,False
 POR,SAC,Jrue Holiday,Active,0.3,22.5,9.8,3.0,17.0,3.6,1.0,7.0,3.1,1.0,6.0,16.4,7.0,26.0,2.2,0.9,0.2,1.9,ast,under,5.5,0.9,True,False
-POR,SAC,Scoot Henderson,Active,0.3,20.3,11.4,4.0,19.0,2.2,0.0,4.0,2.3,0.0,5.0,15.4,7.0,26.0,1.9,0.9,0.2,2.0,ast,under,3.5,0.8,True,False
-SAC,POR,Zach LaVine,Active,0.4,34.1,23.2,13.0,34.0,3.7,1.0,6.0,3.0,1.0,5.0,31.0,18.0,42.0,3.0,1.1,0.3,2.8,ra,over,4.5,0.8,True,False
+POR,SAC,Scoot Henderson,Active,0.3,20.3,11.4,4.0,19.0,2.2,0.0,4.0,2.3,0.0,5.0,15.4,7.0,25.0,1.9,0.9,0.2,2.0,ast,under,3.5,0.8,True,False
+SAC,POR,Zach LaVine,Active,0.4,34.1,23.2,13.0,34.0,3.7,1.0,6.0,3.0,1.0,5.0,31.0,19.0,42.0,3.0,1.1,0.3,2.8,ra,over,4.5,0.8,True,False
 SAC,POR,Keegan Murray,Active,0.4,31.6,12.0,5.0,20.0,5.9,2.0,10.0,1.1,0.0,3.0,18.1,10.0,29.0,1.2,1.1,1.1,1.2,ast,under,1.5,0.7,True,False
 SAC,POR,De'Andre Hunter,Active,0.4,24.3,11.2,5.0,18.0,4.3,1.0,7.0,1.5,0.0,3.0,16.6,9.0,26.0,1.4,0.8,0.2,1.7,pa,under,14.5,0.6,False,False

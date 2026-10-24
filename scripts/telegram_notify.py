@@ -77,8 +77,8 @@ def lean_line(q) -> str:
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
     from nba.ingest import espn_props
-    return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {q.lean_ref:.1f} · "
-            f"<b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f}) · {espn_props.describe(q)}")
+    return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {float(q.dk_line):g} "
+            f"<b>{int(q.dk_price):+d}</b> at DraftKings (our line {q.lean_ref:.1f}) · <b>{q.lean_prob_cal:.0%}</b> (proj {proj:.1f})")
 
 
 def game_message(g, r) -> str:
@@ -102,10 +102,17 @@ def game_message(g, r) -> str:
         if len(wb):
             lines.append(html.escape(winner_line(wb.iloc[0], team_totals(r, g.event_id))))
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
-    if len(strong):
-        lines += [lean_line(q) for _, q in strong.iterrows()]
+    from nba.ingest import espn_props
+    ok = espn_props.ok_mask(strong) if len(strong) else pd.Series(dtype=bool)
+    pub = strong[ok]
+    if len(pub):
+        lines += [lean_line(q) for _, q in pub.iterrows()]
     else:
-        lines.append(f"✅ PICKS: none at {STRONG:.0%}+ this game")
+        lines.append("✅ PICKS: none on DraftKings at our line or better (yet)")
+    rest = strong.drop(pub.index)
+    if len(rest):
+        waiting = int(pd.to_numeric(rest.get("dk_line"), errors="coerce").isna().sum()) if "dk_line" in rest else len(rest)
+        lines.append(f"⏳ waiting for DK line: {waiting} · ⏸ DK line worse than ours: {len(rest) - waiting}")
     kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
     if kp.exists():
         from nba import kalshi
@@ -127,7 +134,8 @@ def snapshot(r) -> dict:
                          "prob": round(float(q.lean_prob_cal), 3) if pd.notna(q.get("lean_prob_cal")) else None,
                          "strong": bool(pd.notna(q.get("lean_prob_cal")) and round(float(q.lean_prob_cal), 2) >= STRONG
                                         and float(q.get("proj_min", 0) or 0) >= 10
-                                        and str(q.get("projected", True)).lower() == "true"),
+                                        and str(q.get("projected", True)).lower() == "true"
+                                        and bool(q.get("dk_ok", False)) and str(q.get("dk_ok", "")).lower() == "true"),
                          "lock": str(q.get("lock_state", ""))}
     return s
 
@@ -150,16 +158,18 @@ def results_messages():
     for k in sorted(new):
         dte, game = k.split("|")
         x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
-        sx = x[x.prob >= STRONG - 0.005]
-        lines = [f"🏁 <b>PICK results {html.escape(game)}</b> ({dte}, {STRONG:.0%}+)"]
+        sx = record.dk_view(x)
+        lines = [f"🏁 <b>PICK results {html.escape(game)}</b> ({dte}, DraftKings line + odds)"]
         for _, q in sx.iterrows():
-            icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
+            icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}.get(q.result, "·")
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
-            lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} {q.ref:g} → {act}")
+            lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} "
+                         f"{float(q.dk_line):g} ({int(q.dk_price):+d}) → {act} ({q.units:+.2f}u)")
         if sx.empty:
-            lines.append(f"no {STRONG:.0%}+ leans this game")
-        lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
-        lines.append(f"All leans (reference, not picks): {record.fmt(record.summarize(x))}")
+            lines.append("no picks on DraftKings this game")
+        else:
+            lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
+        lines.append(f"{STRONG:.0%}+ leans vs own average (reference): {record.fmt(record.summarize(x[x.prob >= STRONG - 0.005]))}")
         if record.WLEDGER.exists():
             wl = pd.read_csv(record.WLEDGER)
             wl = wl[(wl.date == dte) & (wl.game == game)]

@@ -455,6 +455,8 @@ def run(d: date, season: int = LIVE_SEASON, retrain: bool = False) -> pd.DataFra
     from nba.ingest import espn_props  # DraftKings line/odds for display only (never a model input)
     try:
         r = espn_props.attach(r, G, writable)
+        espn_props.log_snapshot(r[r.gameId.isin(G[G.event_id.isin(writable)].event_id.astype("int64"))], d, now,
+                                STRONG_MIN)  # morning-vs-lock line comparison
     except Exception as ex:
         print("DraftKings props unavailable:", ex, flush=True)
     try:
@@ -483,7 +485,7 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
             keep[c] = False
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Picks — {d:%a %b %-d, %Y}", "",
-         "**✅ PICK** = our model's lean at 70%+. **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "
+         "**✅ PICK** = our model's lean at 70%+ that DraftKings offers at our line or better (graded at DK's line + odds). **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "
          "**📈 PREDICTION** = game-winner model (tracked, not a pick; backtest 2019-25: 65.8% winners, calibrated).", "",
          f"Only leans the model rates **{STRONG_MIN:.0%}+** (2025 backtest: 75.8% hit; ranked by model probability — "
          "blending in past hit rates made it worse in 7/7 seasons). Lean = the stat the model leans on hardest vs the "
@@ -506,17 +508,28 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
             L.append(winner_line(wb[wb.event_id.astype(str) == str(g.event_id)].iloc[0], team_totals(r, g.event_id)))
         x = keep[(keep.gameId == int(g.event_id)) & (keep.lean_prob_cal.round(2) >= STRONG_MIN)]
         x = x.sort_values("lean_prob_cal", ascending=False)
-        if len(x):
-            L += ["✅ PICKS (vs player's own average, not a sportsbook line; DraftKings line/odds at this run shown for reference)", "",
-                  "Player | Team | Pick | Model | Proj | DraftKings now", "|---|---|---|---|---|---|"]
-            for _, q in x.iterrows():
+        ok = espn_props.ok_mask(x) if len(x) else pd.Series(dtype=bool)
+        pub, rest = x[ok], x[~ok] if len(x) else x
+        if len(pub):
+            L += ["✅ PICKS (70%+ and DraftKings has our line or better; bet at the DK line/odds shown)", "",
+                  "Player | Team | Bet at DraftKings | Our line | Model | Proj", "|---|---|---|---|---|---|"]
+            for _, q in pub.iterrows():
                 nm = q.player + (" (DTD)" if q.status == "Day-To-Day" else "")
                 flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
                 proj = q.get(f"proj_{q.lean_stat}", float("nan"))
-                L.append(f"✅ {nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}** | "
-                         f"{q.lean_prob_cal:.0%} | {proj:.1f} | {espn_props.describe(q)}")
+                L.append(f"✅ {nm}{flag} | {q.team} | **{STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} "
+                         f"{float(q.dk_line):g} ({int(q.dk_price):+d})** | {q.lean_ref:.1f} | {q.lean_prob_cal:.0%} | {proj:.1f}")
         else:
-            L.append(f"✅ PICKS: none at {STRONG_MIN:.0%}+ this game.")
+            L.append("✅ PICKS: none on DraftKings at our line or better (yet).")
+        if len(rest):
+            wait = rest[pd.to_numeric(rest.get("dk_line"), errors="coerce").isna()] if "dk_line" in rest else rest
+            worse = rest.drop(wait.index)
+            if len(wait):
+                L.append("⏳ Waiting for a DraftKings line: " + ", ".join(
+                    f"{q.player} {STAT_NAME.get(q.lean_stat, q.lean_stat)} {q.lean_side} {q.lean_ref:.1f}" for _, q in wait.iterrows()))
+            if len(worse):
+                L.append("⏸ Not on board (DraftKings line worse than ours): " + ", ".join(
+                    f"{q.player} {q.lean_side} {q.lean_ref:.1f} vs DK {float(q.dk_line):g}" for _, q in worse.iterrows()))
         if kb is not None and len(kb):
             kx = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
             kx = kx.sort_values("exp_roi", ascending=False)

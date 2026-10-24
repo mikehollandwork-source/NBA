@@ -34,12 +34,31 @@ def _box(d: str) -> pd.DataFrame:
     return b
 
 
+DK_BACKFILL = ROOT / "reports" / "live" / "dk_backfill.csv"
+
+
+def _bet(actual, dnp, side, line, win_units):
+    if pd.isna(actual) or dnp == 1:
+        return "void", 0.0
+    if actual == line:
+        return "push", 0.0
+    hit = actual > line if side == "over" else actual < line
+    return ("win", win_units) if hit else ("loss", -1.0)
+
+
 def grade_all() -> pd.DataFrame:
+    from nba.ingest import espn_props
     rows = []
+    bf = pd.read_csv(DK_BACKFILL, dtype={"pid": str}) if DK_BACKFILL.exists() else pd.DataFrame()
     for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
         files = [f for f in day.glob("*.csv") if not f.name.endswith((".kalshi.csv", ".winner.csv"))]
         if not files:
             continue
+        if not len(bf) or day.name not in set(bf.date):   # DK closing lines for days before DK columns existed
+            new = espn_props.backfill(day.name, files)
+            if len(new):
+                bf = pd.concat([bf, new], ignore_index=True)
+                bf.to_csv(DK_BACKFILL, index=False)
         L = pd.concat([pd.read_csv(f, dtype={"pid": str}).assign(game=f.stem) for f in files], ignore_index=True)
         if "lean_stat" not in L:
             continue  # locks from before leans existed
@@ -55,23 +74,38 @@ def grade_all() -> pd.DataFrame:
         L = L[L.gameId.isin(final_games)]
         m = L.merge(box[["pid", "gameId", "dnp", "pts", "reb", "ast", "pra", "pr", "pa", "ra"]],
                     on=["pid", "gameId"], how="left")
+        if "dk_line" not in m and len(bf):
+            b = bf[bf.date == day.name][["gameId", "pid", "stat", "dk_line", "dk_price"]].rename(columns={"stat": "lean_stat"})
+            m = m.merge(b, on=["gameId", "pid", "lean_stat"], how="left")
+        for c in ("dk_line", "dk_price"):
+            if c not in m:
+                m[c] = np.nan
+        m["dk_ok"] = espn_props.ok_mask(m)
         for _, q in m.iterrows():
             actual = q.get(q.lean_stat)
-            if pd.isna(actual) or q.dnp == 1:
-                res, profit = "void", 0.0
-            elif actual == q.lean_ref:
-                res, profit = "push", 0.0
-            else:
-                hit = actual > q.lean_ref if q.lean_side == "over" else actual < q.lean_ref
-                res, profit = ("win", WIN) if hit else ("loss", -1.0)
+            res, profit = _bet(actual, q.dnp, q.lean_side, q.lean_ref, WIN)
+            dres, dunits = _bet(actual, q.dnp, q.lean_side, float(q.dk_line), espn_props.payout(q.dk_price)) \
+                if q.dk_ok else ("", 0.0)
             rows.append({"date": day.name, "game": q.game, "player": q.player, "team": q.team,
                          "stat": q.lean_stat, "side": q.lean_side, "ref": q.lean_ref,
                          "prob": round(float(q.lean_prob_cal), 3), "strong": bool(q.lean_prob_cal >= STRONG - 0.005),
-                         "actual": actual, "result": res, "units": round(profit, 4)})
+                         "actual": actual, "result": res, "units": round(profit, 4),
+                         "dk_line": q.dk_line, "dk_price": q.dk_price, "dk_ok": bool(q.dk_ok),
+                         "dk_result": dres, "dk_units": round(dunits, 4)})
     led = pd.DataFrame(rows, columns=["date", "game", "player", "team", "stat", "side", "ref", "prob", "strong",
-                                      "actual", "result", "units"])
+                                      "actual", "result", "units", "dk_line", "dk_price", "dk_ok", "dk_result",
+                                      "dk_units"])
     led.to_csv(LEDGER, index=False)
     return led
+
+
+def dk_view(led: pd.DataFrame) -> pd.DataFrame:
+    """The real record: 70%+ leans DraftKings offered at our line or better, graded at DK line + odds."""
+    if "dk_ok" not in led:
+        return led.iloc[0:0]
+    x = led[(led.prob >= STRONG - 0.005) & led.dk_ok.astype(str).str.lower().eq("true")].copy()
+    x["result"], x["units"] = x.dk_result, x.dk_units
+    return x
 
 
 KLEDGER = ROOT / "reports" / "live" / "kalshi_record.csv"
@@ -202,22 +236,24 @@ def report(led: pd.DataFrame, kled: pd.DataFrame | None = None, wled: pd.DataFra
     """✅ Picks record first; Kalshi paper tracking (🚫 not picks) after."""
     lines = []
     if led.empty:
-        lines.append("**✅ PICKS record @ -120:** no graded picks yet.")
+        lines.append("**✅ PICKS record (DraftKings line + odds):** no graded picks yet.")
     else:
         last = led.date.max()
         strong = led.prob >= STRONG - 0.005  # recomputed from the stated prob (old ledgers used 65%)
-        lines += ["**✅ PICKS record @ -120 (vs player's own average, not real prices)**",
-                  f"- Picks ({STRONG:.0%}+): {fmt(summarize(led, strong))}",
-                  f"  - last night ({last}): {fmt(summarize(led, strong & (led.date == last)))}",
-                  f"- All leans (reference, not picks): {fmt(summarize(led))}",
-                  f"  - last night ({last}): {fmt(summarize(led, led.date == last))}"]
+        dv = dk_view(led)
+        lines += ["**✅ PICKS record — real DraftKings line + odds (reset Oct 24; earlier days at DK closing line)**",
+                  f"- Picks: {fmt(summarize(dv)) if len(dv) else 'none graded yet'}",
+                  f"  - last night ({last}): {fmt(summarize(dv, dv.date == last)) if len(dv) else 'none'}",
+                  "**Reference only (vs player's own average @ -120, not bettable lines)**",
+                  f"- {STRONG:.0%}+ leans: {fmt(summarize(led, strong))}",
+                  f"- All leans: {fmt(summarize(led))}"]
         by = []
-        for s_, x in led[strong].groupby("stat"):
+        for s_, x in dv.groupby("stat"):
             t = summarize(x)
             if t["w"] + t["l"]:
                 by.append(f"{s_.upper()} {t['w']}-{t['l']}")
         if by:
-            lines.append("- Picks by stat: " + " · ".join(by))
+            lines.append("- DK picks by stat: " + " · ".join(by))
     if wled is not None:
         lines.append("**📈 Game-winner PREDICTIONS (tracked, not picks; straight up)**")
         lines.append(f"- Record: {summarize_w(wled)}" + (f" · last night: {summarize_w(wled[wled.date == wled.date.max()])}"

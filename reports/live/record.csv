@@ -35,3 +35,14 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units
 2026-10-23,CHI@MIL,Ryan Rollins,MIL,pa,under,22.5,0.635,False,17.0,win,0.8333
 2026-10-23,CHI@MIL,Matas Buzelis,CHI,pra,over,23.5,0.613,False,15.0,loss,-1.0
 2026-10-23,CHI@MIL,Josh Giddey,CHI,pa,under,25.5,0.679,False,15.0,win,0.8333
+2026-10-23,ATL@CHA,CJ McCollum,ATL,pra,under,25.5,0.732,True,16.0,win,0.8333
+2026-10-23,ATL@CHA,Royce O'Neale,CHA,ra,under,7.5,0.785,True,2.0,win,0.8333
+2026-10-23,ATL@CHA,Grayson Allen,CHA,ast,under,3.5,0.618,False,3.0,win,0.8333
+2026-10-23,ATL@CHA,Nickeil Alexander-Walker,ATL,reb,under,3.5,0.59,False,3.0,win,0.8333
+2026-10-23,ATL@CHA,Naz Reid,CHA,ast,over,1.5,0.893,True,2.0,win,0.8333
+2026-10-23,ATL@CHA,Luguentz Dort,ATL,reb,under,3.5,0.647,False,5.0,loss,-1.0
+2026-10-23,ATL@CHA,Onyeka Okongwu,ATL,ast,over,2.5,0.724,True,1.0,loss,-1.0
+2026-10-23,ATL@CHA,Moussa Diabate,CHA,pa,over,8.5,0.811,True,6.0,loss,-1.0
+2026-10-23,ATL@CHA,Brandon Miller,CHA,ast,under,3.5,0.683,False,0.0,win,0.8333
+2026-10-23,ATL@CHA,Jalen Johnson,ATL,ast,under,7.5,0.682,False,8.0,loss,-1.0
+2026-10-23,ATL@CHA,Dyson Daniels,ATL,pts,over,10.5,0.665,False,11.0,win,0.8333

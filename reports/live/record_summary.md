@@ -8,6 +8,6 @@
 **📈 Game-winner PREDICTIONS (tracked, not picks; straight up)**
 - Record: 6-6 (50%) · model said 60% · Brier 0.238 (coin flip 0.250) · last night: 6-6 (50%) · model said 60% · Brier 0.238 (coin flip 0.250)
 **🚫 NOT PICKS — Kalshi paper tracking (testing only; real price + fee, $1 each)**
-- Paper record: 77-219 (26.0%) · -11.86u · ROI -4.0% · expected +34.8%
-- Last night (2026-10-23): 61-174 (26.0%) · -25.06u · ROI -10.7% · expected +33.2%
-- Model vs market: Brier model 0.1661 vs Kalshi 0.1638 (market better) · 1651 rungs
+- Paper record: 78-218 (26.4%) · -5.57u · ROI -1.9% · expected +34.8%
+- Last night (2026-10-23): 62-173 (26.4%) · -18.77u · ROI -8.0% · expected +33.2%
+- Model vs market: Brier model 0.1667 vs Kalshi 0.1643 (market better) · 1651 rungs

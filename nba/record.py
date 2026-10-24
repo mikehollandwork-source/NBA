@@ -128,7 +128,8 @@ def grade_winners() -> pd.DataFrame:
         box = _box(day.name)
         if box.empty:
             continue
-        pts = box.groupby(["gameId", "team"]).pts.sum()
+        from nba.live_pipeline import TEAM  # ESPN codes (NY, WSH, ...) -> nba.com codes used in the files
+        pts = box.assign(team=box.team.map(lambda t: TEAM.get(t, t))).groupby(["gameId", "team"]).pts.sum()
         for f in files:
             w = pd.read_csv(f).iloc[0]
             gid = int(w.event_id)

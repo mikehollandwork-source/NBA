@@ -95,11 +95,11 @@ def game_message(g, r) -> str:
     lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
     wp = ROOT / f"data/live/winners_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
     if wp.exists():
-        from nba.live_pipeline import winner_line
+        from nba.live_pipeline import winner_line, team_totals
         wb = pd.read_parquet(wp)
         wb = wb[wb.event_id.astype(str) == str(g.event_id)] if len(wb) else wb
         if len(wb):
-            lines.append(html.escape(winner_line(wb.iloc[0])))
+            lines.append(html.escape(winner_line(wb.iloc[0], team_totals(r, g.event_id))))
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     if len(strong):
         lines += [lean_line(q) for _, q in strong.iterrows()]

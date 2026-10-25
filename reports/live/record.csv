@@ -154,6 +154,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-24,NOP@DEN,Christian Braun,DEN,ast,under,2.5,0.615,False,2.0,win,0.8333,,,False,,0.0
 2026-10-24,NOP@DEN,Bennedict Mathurin,NOP,pa,under,19.5,0.871,True,13.0,win,0.8333,,,False,,0.0
 2026-10-24,NOP@DEN,Jeremiah Fears,NOP,ast,under,3.5,0.73,True,2.0,win,0.8333,2.5,-128.0,False,,0.0
+2026-10-24,GSW@PHX,Devin Booker,PHX,reb,over,3.5,0.684,False,7.0,win,0.8333,3.5,-142.0,True,win,0.7042
+2026-10-24,GSW@PHX,Dillon Brooks,PHX,pa,under,21.5,0.667,False,20.0,win,0.8333,,,False,,0.0
+2026-10-24,GSW@PHX,Miles Bridges,PHX,pa,under,19.5,0.653,False,19.0,win,0.8333,18.5,-116.0,False,,0.0
+2026-10-24,GSW@PHX,Jordan Goodwin,PHX,ra,under,6.5,0.674,False,6.0,win,0.8333,,,False,,0.0
+2026-10-24,GSW@PHX,Collin Gillespie,PHX,ra,under,8.5,0.778,True,13.0,loss,-1.0,,,False,,0.0
+2026-10-24,GSW@PHX,Brandon Williams,GSW,reb,over,2.5,0.635,False,3.0,win,0.8333,3.5,109.0,False,,0.0
 2026-10-24,WAS@CHI,Norman Powell,CHI,ast,under,2.5,0.63,False,3.0,loss,-1.0,1.5,137.0,False,,0.0
 2026-10-24,WAS@CHI,Tre Jones,CHI,ast,under,5.5,0.729,True,3.0,win,0.8333,4.5,-115.0,False,,0.0
 2026-10-24,WAS@CHI,Jalen Smith,CHI,reb,over,6.5,0.72,True,3.0,loss,-1.0,8.5,-102.0,False,,0.0

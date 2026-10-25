@@ -77,10 +77,9 @@ NOP,DEN,Zion Williamson,Active,0.3,32.0,19.9,11.0,29.0,5.2,2.0,9.0,3.1,1.0,6.0,2
 NOP,DEN,Jeremiah Fears,Active,0.4,25.7,11.4,5.0,19.0,3.1,1.0,6.0,2.5,0.0,5.0,16.4,9.0,26.0,1.6,1.2,0.4,1.9,ast,under,3.5,0.7,True,False
 NOP,DEN,Saddiq Bey,Active,0.4,24.2,12.5,5.0,21.0,4.3,1.0,7.0,1.7,0.0,3.0,18.2,9.0,28.0,1.7,0.8,0.2,1.0,pra,under,24.5,0.7,True,False
 NOP,DEN,Bennedict Mathurin,Active,0.4,18.3,8.3,2.0,15.0,3.5,1.0,7.0,1.3,0.0,3.0,13.5,5.0,22.0,0.8,0.6,0.2,1.3,pa,under,19.5,0.9,True,False
-GSW,PHX,Draymond Green,Day-To-Day,0.3,32.4,9.0,4.0,15.0,6.5,3.0,10.0,6.8,3.0,11.0,22.2,14.0,31.0,1.1,1.3,0.6,2.8,ra,over,10.5,0.7,False,False
-GSW,PHX,Brandon Williams,Active,0.4,19.0,10.4,3.0,18.0,3.0,1.0,6.0,2.9,0.0,6.0,16.4,7.0,27.0,0.8,0.9,0.2,1.8,ast,under,3.5,0.7,False,False
+GSW,PHX,Brandon Williams,Active,0.4,22.2,12.1,4.0,21.0,3.5,1.0,7.0,3.4,1.0,7.0,19.1,8.0,31.0,1.0,1.1,0.3,2.1,reb,over,2.5,0.6,False,False
 PHX,GSW,Devin Booker,Active,0.2,33.2,25.0,14.0,37.0,5.1,2.0,8.0,5.1,2.0,8.0,35.0,23.0,49.0,1.1,0.9,0.5,3.3,reb,over,3.5,0.7,False,False
-PHX,GSW,Miles Bridges,Active,0.4,31.3,15.0,7.0,24.0,5.9,3.0,10.0,2.4,0.0,5.0,23.5,14.0,34.0,1.8,0.9,0.5,1.5,pa,under,19.5,0.7,False,False
+PHX,GSW,Miles Bridges,Active,0.4,31.3,15.0,7.0,23.0,5.9,3.0,10.0,2.4,0.0,5.0,23.5,14.0,34.0,1.8,0.9,0.5,1.5,pa,under,19.5,0.7,False,False
 PHX,GSW,Dillon Brooks,Active,0.3,30.8,17.6,9.0,27.0,4.2,2.0,7.0,1.4,0.0,3.0,22.9,13.0,34.0,1.8,1.1,0.2,1.9,pa,under,21.5,0.7,False,False
-PHX,GSW,Collin Gillespie,Active,0.4,21.4,8.8,3.0,16.0,2.9,1.0,6.0,3.4,1.0,6.0,14.5,7.0,24.0,2.9,1.2,0.2,1.5,ra,under,8.5,0.8,True,False
+PHX,GSW,Collin Gillespie,Active,0.4,21.4,8.8,3.0,16.0,2.9,1.0,5.0,3.4,1.0,6.0,14.5,7.0,24.0,2.9,1.2,0.2,1.5,ra,under,8.5,0.8,True,False
 PHX,GSW,Jordan Goodwin,Active,0.4,20.3,6.6,2.0,12.0,4.2,1.0,8.0,1.4,0.0,3.0,12.1,5.0,20.0,1.5,1.6,0.2,1.0,ra,under,6.5,0.7,False,False

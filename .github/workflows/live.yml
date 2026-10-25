@@ -72,7 +72,12 @@ jobs:
             git add reports/live
             git diff --cached --quiet || git commit -q -m "Live projections $D"
             for i in 1 2 3 4; do
-              git pull --rebase -q origin "${GITHUB_REF_NAME}" && git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
+              # on conflicts keep THIS run's files (newest data); never leave a half-finished rebase behind
+              if git pull --rebase -X theirs -q origin "${GITHUB_REF_NAME}"; then
+                git push -q origin "HEAD:${GITHUB_REF_NAME}" && break
+              else
+                git rebase --abort 2>/dev/null || true
+              fi
               sleep $((2 ** i))
             done
           }

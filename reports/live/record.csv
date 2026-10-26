@@ -227,6 +227,50 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-24,BKN@CLE,Day'Ron Sharpe,BKN,reb,over,6.5,0.699,True,8.0,win,0.8333,8.5,-124.0,False,,0.0
 2026-10-24,BKN@CLE,Jaylon Tyson,CLE,pr,under,17.5,0.659,False,16.0,win,0.8333,14.5,-130.0,False,,0.0
 2026-10-24,BKN@CLE,Noah Clowney,BKN,pr,under,15.5,0.682,False,8.0,win,0.8333,11.5,-130.0,False,,0.0
+2026-10-25,MEM@SAC,Jerami Grant,MEM,pr,under,21.5,0.77,True,10.0,win,0.8333,,,False,,0.0
+2026-10-25,MEM@SAC,Zach LaVine,SAC,ra,over,4.5,0.732,True,7.0,win,0.8333,6.5,-101.0,False,,0.0
+2026-10-25,MEM@SAC,De'Andre Hunter,SAC,reb,over,3.5,0.675,False,6.0,win,0.8333,4.5,100.0,False,,0.0
+2026-10-25,MEM@SAC,Cedric Coward,MEM,pa,under,15.5,0.714,True,17.0,loss,-1.0,16.5,-118.0,True,loss,-1.0
+2026-10-25,MEM@SAC,Jaylen Wells,MEM,reb,over,2.5,0.679,False,5.0,win,0.8333,2.5,-163.0,True,win,0.6135
+2026-10-25,LAC@OKC,Kris Dunn,LAC,reb,over,2.5,0.706,True,4.0,win,0.8333,3.5,-126.0,False,,0.0
+2026-10-25,LAC@OKC,Derrick Jones Jr.,LAC,ra,over,4.5,0.654,False,7.0,win,0.8333,,,False,,0.0
+2026-10-25,LAC@OKC,Isaiah Hartenstein,OKC,ast,under,3.5,0.728,True,1.0,win,0.8333,2.5,100.0,False,,0.0
+2026-10-25,LAC@OKC,Shai Gilgeous-Alexander,OKC,ast,under,6.5,0.708,True,5.0,win,0.8333,5.5,117.0,False,,0.0
+2026-10-25,LAC@OKC,Darius Garland,LAC,pts,over,17.5,0.658,False,16.0,loss,-1.0,20.5,-112.0,False,,0.0
+2026-10-25,LAC@OKC,Chet Holmgren,OKC,pts,under,16.5,0.616,False,10.0,win,0.8333,13.5,100.0,False,,0.0
+2026-10-25,LAC@OKC,Jalen Williams,OKC,ast,under,5.5,0.716,True,5.0,win,0.8333,4.5,-149.0,False,,0.0
+2026-10-25,LAC@OKC,Ajay Mitchell,OKC,pra,under,19.5,0.685,False,28.0,loss,-1.0,,,False,,0.0
+2026-10-25,TOR@MIN,Rudy Gobert,MIN,ast,under,1.5,0.562,False,0.0,win,0.8333,1.5,-123.0,True,win,0.813
+2026-10-25,TOR@MIN,Jakob Poeltl,TOR,pa,under,11.5,0.656,False,0.0,win,0.8333,,,False,,0.0
+2026-10-25,TOR@MIN,RJ Barrett,TOR,reb,over,4.5,0.637,False,2.0,loss,-1.0,4.5,-157.0,True,loss,-1.0
+2026-10-25,TOR@MIN,Immanuel Quickley,TOR,pra,under,25.5,0.592,False,24.0,win,0.8333,24.5,-108.0,False,,0.0
+2026-10-25,TOR@MIN,Ayo Dosunmu,MIN,ra,over,6.5,0.706,True,6.0,loss,-1.0,7.5,-101.0,False,,0.0
+2026-10-25,TOR@MIN,Jaden McDaniels,MIN,reb,over,3.5,0.734,True,6.0,win,0.8333,4.5,-130.0,False,,0.0
+2026-10-25,TOR@MIN,LaMelo Ball,MIN,pra,under,31.5,0.657,False,24.0,win,0.8333,30.5,-111.0,False,,0.0
+2026-10-25,TOR@MIN,Scottie Barnes,TOR,pr,over,24.5,0.653,False,3.0,loss,-1.0,26.5,-122.0,False,,0.0
+2026-10-25,TOR@MIN,Anthony Edwards,MIN,reb,over,4.5,0.676,False,1.0,loss,-1.0,5.5,114.0,False,,0.0
+2026-10-25,TOR@MIN,Kawhi Leonard,TOR,pa,under,30.5,0.721,True,,void,0.0,27.5,-116.0,False,,0.0
+2026-10-25,IND@BKN,Julius Randle,BKN,ast,over,4.5,0.616,False,7.0,win,0.8333,5.5,114.0,False,,0.0
+2026-10-25,IND@BKN,Kelly Oubre Jr.,IND,pr,under,18.5,0.755,True,16.0,win,0.8333,11.5,-121.0,False,,0.0
+2026-10-25,IND@BKN,Pascal Siakam,IND,ra,under,10.5,0.628,False,13.0,loss,-1.0,9.5,-106.0,False,,0.0
+2026-10-25,IND@BKN,Ivica Zubac,IND,pra,under,26.5,0.612,False,5.0,win,0.8333,28.5,-106.0,True,win,0.9434
+2026-10-25,IND@BKN,Michael Porter Jr.,BKN,pa,under,26.5,0.604,False,10.0,win,0.8333,24.5,-110.0,False,,0.0
+2026-10-25,IND@BKN,Andrew Nembhard,IND,ra,under,10.5,0.57,False,4.0,win,0.8333,9.5,-128.0,False,,0.0
+2026-10-25,IND@BKN,Aaron Nesmith,IND,pra,under,18.5,0.697,True,16.0,win,0.8333,,,False,,0.0
+2026-10-25,IND@BKN,Day'Ron Sharpe,BKN,reb,over,6.5,0.728,True,4.0,loss,-1.0,9.5,-101.0,False,,0.0
+2026-10-25,IND@BKN,Noah Clowney,BKN,pts,under,11.5,0.703,True,9.0,win,0.8333,7.5,-118.0,False,,0.0
+2026-10-25,IND@BKN,Jarace Walker,IND,ast,under,2.5,0.69,False,1.0,win,0.8333,,,False,,0.0
+2026-10-25,ORL@NYK,Josh Hart,NYK,ra,over,11.5,0.582,False,10.0,loss,-1.0,12.5,-118.0,False,,0.0
+2026-10-25,ORL@NYK,Karl-Anthony Towns,NYK,pra,under,34.5,0.592,False,40.0,loss,-1.0,35.5,-114.0,True,loss,-1.0
+2026-10-25,ORL@NYK,Mikal Bridges,NYK,pra,under,21.5,0.701,True,12.0,win,0.8333,18.5,-106.0,False,,0.0
+2026-10-25,ORL@NYK,Jalen Brunson,NYK,ast,under,6.5,0.645,False,4.0,win,0.8333,5.5,114.0,False,,0.0
+2026-10-25,ORL@NYK,OG Anunoby,NYK,ast,over,1.5,0.775,True,2.0,win,0.8333,2.5,145.0,False,,0.0
+2026-10-25,ORL@NYK,Desmond Bane,ORL,pa,under,23.5,0.657,False,24.0,loss,-1.0,23.5,-126.0,True,loss,-1.0
+2026-10-25,ORL@NYK,Wendell Carter Jr.,ORL,pr,over,18.5,0.623,False,19.0,win,0.8333,18.5,-125.0,True,win,0.8
+2026-10-25,ORL@NYK,Miles McBride,NYK,ast,under,2.5,0.684,False,1.0,win,0.8333,,,False,,0.0
+2026-10-25,ORL@NYK,Jalen Suggs,ORL,ra,over,8.5,0.589,False,12.0,win,0.8333,9.5,-120.0,False,,0.0
+2026-10-25,ORL@NYK,Franz Wagner,ORL,ra,over,8.5,0.637,False,22.0,win,0.8333,10.5,-112.0,False,,0.0
+2026-10-25,ORL@NYK,Anthony Black,ORL,ra,under,7.5,0.791,True,8.0,loss,-1.0,,,False,,0.0
 2026-10-25,LAL@UTA,Luka Doncic,LAL,ast,under,8.5,0.639,False,10.0,loss,-1.0,8.5,-149.0,True,loss,-1.0
 2026-10-25,LAL@UTA,Lauri Markkanen,UTA,pra,under,35.5,0.656,False,35.0,win,0.8333,31.5,-115.0,False,,0.0
 2026-10-25,LAL@UTA,Austin Reaves,LAL,reb,under,4.5,0.607,False,1.0,win,0.8333,4.5,-108.0,True,win,0.9259
@@ -236,3 +280,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-25,LAL@UTA,Quentin Grimes,LAL,pra,under,19.5,0.615,False,5.0,win,0.8333,17.5,-126.0,False,,0.0
 2026-10-25,LAL@UTA,Keyonte George,UTA,pr,under,26.5,0.608,False,33.0,loss,-1.0,23.5,-121.0,False,,0.0
 2026-10-25,LAL@UTA,Isaiah Collier,UTA,ast,under,6.5,0.757,True,6.0,win,0.8333,4.5,-101.0,False,,0.0
+2026-10-25,DET@PHI,LeBron James,PHI,reb,over,5.5,0.704,True,2.0,loss,-1.0,7.5,110.0,False,,0.0
+2026-10-25,DET@PHI,Kentavious Caldwell-Pope,PHI,pr,over,9.5,0.612,False,10.0,win,0.8333,,,False,,0.0
+2026-10-25,DET@PHI,Duncan Robinson,DET,pr,over,13.5,0.627,False,24.0,win,0.8333,15.5,-119.0,False,,0.0
+2026-10-25,DET@PHI,John Collins,DET,ast,over,0.5,0.633,False,0.0,loss,-1.0,,,False,,0.0
+2026-10-25,DET@PHI,Jaylen Brown,PHI,pr,under,35.5,0.651,False,20.0,win,0.8333,33.5,-117.0,False,,0.0
+2026-10-25,DET@PHI,Anfernee Simons,PHI,ast,under,2.5,0.72,True,3.0,loss,-1.0,,,False,,0.0
+2026-10-25,DET@PHI,Tyrese Maxey,PHI,pr,over,31.5,0.582,False,34.0,win,0.8333,30.5,-124.0,True,win,0.8065
+2026-10-25,DET@PHI,Cade Cunningham,DET,ast,under,9.5,0.698,True,8.0,win,0.8333,9.5,-104.0,True,win,0.9615
+2026-10-25,DET@PHI,VJ Edgecombe,PHI,reb,over,5.5,0.603,False,,void,0.0,6.5,114.0,False,,0.0

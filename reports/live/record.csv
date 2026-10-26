@@ -227,3 +227,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-24,BKN@CLE,Day'Ron Sharpe,BKN,reb,over,6.5,0.699,True,8.0,win,0.8333,8.5,-124.0,False,,0.0
 2026-10-24,BKN@CLE,Jaylon Tyson,CLE,pr,under,17.5,0.659,False,16.0,win,0.8333,14.5,-130.0,False,,0.0
 2026-10-24,BKN@CLE,Noah Clowney,BKN,pr,under,15.5,0.682,False,8.0,win,0.8333,11.5,-130.0,False,,0.0
+2026-10-25,LAL@UTA,Luka Doncic,LAL,ast,under,8.5,0.639,False,10.0,loss,-1.0,8.5,-149.0,True,loss,-1.0
+2026-10-25,LAL@UTA,Lauri Markkanen,UTA,pra,under,35.5,0.656,False,35.0,win,0.8333,31.5,-115.0,False,,0.0
+2026-10-25,LAL@UTA,Austin Reaves,LAL,reb,under,4.5,0.607,False,1.0,win,0.8333,4.5,-108.0,True,win,0.9259
+2026-10-25,LAL@UTA,Collin Sexton,LAL,pra,under,20.5,0.822,True,16.0,win,0.8333,,,False,,0.0
+2026-10-25,LAL@UTA,Jaren Jackson Jr.,UTA,ast,over,1.5,0.644,False,1.0,loss,-1.0,2.5,143.0,False,,0.0
+2026-10-25,LAL@UTA,Sandro Mamukelashvili,LAL,pts,under,10.5,0.667,False,9.0,win,0.8333,8.5,101.0,False,,0.0
+2026-10-25,LAL@UTA,Quentin Grimes,LAL,pra,under,19.5,0.615,False,5.0,win,0.8333,17.5,-126.0,False,,0.0
+2026-10-25,LAL@UTA,Keyonte George,UTA,pr,under,26.5,0.608,False,33.0,loss,-1.0,23.5,-121.0,False,,0.0
+2026-10-25,LAL@UTA,Isaiah Collier,UTA,ast,under,6.5,0.757,True,6.0,win,0.8333,4.5,-101.0,False,,0.0

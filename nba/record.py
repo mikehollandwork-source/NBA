@@ -120,6 +120,27 @@ def dk_view(led: pd.DataFrame) -> pd.DataFrame:
 KLEDGER = ROOT / "reports" / "live" / "kalshi_record.csv"
 
 
+KCOLS = ["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_model", "market_p", "p_side",
+         "exp_roi", "paper_pick", "actual", "yes_hit", "result", "units",
+         "fade_side", "fade_cost", "fade_result", "fade_units"]
+
+
+def add_fade(g: pd.DataFrame) -> pd.DataFrame:
+    """Fade = the OPPOSITE side of each Kalshi leg at its real price + fee, frozen at the lock
+    (user's choice 2026-10-27: paper only, tests whether betting against the model's long shots pays)."""
+    from nba import kalshi
+    g = g.copy()
+    cy = g["cost_yes"] if "cost_yes" in g else g.yes_ask + kalshi.fee(g.yes_ask)
+    cn = g["cost_no"] if "cost_no" in g else (1 - g.yes_bid) + kalshi.fee(1 - g.yes_bid)
+    g["fade_side"] = np.where(g.side == "YES", "NO", "YES")
+    g["fade_cost"] = np.where(g.side == "YES", cn, cy)
+    void = g.result == "void"
+    win = g.result == "loss"   # the leg lost -> its opposite won
+    g["fade_result"] = np.where(void, "void", np.where(win, "win", "loss"))
+    g["fade_units"] = np.where(void, 0.0, np.where(win, (1 - g.fade_cost) / g.fade_cost, -1.0))
+    return g
+
+
 def grade_kalshi() -> pd.DataFrame:
     """Grade locked Kalshi picks at the price paid + fee (win (1-cost)/cost, loss -1, void 0)."""
     from nba import kalshi
@@ -149,11 +170,9 @@ def grade_kalshi() -> pd.DataFrame:
         if "market_p" not in g:
             g["market_p"] = (g.yes_bid + g.yes_ask) / 2
         g["yes_hit"] = (g.actual >= g.k).astype(float).where(g.result != "void")
-        out.append(g[["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_model", "market_p",
-                      "p_side", "exp_roi", "paper_pick", "actual", "yes_hit", "result", "units"]])
-    led = pd.concat(out, ignore_index=True) if out else pd.DataFrame(
-        columns=["date", "game", "player", "team", "stat", "side", "k", "price", "cost", "p_model", "market_p", "p_side",
-                 "exp_roi", "paper_pick", "actual", "yes_hit", "result", "units"])
+        g = add_fade(g)
+        out.append(g[KCOLS])
+    led = pd.concat(out, ignore_index=True) if out else pd.DataFrame(columns=KCOLS)
     led.to_csv(KLEDGER, index=False)
     return led
 
@@ -209,6 +228,20 @@ def model_vs_market(x: pd.DataFrame) -> str:
     bm, bk = ((x.p_model - x.yes_hit) ** 2).mean(), ((x.market_p - x.yes_hit) ** 2).mean()
     who = "model better" if bm < bk else "market better"
     return f"Brier model {bm:.4f} vs Kalshi {bk:.4f} ({who}) · {len(x)} rungs"
+
+
+def summarize_fade(x: pd.DataFrame) -> str:
+    """Record of fading every Kalshi paper leg (opposite side, real price + fee)."""
+    if "paper_pick" in x:
+        x = x[x.paper_pick.astype(str).str.lower().eq("true")]
+    if "fade_result" not in x:
+        return "no graded fades yet"
+    x = x[x.fade_result != "void"]
+    w, l = (x.fade_result == "win").sum(), (x.fade_result == "loss").sum()
+    if not w + l:
+        return "no graded fades yet"
+    u = x.fade_units.sum()
+    return f"{w}-{l} ({w / (w + l):.1%}) · {u:+.2f}u · ROI {u / (w + l):+.1%}"
 
 
 def summarize_k(x: pd.DataFrame) -> str:
@@ -272,7 +305,9 @@ def report(led: pd.DataFrame, kled: pd.DataFrame | None = None, wled: pd.DataFra
         if len(kled):
             last = kled.date.max()
             lines += [f"- Paper record: {summarize_k(kled)}", f"- Last night ({last}): {summarize_k(kled[kled.date == last])}",
-                      f"- Model vs market: {model_vs_market(kled)}"]
+                      f"- Model vs market: {model_vs_market(kled)}",
+                      f"- 🔁 Fade (opposite side of every paper leg, real price + fee; also NOT picks): {summarize_fade(kled)}",
+                      f"  - last night ({last}): {summarize_fade(kled[kled.date == last])}"]
         else:
             lines.append("- nothing graded yet (Oct 21 test: 53-187, -19%)")
     return "\n".join(lines)

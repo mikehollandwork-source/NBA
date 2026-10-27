@@ -207,6 +207,7 @@ def kalshi_results():
             lines.append(f"{icon} {html.escape(q.player)} {q.stat.upper()} {rung} @ {q.price * 100:.0f}¢ → "
                          f"{'DNP' if q.result == 'void' else format(q.actual, 'g')} ({q.units:+.2f}u)")
         lines.append("Paper record: " + record.summarize_k(k))
+        lines.append("🔁 Fade record (opposite side, not picks): " + record.summarize_fade(k))
         lines.append("Model vs market: " + record.model_vs_market(k))
         send("\n".join(lines))
     if TOKEN:  # dry runs must not mark anything as sent

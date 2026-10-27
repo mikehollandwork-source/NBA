@@ -11,3 +11,5 @@
 - Paper record: 179-537 (25.0%) · -107.07u · ROI -15.0% · expected +30.4%
 - Last night (2026-10-26): 36-115 (23.8%) · -37.55u · ROI -24.9% · expected +25.0%
 - Model vs market: Brier model 0.1709 vs Kalshi 0.1665 (market better) · 4192 rungs
+- 🔁 Fade (opposite side of every paper leg, real price + fee; also NOT picks): 537-179 (75.0%) · -25.09u · ROI -3.5%
+  - last night (2026-10-26): 115-36 (76.2%) · -5.21u · ROI -3.4%

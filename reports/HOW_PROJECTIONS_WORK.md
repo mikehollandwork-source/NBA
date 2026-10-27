@@ -150,6 +150,7 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - For every rung: our probability P(stat ≥ k) from the same 20,000-game simulation as the ranges (§7), vs Kalshi's price (mid of bid/ask).
 - "Paper picks" = best rung per player-stat where buying at the ask plus Kalshi's fee (0.07 × price × (1 − price)) has ≥5% expected return. **Shown for tracking only, not as bets** — on Oct 21 this rule went 53-187 (−19% ROI) at real prices.
 - Graded after each game at the real price paid; the record also reports a Brier score for model vs market on every rung (lower = better). If the model never beats Kalshi on that score, there is no edge.
+- **🔁 Fade tracking:** each paper leg is also graded on the opposite side (if the model bought YES, the fade buys NO) at the real price + fee frozen at the lock. Tests whether betting *against* the model's disagreements pays. Oct 22-26: paper −15.8% ROI, fade −3.3% — both lose; the bid/ask spread and fee cover the gap. Paper only, not picks.
 - Prices are never used as model inputs.
 
 ## 14. Game-winner predictions (📈 tracked, not picks)

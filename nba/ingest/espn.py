@@ -13,7 +13,7 @@ from datetime import date, timedelta
 import pandas as pd
 import requests
 
-from nba.config import RAW, PROC
+from nba.config import RAW, PROC, LIVE_SEASON
 
 BASE = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba"
 KEEP_KEYS = ("boxscore", "header")  # never store odds/pickcenter/againstTheSpread
@@ -21,23 +21,41 @@ S = requests.Session()
 S.headers["User-Agent"] = "Mozilla/5.0 nba-projection-research"
 
 
-def _get(url, params=None, tries=4):
+def _get(url, params=None, tries=7):
+    """Retry with backoff (~2 min total): ESPN sometimes refuses GitHub runners for a minute or two."""
+    last = None
     for i in range(tries):
         try:
             r = S.get(url, params=params, timeout=30)
             if r.status_code == 200:
                 return r.json()
-        except requests.RequestException:
-            pass
-        time.sleep(2 ** i)
-    raise RuntimeError(f"failed: {url} {params}")
+            last = f"HTTP {r.status_code}"
+        except requests.RequestException as ex:
+            last = type(ex).__name__
+        time.sleep(min(2 ** i, 30))
+    raise RuntimeError(f"failed: {url} {params} ({last})")
+
+
+def _scoreboard(day: str) -> dict:
+    """Scoreboard for YYYYMMDD. Finished past days are cached on disk (they never change), so a
+    flaky ESPN can't stop the live run over a day that's already final."""
+    f = RAW / "espn" / str(LIVE_SEASON) / "scoreboard" / f"{day}.json"  # inside the Actions ESPN cache path
+    if f.exists():
+        return json.loads(f.read_text())
+    b = _get(f"{BASE}/scoreboard", {"dates": day})
+    ev = b.get("events", [])
+    if day < (date.today() - timedelta(1)).strftime("%Y%m%d") and ev and all(
+            e["status"]["type"]["completed"] or e["status"]["type"].get("name") == "STATUS_POSTPONED" for e in ev):
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps({"events": [{k: e[k] for k in ("id", "date", "name", "season", "status")} for e in ev]}))
+    return b
 
 
 def regular_season_event_ids(start: str, end: str, season: int | None = None) -> list[dict]:
     d0, d1 = date.fromisoformat(start), date.fromisoformat(end)
     days = [(d0 + timedelta(n)).strftime("%Y%m%d") for n in range((d1 - d0).days + 1)]
-    with ThreadPoolExecutor(8) as ex:
-        boards = list(ex.map(lambda d: _get(f"{BASE}/scoreboard", {"dates": d}), days))
+    with ThreadPoolExecutor(4) as ex:
+        boards = list(ex.map(_scoreboard, days))
     events = []
     for b in boards:
         for e in b.get("events", []):

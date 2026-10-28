@@ -233,19 +233,20 @@ def on_fire(r: pd.DataFrame, n: int = 5) -> str:
     x = x.join(last, on="pid")
     x = x[x.last_pts.notna()]
     x["hot"] = x.last_pts - x.pts_ref
-    x = x[x.hot > 0].nlargest(15, "hot").nlargest(n, "lean_prob_cal")
+    # user rule 2026-10-28: only players DraftKings offers at our number or better (same check + cap as picks)
+    x = x[(x.hot > 0) & espn_props.ok_mask(x)].nlargest(15, "hot").nlargest(n, "lean_prob_cal")
     if x.empty:
-        return ""
-    x["is_pick"] = (x.lean_prob_cal.round(2) >= STRONG) & espn_props.ok_mask(x)
+        return "🔥 <b>On fire</b>: none with a DraftKings line at our number or better yet"
+    x["is_pick"] = x.lean_prob_cal.round(2) >= STRONG
     lines = ["🔥 <b>On fire — 5 players our data likes most today</b>"]
     for _, q in x.iterrows():
         stat = STAT_NAME.get(q.lean_stat, str(q.lean_stat).upper())
         warn = " ⚠️" if q.lean_side == "under" else ""
-        tag = (f" · ✅ PICK DK {'o' if q.lean_side == 'over' else 'u'}{float(q.dk_line):g} {int(q.dk_price):+d}"
-               if q.is_pick else "")
+        tag = f" · DK {'o' if q.lean_side == 'over' else 'u'}{float(q.dk_line):g} {int(q.dk_price):+d}" + (
+            " ✅ PICK" if q.is_pick else "")
         lines.append(f"• <b>{html.escape(q.player)}</b> ({q.team}) — {q.last_pts:.0f} pts last game (avg {q.pts_ref:.1f}) → "
                      f"{stat} {q.lean_side} {q.lean_ref:g} · <b>{q.lean_prob_cal:.0%}</b>{warn}{tag}")
-    lines.append("Lean vs his own average, not a sportsbook line. ✅ PICK = bettable at DraftKings. "
+    lines.append("Only players DraftKings offers at our number or better. ✅ PICK = 70%+. "
                  "⚠️ under after a hot game (hits less than stated).")
     return "\n".join(lines)
 

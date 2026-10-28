@@ -94,7 +94,7 @@ def payout(american) -> float:
 def log_snapshot(r: pd.DataFrame, d, now, strong_min: float):
     """Append DK line/price for every 70%+ lean at this run (morning-vs-lock comparison later)."""
     from nba.config import ROOT
-    x = r[(r.lean_prob_cal.round(2) >= strong_min) & r.get("dk_line", pd.Series(dtype=float)).notna()]
+    x = r[(r.lean_prob_cal.round(2) >= strong_min) & (r.proj_min >= 10) & r.get("dk_line", pd.Series(dtype=float)).notna()]
     if x.empty:
         return
     out = ROOT / "reports" / "live" / "dk_lines" / f"{d}.csv"

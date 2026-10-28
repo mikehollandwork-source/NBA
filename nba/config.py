@@ -46,3 +46,8 @@ LOCK_LEAD_MIN = 60
 # Plain-English stat names for the board/Telegram (lean stats).
 STAT_NAME = {"pts": "Points", "reb": "Rebounds", "ast": "Assists", "pra": "Pts+Reb+Ast",
              "pr": "Pts+Reb", "pa": "Pts+Ast", "ra": "Reb+Ast"}
+
+# Disagreement cap (user rule 2026-10-28): drop a pick when our probability beats DraftKings' implied
+# probability by more than this. Oct 22-27 leans 20+ pts above DK's implied: 41% hit, -21% ROI (n=54).
+MAX_DISAGREE = 0.20
+CAP_FROM = "2026-10-28"  # first lock date the cap applies to in the record

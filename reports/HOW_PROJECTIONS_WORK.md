@@ -168,7 +168,7 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - Early-season usage trends were tested (2019-25, 3,813 games) and predicted nothing beyond our projection, so they are not used.
 
 ## 16. Daily channel posts (Discord)
-- **Morning:** the pick record (DraftKings line + odds) and 🔥 **On fire**: of the 15 players who beat their own average by the most last game (20+ projected minutes), the 5 our data leans on hardest today. Backtest 2019-25: these leans hit 79.3% vs 76.7% stated, better than stated in every season. Unders right after a hot game hit only 64% vs 70% stated, so they carry ⚠️.
+- **Morning:** the pick record (DraftKings line + odds) and 🔥 **On fire**: of the 15 players who beat their own average by the most last game (20+ projected minutes), the 5 our data leans on hardest today. Only players DraftKings offers at our number or better (same check and 20-point cap as picks) can make the list. Backtest 2019-25: these leans hit 79.3% vs 76.7% stated, better than stated in every season. Unders right after a hot game hit only 64% vs 70% stated, so they carry ⚠️.
 - **At each game's lock (1 hour before tip):** that game's ✅ picks, or just the teams and start time if there are none.
 - **After games:** results for games that had picks, then the updated record.
 - **Disagreement cap:** a 70%+ lean is not a pick if our probability is more than 20 points above DraftKings' implied probability for that price. When we disagree that much, the line has usually known something (Oct 22-27: 41% hit, n=54).

@@ -249,7 +249,8 @@ def add_leans(r: pd.DataFrame, te: pd.DataFrame, season: int) -> pd.DataFrame:
     # star first-game under: model overstates these (70%+ hit 66.7% vs 77.8% stated, n=42)
     r["star_g1_under"] = ((x.pts_lastszn.to_numpy() >= STAR_PTS) & (x.gp.to_numpy() < 1)
                           & (r.lean_side.to_numpy() == "under"))
-    r["strong"] = r.lean_prob_cal.round(2) >= STRONG_MIN
+    # same 10-minute floor the board, Telegram and grader use
+    r["strong"] = (r.lean_prob_cal.round(2) >= STRONG_MIN) & (r.proj_min >= 10)
     return r
 
 

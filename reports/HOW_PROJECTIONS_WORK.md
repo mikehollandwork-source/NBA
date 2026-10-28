@@ -162,3 +162,7 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 
 ## 15. Where it lives in the code
 `nba/analysis/features.py` (inputs) · `groups.py` (input groups) · `drivers.py` (model settings) · `preseason.py` · `projection.py` · `lean.py` · `nba/live_pipeline.py` (tonight) · `nba/record.py` (grading) · `nba/kalshi.py` (paper tracking) · `nba/analysis/winners.py` (game winners) · `scripts/telegram_notify.py`
+
+## 15. 🔥 Scoring watch (Telegram, not picks)
+- Top 5 players on the slate by a mix of **ceiling** (90th-percentile points from the 20,000 sims — a 1-in-10 good night) and **upside** (ceiling minus the player's own average). Players projected under 20 minutes or listed Out/Doubtful are skipped.
+- Early-season usage trends were tested (2019-25, 3,813 games) and predicted nothing beyond our projection, so they are not used.

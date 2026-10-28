@@ -26,11 +26,13 @@ def _get(url, params=None, tries=7):
     last = None
     for i in range(tries):
         try:
-            r = S.get(url, params=params, timeout=30)
+            # retries add a throwaway param so a CDN edge serving a broken cached copy is bypassed
+            q = dict(params or {}, **({"_": int(time.time() * 1000)} if i else {}))
+            r = S.get(url, params=q, timeout=30)
             if r.status_code == 200:
                 return r.json()
             last = f"HTTP {r.status_code}"
-        except requests.RequestException as ex:
+        except (requests.RequestException, ValueError) as ex:  # ValueError = truncated/non-JSON body
             last = type(ex).__name__
         time.sleep(min(2 ** i, 30))
     raise RuntimeError(f"failed: {url} {params} ({last})")

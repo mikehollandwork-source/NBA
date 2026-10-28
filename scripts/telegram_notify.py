@@ -133,47 +133,18 @@ def lean_line(q) -> str:
 
 
 def game_message(g, r) -> str:
+    """Lock post (user's choice 2026-10-28: clean): game, lock time, ✅ picks or 'no picks'."""
     tip = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").strftime("%-I:%M %p ET")
     x = r[(r.gameId == int(g.event_id))]
-    state = x.lock_state.iloc[0] if len(x) else ""
-    if state == "LOCKED":
-        at = x.locked_at_utc.iloc[0] if "locked_at_utc" in x else None
-        lock = " · 🔒 locked" + (f" {pd.Timestamp(at).tz_convert('America/New_York'):%-I:%M %p}" if pd.notna(at) else "")
-    else:
-        cut = pd.Timestamp(g.tip_utc) - pd.Timedelta(minutes=LOCK_LEAD_MIN)
-        lock = f" · locks {cut.tz_convert('America/New_York'):%-I:%M %p}"
+    at = x.locked_at_utc.iloc[0] if len(x) and "locked_at_utc" in x else None
+    lock = f" · 🔒 {pd.Timestamp(at).tz_convert('America/New_York'):%-I:%M %p}" if at is not None and pd.notna(at) else ""
     p = x[x.get("projected", True).astype(str).str.lower() == "true"] if "projected" in x else x
     p = p[p.lean_stat.apply(lambda v: isinstance(v, str)) & (p.proj_min >= 10)].sort_values("lean_prob_cal", ascending=False)
-    lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
-    wp = ROOT / f"data/live/winners_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
-    if wp.exists():
-        from nba.live_pipeline import winner_line, team_totals
-        wb = pd.read_parquet(wp)
-        wb = wb[wb.event_id.astype(str) == str(g.event_id)] if len(wb) else wb
-        if len(wb):
-            lines.append(html.escape(winner_line(wb.iloc[0], team_totals(r, g.event_id))))
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     from nba.ingest import espn_props
-    ok = espn_props.ok_mask(strong) if len(strong) else pd.Series(dtype=bool)
-    pub = strong[ok]
-    if len(pub):
-        lines += [lean_line(q) for _, q in pub.iterrows()]
-    else:
-        lines.append("✅ PICKS: none on DraftKings at our line or better (yet)")
-    rest = strong.drop(pub.index)
-    if len(rest):
-        waiting = int(pd.to_numeric(rest.get("dk_line"), errors="coerce").isna().sum()) if "dk_line" in rest else len(rest)
-        lines.append(f"⏳ waiting for DK line: {waiting} · ⏸ DK line worse than ours: {len(rest) - waiting}")
-    kp = ROOT / f"data/live/kalshi_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
-    if kp.exists():
-        from nba import kalshi
-        kb = pd.read_parquet(kp)
-        if len(kb):
-            kb = kb[(kb.gameId == int(g.event_id)) & kb.paper_pick.astype(str).str.lower().eq("true")]
-            kb = kb.sort_values("exp_roi", ascending=False).head(3)
-        if len(kb):
-            lines.append("🚫 <b>NOT PICKS — Kalshi paper tracking only</b> (do not bet; -19% on its Oct 21 test)")
-            lines += [f"🚫 NOT A PICK · {html.escape(q.player)} — {html.escape(kalshi.describe(q))}" for _, q in kb.iterrows()]
+    pub = strong[espn_props.ok_mask(strong)] if len(strong) else strong
+    lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
+    lines += [lean_line(q) for _, q in pub.iterrows()] if len(pub) else ["No picks"]
     return "\n".join(lines)
 
 
@@ -216,22 +187,9 @@ def results_messages():
             act = "DNP" if q.result == "void" else f"{q.actual:g}"
             lines.append(f"{icon} {html.escape(q.player)} {STAT_NAME.get(q.stat, q.stat.upper())} {q.side} "
                          f"{float(q.dk_line):g} ({int(q.dk_price):+d}) → {act} ({q.units:+.2f}u)")
-        if sx.empty:
-            lines.append("no picks on DraftKings this game")
-        else:
-            lines.append(f"✅ Picks: {record.fmt(record.summarize(sx))}")
-        lines.append(f"{STRONG:.0%}+ leans vs own average (reference): {record.fmt(record.summarize(x[x.prob >= STRONG - 0.005]))}")
-        if record.WLEDGER.exists():
-            wl = pd.read_csv(record.WLEDGER)
-            wl = wl[(wl.date == dte) & (wl.game == game)]
-            for _, q in wl.iterrows():
-                icon = "✅" if q.result == "win" else "❌"
-                lines.append(f"📈 Prediction (not a pick): {q.pick_team} {q.p_pick:.0%} → {icon} "
-                             f"final {game.split('@')[0]} {q.away_pts}-{q.home_pts} {game.split('@')[1]}")
-        send("\n".join(lines))
-    kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
-    wled = pd.read_csv(record.WLEDGER) if record.WLEDGER.exists() else None
-    send(html.escape(record.report(led, kled, wled)).replace("**", ""))
+        if len(sx):  # games with no picks don't get a results post (keep it clean)
+            send("\n".join(lines))
+    send(record_brief())
     if LIVE:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
@@ -265,6 +223,62 @@ def kalshi_results():
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
+def record_brief() -> str:
+    """One-line pick record (DraftKings line + odds) + last night."""
+    from nba import record
+    if not record.LEDGER.exists():
+        return "📊 <b>Record</b>: no graded picks yet"
+    led = pd.read_csv(record.LEDGER)
+    dv = record.dk_view(led)
+    if dv.empty:
+        return "📊 <b>Record</b>: no graded picks yet"
+    last = led.date.max()
+    tot, ln = record.summarize(dv), record.summarize(dv, dv.date == last)
+    def f(t):
+        n = t["w"] + t["l"]
+        return f"{t['w']}-{t['l']}" + (f" ({t['w'] / n:.0%}) · {t['units']:+.2f}u" if n else "")
+    return (f"📊 <b>Record</b> (DraftKings line + odds): {f(tot)}\n"
+            f"Last night ({pd.Timestamp(last):%b %-d}): {f(ln) if ln['w'] + ln['l'] else 'no picks'}")
+
+
+def on_fire(r: pd.DataFrame, n: int = 5) -> str:
+    """🔥 Players who scored well above their average last game, ranked by how strongly our data leans today
+    (user's choice 2026-10-28). Backtest 2019-25 (5 a day, vs own baseline): stated 76.7% -> hit 79.3%, better than
+    stated in 7/7 seasons; unders after a hot game hit 64% vs 70% stated, so they're flagged ⚠️."""
+    from nba.config import PROC, LIVE_SEASON
+    from nba.ingest import espn_props
+    f = PROC / f"player_games_{LIVE_SEASON}.parquet"
+    if not f.exists():
+        return ""
+    pg = pd.read_parquet(f)
+    pg = pg[(pg.source != "pending") & pg.pts.notna() & (pg["min"] > 0)].sort_values("game_date")  # finished games only
+    last = pg.assign(pid=pg.espn_id.astype(str)).groupby("pid").tail(1).set_index("pid")[["pts"]].rename(columns={"pts": "last_pts"})
+    x = r[r.lean_stat.apply(lambda v: isinstance(v, str)) & (r.proj_min >= 20) & r.pts_ref.notna()].copy()
+    if "projected" in x:
+        x = x[x.projected.astype(str).str.lower() == "true"]
+    if "status" in x:
+        x = x[~x.status.fillna("").str.lower().isin(["out", "doubtful"])]
+    x["pid"] = x.pid.astype(str)
+    x = x.join(last, on="pid")
+    x = x[x.last_pts.notna()]
+    x["hot"] = x.last_pts - x.pts_ref
+    x = x[x.hot > 0].nlargest(15, "hot").nlargest(n, "lean_prob_cal")
+    if x.empty:
+        return ""
+    x["is_pick"] = (x.lean_prob_cal.round(2) >= STRONG) & espn_props.ok_mask(x)
+    lines = ["🔥 <b>On fire — 5 players our data likes most today</b>"]
+    for _, q in x.iterrows():
+        stat = STAT_NAME.get(q.lean_stat, str(q.lean_stat).upper())
+        warn = " ⚠️" if q.lean_side == "under" else ""
+        tag = (f" · ✅ PICK DK {'o' if q.lean_side == 'over' else 'u'}{float(q.dk_line):g} {int(q.dk_price):+d}"
+               if q.is_pick else "")
+        lines.append(f"• <b>{html.escape(q.player)}</b> ({q.team}) — {q.last_pts:.0f} pts last game (avg {q.pts_ref:.1f}) → "
+                     f"{stat} {q.lean_side} {q.lean_ref:g} · <b>{q.lean_prob_cal:.0%}</b>{warn}{tag}")
+    lines.append("Lean vs his own average, not a sportsbook line. ✅ PICK = bettable at DraftKings. "
+                 "⚠️ under after a hot game (hits less than stated).")
+    return "\n".join(lines)
+
+
 def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
     """🔥 Most scoring potential tonight (user's choice 2026-10-28: mix of ceiling and upside vs average).
     Ceiling = 90th-percentile points from the 20,000 sims (a 1-in-10 good night); upside = ceiling minus
@@ -286,8 +300,7 @@ def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
 
 
 def main(d: date):
-    kalshi_results()
-    results_messages()
+    results_messages()  # Kalshi paper is still graded in the record files, no longer posted (user 2026-10-28)
     proj = ROOT / f"data/live/projections_{d}.parquet"
     if not proj.exists():
         print(f"no projections for {d}; results only")
@@ -298,59 +311,20 @@ def main(d: date):
     state_path = ROOT / f"reports/live/telegram_state_{d}.json"
     now = snapshot(r)
     if not state_path.exists():
-        n_strong = sum(v["strong"] for v in now.values())
-        rec = ROOT / "reports/live/record_summary.md"
-        rec_txt = html.escape(rec.read_text()).replace("**", "") if rec.exists() else ""
-        send(f"🏀 <b>Picks — {d:%a %b %-d}</b>\n{len(G)} games · {n_strong} picks ({STRONG:.0%}+)\n"
-             f"✅ PICK = our model's lean at {STRONG:.0%}+. 🚫 NOT A PICK = Kalshi paper tracking (testing only, do not bet). "
-             f"📈 PREDICTION = game-winner model (tracked, not a pick).\n"
-             f"Lean = stat the model leans on hardest vs the player's own baseline (not a sportsbook line). "
-             f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "
-             f"Players whose PRA swings > {VOL_MAX} get no projection. Final lock {LOCK_LEAD_MIN} min before tip; "
-             f"full projections in the CSV.\n\n{rec_txt}")
-        watch = scoring_watch(r)
-        if watch:
-            send(watch)
-        for _, g in G.sort_values("tip_utc").iterrows():
-            send(game_message(g, r))
-        if csv.exists():
-            send_file(csv, f"Full projections {d}")
+        # morning post (user's choice 2026-10-28): record + on-fire list only; games post when they lock
+        send(f"🏀 <b>{d:%a %b %-d}</b> · {len(G)} games · picks post as each game locks (1 hr before tip)\n\n"
+             + record_brief())
+        fire = on_fire(r)
+        if fire:
+            send(fire)
     else:
         old = json.loads(state_path.read_text())
-        changed_games, notes = set(), []
-        for pid, n in now.items():
-            o = old.get(pid)
-            was = bool(o and o.get("strong", o.get("prob") is not None and o["prob"] >= STRONG))
-            if o is not None and n["lock"] == "LOCKED" and o["lock"] != "LOCKED":
-                changed_games.add(n["game"]); continue  # final lock -> resend that game
-            if n["lock"] == "LOCKED":
-                continue
-            if not (n["strong"] or was):
-                continue  # only the strongest leans are on the board
-            if n["strong"] and not was:
-                notes.append(f"➕ {n['player']}: {n['lean']} {n['prob']:.0%} now on the board"); changed_games.add(n["game"])
-            elif was and not n["strong"]:
-                why = f"{n['lean'] or 'no lean'} {n['prob']:.0%}" if n["prob"] is not None else "removed (ruled out?)"
-                notes.append(f"➖ {n['player']} off the board ({why})"); changed_games.add(n["game"])
-            else:
-                if n["status"] != o["status"]:
-                    notes.append(f"🩹 {n['player']}: {o['status'] or 'Active'} → {n['status'] or 'Active'}"); changed_games.add(n["game"])
-                if n["lean"] != o["lean"] or abs(n["prob"] - o["prob"]) >= 0.05:
-                    notes.append(f"↔️ {n['player']}: {o['lean']} {o['prob']:.0%} → {n['lean']} {n['prob']:.0%}")
-                    changed_games.add(n["game"])
-        for pid, o in old.items():
-            was = o.get("strong", o.get("prob") is not None and o["prob"] >= STRONG)
-            if pid not in now and was and o["lock"] != "LOCKED":
-                notes.append(f"➖ {o['player']} off the board (ruled out?)"); changed_games.add(o["game"])
-        if not changed_games:
-            print("no changes; nothing sent")
-        else:
-            if notes:
-                send(f"🔄 <b>Update — {pd.Timestamp.now(tz='America/New_York'):%-I:%M %p ET}</b>\n" + "\n".join(html.escape(x) for x in notes[:40]))
-            for _, g in G[G.event_id.astype(int).isin(changed_games)].sort_values("tip_utc").iterrows():
-                send(game_message(g, r))
-            if csv.exists():
-                send_file(csv, f"Updated projections {d}")
+        locked_now = {n["game"] for pid, n in now.items()
+                      if n["lock"] == "LOCKED" and old.get(pid, {}).get("lock") != "LOCKED"}
+        for _, g in G[G.event_id.astype(int).isin(locked_now)].sort_values("tip_utc").iterrows():
+            send(game_message(g, r))
+        if not locked_now:
+            print("no new locks; nothing sent")
     if LIVE:  # dry runs must not mark the board as sent
         state_path.write_text(json.dumps(now))
 

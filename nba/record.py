@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from nba.config import ROOT, LIVE_SEASON, STRONG_MIN
+from nba.config import ROOT, LIVE_SEASON, STRONG_MIN, CAP_FROM
 from nba.ingest import espn
 
 LOCKS = ROOT / "reports" / "live" / "locked"
@@ -89,7 +89,7 @@ def grade_all() -> pd.DataFrame:
         for c in ("dk_line", "dk_price"):
             if c not in m:
                 m[c] = np.nan
-        m["dk_ok"] = espn_props.ok_mask(m)
+        m["dk_ok"] = espn_props.ok_mask(m, cap=day.name >= CAP_FROM)  # cap only from the day it was adopted
         for _, q in m.iterrows():
             actual = q.get(q.lean_stat)
             res, profit = _bet(actual, q.dnp, q.lean_side, q.lean_ref, WIN)

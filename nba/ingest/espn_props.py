@@ -7,6 +7,7 @@ Each player/stat/line comes as two prices; the first is the OVER (verified 2026-
 lines from Oct 22-23: when the first price was the favorite players went over 49% vs 42%).
 Props appear the morning of game day; ESPN keeps only recent games (no historical archive).
 """
+import numpy as np
 import requests
 import pandas as pd
 
@@ -77,13 +78,25 @@ def attach(r: pd.DataFrame, G: pd.DataFrame, writable: set) -> pd.DataFrame:
     return r
 
 
-def ok_mask(r: pd.DataFrame) -> pd.Series:
-    """DK line is ours or better for the lean's side."""
+def implied(american) -> pd.Series:
+    """DraftKings' implied probability for an American price (vig included)."""
+    a = pd.to_numeric(american, errors="coerce")
+    return pd.Series(np.where(a < 0, -a / (-a + 100), 100 / (a + 100)), index=getattr(a, "index", None))
+
+
+def ok_mask(r: pd.DataFrame, cap: bool = True) -> pd.Series:
+    """DK line is ours or better for the lean's side, and (cap) we don't disagree with DK's price by more
+    than MAX_DISAGREE (user rule 2026-10-28: a big disagreement means the line knows something)."""
+    from nba.config import MAX_DISAGREE
     if "dk_line" not in r:
         return pd.Series(False, index=r.index)
     line = pd.to_numeric(r.dk_line, errors="coerce")
+    price = pd.to_numeric(r.get("dk_price"), errors="coerce")
     ok = ((r.lean_side == "under") & (line >= r.lean_ref)) | ((r.lean_side == "over") & (line <= r.lean_ref))
-    return ok & line.notna() & pd.to_numeric(r.get("dk_price"), errors="coerce").notna()
+    ok = ok & line.notna() & price.notna()
+    if cap and "lean_prob_cal" in r:
+        ok = ok & ((pd.to_numeric(r.lean_prob_cal, errors="coerce") - implied(price)) <= MAX_DISAGREE + 1e-9)
+    return ok
 
 
 def payout(american) -> float:

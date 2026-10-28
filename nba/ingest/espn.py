@@ -53,11 +53,39 @@ def _scoreboard(day: str) -> dict:
     return b
 
 
+def _board_from_cache(day: str, season: int) -> dict:
+    """Scoreboard-shaped events for a past US date from cached summaries (completed games only)."""
+    evs = []
+    for f in (RAW / "espn" / str(season)).glob("*.json.gz"):
+        try:
+            h = json.loads(gzip.decompress(f.read_bytes()))["header"]
+            c = h["competitions"][0]
+        except (KeyError, IndexError, ValueError, OSError):
+            continue
+        et = pd.Timestamp(c["date"]).tz_convert("America/New_York").strftime("%Y%m%d")
+        st = c.get("status", {}).get("type", {})
+        if et == day and st.get("completed"):
+            evs.append({"id": f.name.split(".")[0], "date": c["date"], "name": "",
+                        "season": h.get("season", {}), "status": {"type": st}})
+    return {"events": evs}
+
+
 def regular_season_event_ids(start: str, end: str, season: int | None = None) -> list[dict]:
     d0, d1 = date.fromisoformat(start), date.fromisoformat(end)
     days = [(d0 + timedelta(n)).strftime("%Y%m%d") for n in range((d1 - d0).days + 1)]
+    def board(day):
+        try:
+            return _scoreboard(day)
+        except RuntimeError as ex:
+            # past day ESPN won't serve: rebuild it from box scores already cached on disk
+            if day >= date.today().strftime("%Y%m%d") or season is None:
+                raise
+            b = _board_from_cache(day, season)
+            print(f"scoreboard {day} unavailable ({ex}); using {len(b['events'])} cached box scores", flush=True)
+            return b
+
     with ThreadPoolExecutor(4) as ex:
-        boards = list(ex.map(_scoreboard, days))
+        boards = list(ex.map(board, days))
     events = []
     for b in boards:
         for e in b.get("events", []):

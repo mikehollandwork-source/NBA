@@ -9,7 +9,8 @@ flipped or moved >= 5 pts, injury status) and games that just locked (final
 lock = 1 hour before tip), plus the updated CSV. State lives in reports/live/telegram_state_<date>.json
 (committed, so hourly Actions runs know what was already sent).
 
-Needs secrets TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID; without them it prints
+Sends to Discord when DISCORD_WEBHOOK_URL is set (preferred, user's choice 2026-10-28), else Telegram
+(TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID); without either it prints
 the messages instead (dry run).
 """
 import html
@@ -30,6 +31,47 @@ STRONG = STRONG_MIN  # backtest 2025: stated 70%+ leans hit 75.8%
 TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip() or None
 CHAT = (os.environ.get("TELEGRAM_CHAT_ID") or "").strip() or None
 API = f"https://api.telegram.org/bot{TOKEN}"
+# Discord webhook (user's choice 2026-10-28): when set it replaces Telegram; one secret, no chat id
+DISCORD = (os.environ.get("DISCORD_WEBHOOK_URL") or "").strip() or None
+LIVE = bool(DISCORD or TOKEN)  # False = dry run (prints only, nothing marked as sent)
+
+
+def _to_discord(text: str) -> str:
+    """Telegram HTML -> Discord markdown."""
+    return html.unescape(text.replace("<b>", "**").replace("</b>", "**").replace("<i>", "*").replace("</i>", "*"))
+
+
+def _chunks(text: str, size: int = 1900):
+    """Split on line breaks so no message passes Discord's 2,000-character limit."""
+    out, cur = [], ""
+    for line in text.split("\n"):
+        while len(line) > size:  # a single huge line
+            out.append(cur) if cur else None
+            cur = ""
+            out.append(line[:size])
+            line = line[size:]
+        if len(cur) + len(line) + 1 > size:
+            out.append(cur)
+            cur = line
+        else:
+            cur = f"{cur}\n{line}" if cur else line
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _discord_post(**kw):
+    import time
+    for _ in range(5):
+        r = requests.post(DISCORD, timeout=60, **kw)
+        if r.status_code == 429:  # rate limited: wait as told
+            time.sleep(float(r.json().get("retry_after", 1)) + 0.2)
+            continue
+        if not r.ok:
+            raise SystemExit(f"Discord post failed ({r.status_code}): {r.text[:200]}")
+        time.sleep(0.6)  # stay under the webhook rate limit
+        return
+    raise SystemExit("Discord post failed: rate limited 5 times")
 
 
 def _check(r, what: str):
@@ -49,6 +91,10 @@ def _check(r, what: str):
 
 
 def send(text: str):
+    if DISCORD:
+        for chunk in _chunks(_to_discord(text)):
+            _discord_post(json={"content": chunk, "allowed_mentions": {"parse": []}})
+        return
     if not TOKEN:
         print("---- [dry run] ----\n" + text)
         return
@@ -63,6 +109,11 @@ def send(text: str):
 
 
 def send_file(path: Path, caption: str):
+    if DISCORD:
+        with open(path, "rb") as f:
+            _discord_post(data={"payload_json": json.dumps({"content": caption, "allowed_mentions": {"parse": []}})},
+                          files={"files[0]": (path.name, f)})
+        return
     if not TOKEN:
         print(f"---- [dry run] file {path.name}: {caption}")
         return
@@ -181,7 +232,7 @@ def results_messages():
     kled = pd.read_csv(record.KLEDGER) if record.KLEDGER.exists() else None
     wled = pd.read_csv(record.WLEDGER) if record.WLEDGER.exists() else None
     send(html.escape(record.report(led, kled, wled)).replace("**", ""))
-    if TOKEN:  # dry runs must not mark anything as sent
+    if LIVE:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
@@ -210,7 +261,7 @@ def kalshi_results():
         lines.append("🔁 Fade record (opposite side, not picks): " + record.summarize_fade(k))
         lines.append("Model vs market: " + record.model_vs_market(k))
         send("\n".join(lines))
-    if TOKEN:  # dry runs must not mark anything as sent
+    if LIVE:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
@@ -300,7 +351,7 @@ def main(d: date):
                 send(game_message(g, r))
             if csv.exists():
                 send_file(csv, f"Updated projections {d}")
-    if TOKEN:  # dry runs must not mark the board as sent
+    if LIVE:  # dry runs must not mark the board as sent
         state_path.write_text(json.dumps(now))
 
 

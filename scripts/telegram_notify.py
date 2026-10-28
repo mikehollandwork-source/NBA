@@ -143,9 +143,9 @@ def game_message(g, r) -> str:
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     from nba.ingest import espn_props
     pub = strong[espn_props.ok_mask(strong)] if len(strong) else strong
-    lines = [f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"]
-    lines += [lean_line(q) for _, q in pub.iterrows()] if len(pub) else ["No picks"]
-    return "\n".join(lines)
+    if pub.empty:  # user 2026-10-28: no picks -> just the teams and start time
+        return f"<b>{g.away} @ {g.home}</b> · {tip}"
+    return "\n".join([f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"] + [lean_line(q) for _, q in pub.iterrows()])
 
 
 def snapshot(r) -> dict:
@@ -190,35 +190,6 @@ def results_messages():
         if len(sx):  # games with no picks don't get a results post (keep it clean)
             send("\n".join(lines))
     send(record_brief())
-    if LIVE:  # dry runs must not mark anything as sent
-        st_path.write_text(json.dumps(sorted(done | set(new))))
-
-
-def kalshi_results():
-    from nba import record
-    if not record.KLEDGER.exists():
-        return
-    k = pd.read_csv(record.KLEDGER)
-    if k.empty:
-        return
-    st_path = ROOT / "reports/live/telegram_kalshi_state.json"
-    done = set(json.loads(st_path.read_text())) if st_path.exists() else set()
-    new = [x for x in (k.date + "|" + k.game).unique() if x not in done]
-    for key_ in sorted(new):
-        dte, game = key_.split("|")
-        x = k[(k.date == dte) & (k.game == game) & k.paper_pick.astype(str).str.lower().eq("true")]
-        if x.empty:
-            continue
-        lines = [f"🚫 <b>NOT PICKS — Kalshi paper results {html.escape(game)}</b> ({dte})"]
-        for _, q in x.iterrows():
-            icon = {"win": "✅", "loss": "❌", "void": "⚪"}[q.result]
-            rung = f"{q.k}+" if q.side == "YES" else f"under {q.k}"
-            lines.append(f"{icon} {html.escape(q.player)} {q.stat.upper()} {rung} @ {q.price * 100:.0f}¢ → "
-                         f"{'DNP' if q.result == 'void' else format(q.actual, 'g')} ({q.units:+.2f}u)")
-        lines.append("Paper record: " + record.summarize_k(k))
-        lines.append("🔁 Fade record (opposite side, not picks): " + record.summarize_fade(k))
-        lines.append("Model vs market: " + record.model_vs_market(k))
-        send("\n".join(lines))
     if LIVE:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
@@ -300,7 +271,7 @@ def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
 
 
 def main(d: date):
-    results_messages()  # Kalshi paper is still graded in the record files, no longer posted (user 2026-10-28)
+    results_messages()  # Kalshi paper is graded in the record files only; never posted (user 2026-10-28)
     proj = ROOT / f"data/live/projections_{d}.parquet"
     if not proj.exists():
         print(f"no projections for {d}; results only")

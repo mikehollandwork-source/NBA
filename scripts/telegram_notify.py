@@ -214,6 +214,26 @@ def kalshi_results():
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
 
+def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
+    """🔥 Most scoring potential tonight (user's choice 2026-10-28: mix of ceiling and upside vs average).
+    Ceiling = 90th-percentile points from the 20,000 sims (a 1-in-10 good night); upside = ceiling minus
+    the player's own baseline. Ranked by the average of both percentile ranks on the slate. Not picks."""
+    x = r[r.get("projected", True).astype(bool) & (r.proj_min >= 20) & r.pts_p90.notna() & r.pts_ref.notna()].copy()
+    if "status" in x:
+        x = x[~x.status.fillna("").str.lower().isin(["out", "doubtful"])]
+    if x.empty:
+        return ""
+    x["upside"] = x.pts_p90 - x.pts_ref
+    x["score"] = (x.pts_p90.rank(pct=True) + x.upside.rank(pct=True)) / 2
+    x = x.sort_values(["score", "pts_p90"], ascending=False).head(n)
+    lines = ["🔥 <b>Scoring watch — most points potential tonight</b> (NOT picks)",
+             "Mix of ceiling (1-in-10 good night from the sims) and upside vs the player's own average."]
+    for _, q in x.iterrows():
+        lines.append(f"• {html.escape(q.player)} ({q.team}) — proj {q.proj_pts:.1f} · ceiling {q.pts_p90:.0f} · "
+                     f"avg {q.pts_ref:.1f} (+{q.upside:.0f})")
+    return "\n".join(lines)
+
+
 def main(d: date):
     kalshi_results()
     results_messages()
@@ -237,6 +257,9 @@ def main(d: date):
              f"Ranked by model probability. ⚠️ = star first-game under (model overstates these). "
              f"Players whose PRA swings > {VOL_MAX} get no projection. Final lock {LOCK_LEAD_MIN} min before tip; "
              f"full projections in the CSV.\n\n{rec_txt}")
+        watch = scoring_watch(r)
+        if watch:
+            send(watch)
         for _, g in G.sort_values("tip_utc").iterrows():
             send(game_message(g, r))
         if csv.exists():

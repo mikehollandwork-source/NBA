@@ -82,6 +82,10 @@ def regular_season_event_ids(start: str, end: str, season: int | None = None) ->
                 raise
             b = _board_from_cache(day, season)
             print(f"scoreboard {day} unavailable ({ex}); using {len(b['events'])} cached box scores", flush=True)
+            if b["events"] and day < (date.today() - timedelta(1)).strftime("%Y%m%d"):
+                f = RAW / "espn" / str(LIVE_SEASON) / "scoreboard" / f"{day}.json"  # don't pay the retries again
+                f.parent.mkdir(parents=True, exist_ok=True)
+                f.write_text(json.dumps(b))
             return b
 
     with ThreadPoolExecutor(4) as ex:

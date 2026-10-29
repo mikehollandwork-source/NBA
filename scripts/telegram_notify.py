@@ -16,6 +16,7 @@ the messages instead (dry run).
 import html
 import json
 import os
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -60,15 +61,35 @@ def _chunks(text: str, size: int = 1900):
     return out
 
 
+WEBHOOK_RE = re.compile(r"^https://(?:(?:ptb|canary)\.)?discord(?:app)?\.com/api/(?:v\d+/)?webhooks/\d+/[\w-]+$")
+
+
+def _check_webhook():
+    """Fail loudly (without printing the secret) if the URL isn't a Discord webhook link."""
+    if not WEBHOOK_RE.match(DISCORD):
+        host = DISCORD.split("/")[2] if DISCORD.count("/") >= 2 else "?"
+        path = "/".join(DISCORD.split("/")[3:5]) if DISCORD.count("/") >= 4 else "?"
+        raise SystemExit(f"DISCORD_WEBHOOK_URL is not a webhook link (looks like {host}/{path}/...). It must look like "
+                         "https://discord.com/api/webhooks/<number>/<token> - copy it from Channel > Integrations > Webhooks.")
+
+
 def _discord_post(**kw):
     import time
+    _check_webhook()
     for _ in range(5):
-        r = requests.post(DISCORD, timeout=60, **kw)
+        # wait=true: Discord returns the created message, so we know it was really posted
+        r = requests.post(DISCORD, params={"wait": "true"}, timeout=60, **kw)
         if r.status_code == 429:  # rate limited: wait as told
             time.sleep(float(r.json().get("retry_after", 1)) + 0.2)
             continue
         if not r.ok:
             raise SystemExit(f"Discord post failed ({r.status_code}): {r.text[:200]}")
+        try:
+            ok = "id" in r.json()
+        except ValueError:
+            ok = False
+        if not ok:
+            raise SystemExit(f"Discord did not create a message ({r.status_code}); check DISCORD_WEBHOOK_URL")
         time.sleep(0.6)  # stay under the webhook rate limit
         return
     raise SystemExit("Discord post failed: rate limited 5 times")
@@ -302,4 +323,8 @@ def main(d: date):
 
 
 if __name__ == "__main__":
-    main(date.fromisoformat(sys.argv[1]))
+    if sys.argv[1] == "--test":  # one test message (workflow: discord-test)
+        send("✅ NBA board connected — test message")
+        print("test message posted" if LIVE else "dry run: no DISCORD_WEBHOOK_URL / Telegram secrets set")
+    else:
+        main(date.fromisoformat(sys.argv[1]))

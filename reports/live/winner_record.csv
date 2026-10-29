@@ -39,3 +39,5 @@ date,game,pick_team,p_pick,proj_margin_home,home_pts,away_pts,winner,result
 2026-10-27,DET@NYK,DET,0.565,-2.1,111,97,NYK,loss
 2026-10-27,BKN@BOS,BOS,0.834,13.1,125,124,BOS,win
 2026-10-27,SAC@SAS,SAS,0.847,13.8,130,103,SAS,win
+2026-10-28,WAS@CLE,CLE,0.783,10.5,121,111,CLE,win
+2026-10-28,MIA@ATL,ATL,0.672,6.0,117,129,MIA,loss

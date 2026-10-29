@@ -10,7 +10,7 @@ CLE,ATL,Donovan Mitchell,Active,0.3,33.7,26.0,15.0,38.0,5.2,2.0,8.0,5.4,2.0,9.0,
 CLE,ATL,Evan Mobley,Active,0.3,32.6,17.7,10.0,26.0,9.1,5.0,14.0,3.1,1.0,6.0,30.4,20.0,41.0,1.6,0.8,1.3,2.0,ast,under,3.5,0.6,False,False
 CLE,ATL,Jarrett Allen,Active,0.4,27.7,13.7,6.0,22.0,9.3,4.0,14.0,1.4,0.0,3.0,23.6,13.0,36.0,0.2,1.0,1.0,1.5,pa,under,16.5,0.6,False,False
 CLE,ATL,Sam Merrill,Active,0.4,23.6,9.2,3.0,16.0,2.5,0.0,5.0,2.0,0.0,4.0,13.9,6.0,22.0,2.0,0.6,0.1,0.8,pa,under,14.5,0.7,True,False
-CLE,ATL,Jaylon Tyson,Active,0.4,22.0,10.3,3.0,18.0,3.7,1.0,7.0,2.5,0.0,5.0,15.8,7.0,27.0,1.6,0.7,0.4,1.3,pr,under,17.5,0.7,True,False
+CLE,ATL,Jaylon Tyson,Day-To-Day,0.4,22.0,10.3,3.0,18.0,3.7,1.0,7.0,2.5,0.0,5.0,15.8,7.0,27.0,1.6,0.7,0.4,1.3,pr,under,17.5,0.7,True,False
 NOP,SAC,Trey Murphy III,Active,0.3,31.8,17.0,8.0,27.0,4.8,2.0,8.0,3.3,1.0,6.0,24.2,14.0,36.0,2.7,1.3,0.3,1.6,pra,under,30.5,0.7,True,False
 NOP,SAC,Zion Williamson,Active,0.3,30.5,20.4,11.0,30.0,5.3,2.0,9.0,3.2,1.0,6.0,28.6,18.0,40.0,0.7,1.2,0.6,2.1,ast,over,2.5,0.6,False,False
 NOP,SAC,Jeremiah Fears,Active,0.4,25.0,12.5,5.0,20.0,3.6,1.0,6.0,2.8,1.0,5.0,18.1,10.0,28.0,1.4,1.1,0.4,2.0,ast,under,3.5,0.7,False,False

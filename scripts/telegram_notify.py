@@ -27,6 +27,7 @@ import requests  # noqa: E402
 
 from nba.config import ROOT, VOL_MAX, STRONG_MIN, LOCK_LEAD_MIN, STAT_NAME  # noqa: E402
 
+MORNING_HOUR = 10  # ET; morning post never goes out earlier (late cron runs after midnight, DK lines not up)
 STRONG = STRONG_MIN  # backtest 2025: stated 70%+ leans hit 75.8%
 # strip: secrets pasted with a trailing newline break the API URL (404)
 TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip() or None
@@ -198,6 +199,7 @@ def results_messages():
     new = [k for k in (led.date + "|" + led.game).unique() if k not in done]
     if not new:
         return
+    posted = False
     for k in sorted(new):
         dte, game = k.split("|")
         x = led[(led.date == dte) & (led.game == game)].sort_values("prob", ascending=False)
@@ -210,7 +212,9 @@ def results_messages():
                          f"{float(q.dk_line):g} ({int(q.dk_price):+d}) → {act} ({q.units:+.2f}u)")
         if len(sx):  # games with no picks don't get a results post (keep it clean)
             send("\n".join(lines))
-    send(record_brief())
+            posted = True
+    if posted:  # record line only after real results (the morning post carries it otherwise)
+        send(record_brief())
     if LIVE:  # dry runs must not mark anything as sent
         st_path.write_text(json.dumps(sorted(done | set(new))))
 
@@ -303,6 +307,11 @@ def main(d: date):
     csv = ROOT / f"reports/live/game_day_{d}.csv"
     state_path = ROOT / f"reports/live/telegram_state_{d}.json"
     now = snapshot(r)
+    et_hour = pd.Timestamp.now(tz="America/New_York").hour
+    if not state_path.exists() and et_hour < MORNING_HOUR:
+        # a late-night run that already counts as "tomorrow": wait for the real morning (DK lines up by then)
+        print(f"before {MORNING_HOUR}:00 ET; morning post waits for a later run")
+        return
     if not state_path.exists():
         # morning post (user's choice 2026-10-28): record + on-fire list only; games post when they lock
         send(f"🏀 <b>{d:%a %b %-d}</b> · {len(G)} games · picks post as each game locks (1 hr before tip)\n\n"

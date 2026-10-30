@@ -51,3 +51,6 @@ date,game,pick_team,p_pick,proj_margin_home,home_pts,away_pts,winner,result
 2026-10-28,DEN@NOP,DEN,0.51,-0.4,91,104,DEN,win
 2026-10-28,CHA@DET,DET,0.692,6.8,97,89,DET,win
 2026-10-28,MIA@ATL,ATL,0.672,6.0,117,129,MIA,loss
+2026-10-29,CLE@ATL,ATL,0.58,2.7,114,111,ATL,win
+2026-10-29,MEM@POR,POR,0.642,4.9,103,124,MEM,loss
+2026-10-29,SAC@NOP,NOP,0.587,3.1,132,120,NOP,win

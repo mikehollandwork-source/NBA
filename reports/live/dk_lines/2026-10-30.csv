@@ -1,0 +1,3 @@
+run_utc,gameId,pid,player,lean_stat,lean_side,lean_ref,lean_prob_cal,dk_line,dk_price
+2026-10-30T05:20:44+00:00,401909280,3147657,Mikal Bridges,pts,over,3.5,0.8027801511305303,10.5,-106.0
+2026-10-30T05:20:44+00:00,401909280,3934672,Jalen Brunson,reb,over,1.5,0.7276408786864265,2.5,-124.0

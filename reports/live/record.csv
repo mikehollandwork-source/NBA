@@ -662,3 +662,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-30,CHA@WAS,Kyshawn George,WAS,pa,over,19.5,0.558,False,15.0,loss,-1.0,16.5,-123.0,True,loss,-1.0
 2026-10-30,CHA@WAS,Tre Johnson,WAS,ra,under,4.5,0.697,True,2.0,win,0.8333,,,False,,0.0
 2026-10-30,CHA@WAS,Anthony Davis,WAS,ast,over,1.5,0.685,False,1.0,loss,-1.0,2.5,-111.0,False,,0.0
+2026-10-31,POR@UTA,Jrue Holiday,POR,ra,under,10.5,0.712,True,7.0,win,0.8333,9.5,-121.0,False,,0.0
+2026-10-31,POR@UTA,Robert Williams III,POR,pr,over,12.5,0.572,False,6.0,loss,-1.0,,,False,,0.0
+2026-10-31,POR@UTA,Lauri Markkanen,UTA,pra,under,35.5,0.77,True,20.0,win,0.8333,,,False,,0.0
+2026-10-31,POR@UTA,Toumani Camara,POR,ast,under,2.5,0.763,True,0.0,win,0.8333,1.5,123.0,False,,0.0
+2026-10-31,POR@UTA,Keyonte George,UTA,ast,over,6.5,0.517,False,4.0,loss,-1.0,,,False,,0.0
+2026-10-31,POR@UTA,Deni Avdija,POR,pr,over,30.5,0.551,False,29.0,loss,-1.0,31.5,-120.0,False,,0.0
+2026-10-31,POR@UTA,Scoot Henderson,POR,ast,under,3.5,0.767,True,1.0,win,0.8333,3.5,-119.0,False,,0.0
+2026-10-31,POR@UTA,Isaiah Collier,UTA,reb,under,4.5,0.675,False,1.0,win,0.8333,,,False,,0.0
+2026-10-31,POR@UTA,Donovan Clingan,POR,reb,under,11.5,0.712,True,9.0,win,0.8333,11.5,-103.0,False,,0.0

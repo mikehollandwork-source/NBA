@@ -1,15 +1,15 @@
 **✅ PICKS record — real DraftKings line + odds (reset Oct 24; earlier days at DK closing line)**
-- Picks: 9-6 (60.0%) · +1.41u · ROI +9.4% · model said 73%
-  - last night (2026-10-29): no graded leans yet
+- Picks: 10-6 (62.5%) · +2.02u · ROI +12.6% · model said 73%
+  - last night (2026-10-30): 1-0 (100.0%) · +0.61u · ROI +61.0% · model said 72%
 **Reference only (vs player's own average @ -120, not bettable lines)**
-- 70%+ leans: 137-55 (71.4%) · +59.16u · ROI +30.8% · model said 75%
-- All leans: 364-193 (65.4%) · +110.32u · ROI +19.8% · model said 68%
-- DK picks by stat: AST 6-1 · PA 0-3 · RA 3-2
+- 70%+ leans: 168-61 (73.4%) · +78.99u · ROI +34.5% · model said 75%
+- All leans: 430-224 (65.7%) · +134.32u · ROI +20.5% · model said 68%
+- DK picks by stat: AST 7-1 · PA 0-3 · RA 3-2
 **📈 Game-winner PREDICTIONS (tracked, not picks; straight up)**
-- Record: 36-19 (65%) · model said 64% · Brier 0.216 (coin flip 0.250) · last night: 2-1 (67%) · model said 60% · Brier 0.253 (coin flip 0.250)
+- Record: 41-24 (63%) · model said 65% · Brier 0.219 (coin flip 0.250) · last night: 5-5 (50%) · model said 66% · Brier 0.236 (coin flip 0.250)
 **🚫 NOT PICKS — Kalshi paper tracking (testing only; real price + fee, $1 each)**
-- Paper record: 270-763 (26.1%) · -164.46u · ROI -15.9% · expected +28.2%
-- Last night (2026-10-29): 13-40 (24.5%) · -16.95u · ROI -32.0% · expected +19.9%
-- Model vs market: Brier model 0.1679 vs Kalshi 0.1644 (market better) · 6323 rungs
-- 🔁 Fade (opposite side of every paper leg, real price + fee; also NOT picks): 763-270 (73.9%) · -43.62u · ROI -4.2%
-  - last night (2026-10-29): 40-13 (75.5%) · +1.00u · ROI +1.9%
+- Paper record: 322-897 (26.4%) · -182.79u · ROI -15.0% · expected +27.8%
+- Last night (2026-10-30): 52-134 (28.0%) · -18.33u · ROI -9.9% · expected +25.0%
+- Model vs market: Brier model 0.1679 vs Kalshi 0.1639 (market better) · 7425 rungs
+- 🔁 Fade (opposite side of every paper leg, real price + fee; also NOT picks): 897-322 (73.6%) · -48.67u · ROI -4.0%
+  - last night (2026-10-30): 134-52 (72.0%) · -5.05u · ROI -2.7%

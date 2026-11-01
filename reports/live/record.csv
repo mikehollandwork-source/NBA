@@ -728,3 +728,11 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-10-31,OKC@HOU,Amen Thompson,HOU,ast,over,3.5,0.767,True,1.0,loss,-1.0,4.5,-102.0,False,,0.0
 2026-10-31,OKC@HOU,Alperen Sengun,HOU,ast,over,5.5,0.698,True,9.0,win,0.8333,5.5,-143.0,True,win,0.6993
 2026-10-31,OKC@HOU,Ajay Mitchell,OKC,ra,over,6.5,0.664,False,8.0,win,0.8333,7.5,-146.0,False,,0.0
+2026-11-01,BOS@ORL,Derrick White,BOS,pts,over,10.5,0.602,False,12.0,win,0.8333,13.5,-115.0,False,,0.0
+2026-11-01,BOS@ORL,Desmond Bane,ORL,ast,over,2.5,0.704,True,1.0,loss,-1.0,3.5,-118.0,False,,0.0
+2026-11-01,BOS@ORL,Payton Pritchard,BOS,reb,over,1.5,0.721,True,7.0,win,0.8333,2.5,-173.0,False,,0.0
+2026-11-01,BOS@ORL,Paul George,BOS,pa,under,25.5,0.59,False,25.0,win,0.8333,22.5,-126.0,False,,0.0
+2026-11-01,BOS@ORL,Wendell Carter Jr.,ORL,ra,over,9.5,0.566,False,10.0,win,0.8333,9.5,-139.0,True,win,0.7194
+2026-11-01,BOS@ORL,Neemias Queta,BOS,reb,over,4.5,0.67,False,8.0,win,0.8333,7.5,-108.0,False,,0.0
+2026-11-01,BOS@ORL,Franz Wagner,ORL,ra,under,13.5,0.605,False,18.0,loss,-1.0,12.5,-133.0,False,,0.0
+2026-11-01,BOS@ORL,Anthony Black,ORL,ast,over,3.5,0.764,True,3.0,loss,-1.0,3.5,-146.0,True,loss,-1.0

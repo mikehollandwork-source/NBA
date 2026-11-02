@@ -736,3 +736,27 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-01,BOS@ORL,Neemias Queta,BOS,reb,over,4.5,0.67,False,8.0,win,0.8333,7.5,-108.0,False,,0.0
 2026-11-01,BOS@ORL,Franz Wagner,ORL,ra,under,13.5,0.605,False,18.0,loss,-1.0,12.5,-133.0,False,,0.0
 2026-11-01,BOS@ORL,Anthony Black,ORL,ast,over,3.5,0.764,True,3.0,loss,-1.0,3.5,-146.0,True,loss,-1.0
+2026-11-01,BKN@IND,Julius Randle,BKN,ast,over,4.5,0.697,True,6.0,win,0.8333,5.5,111.0,False,,0.0
+2026-11-01,BKN@IND,Kelly Oubre Jr.,IND,ra,over,3.5,0.765,True,3.0,loss,-1.0,5.5,-147.0,False,,0.0
+2026-11-01,BKN@IND,Pascal Siakam,IND,pts,over,21.5,0.691,False,17.0,loss,-1.0,23.5,-115.0,False,,0.0
+2026-11-01,BKN@IND,Michael Porter Jr.,BKN,ast,over,0.5,0.823,True,3.0,win,0.8333,1.5,-174.0,False,,0.0
+2026-11-01,BKN@IND,Andrew Nembhard,IND,reb,over,1.5,0.704,True,3.0,win,0.8333,3.5,114.0,False,,0.0
+2026-11-01,BKN@IND,Aaron Nesmith,IND,ra,over,2.5,0.794,True,7.0,win,0.8333,4.5,-144.0,False,,0.0
+2026-11-01,BKN@IND,Day'Ron Sharpe,BKN,ast,over,0.5,0.794,True,4.0,win,0.8333,2.5,113.0,False,,0.0
+2026-11-01,BKN@IND,Noah Clowney,BKN,pa,over,4.5,0.747,True,8.0,win,0.8333,,,False,,0.0
+2026-11-01,BKN@IND,Jarace Walker,IND,pa,over,7.5,0.798,True,9.0,win,0.8333,13.5,-107.0,False,,0.0
+2026-11-01,TOR@LAL,Jakob Poeltl,TOR,pts,over,3.5,0.62,False,,void,0.0,6.5,-119.0,False,,0.0
+2026-11-01,TOR@LAL,Luka Doncic,LAL,pra,under,50.5,0.607,False,66.0,loss,-1.0,47.5,-107.0,False,,0.0
+2026-11-01,TOR@LAL,Austin Reaves,LAL,ast,under,5.5,0.594,False,4.0,win,0.8333,5.5,-154.0,True,win,0.6494
+2026-11-01,TOR@LAL,Collin Sexton,LAL,ast,over,1.5,0.604,False,3.0,win,0.8333,1.5,-120.0,True,win,0.8333
+2026-11-01,TOR@LAL,Sandro Mamukelashvili,LAL,pa,over,9.5,0.604,False,12.0,win,0.8333,9.5,-116.0,True,win,0.8621
+2026-11-01,TOR@LAL,RJ Barrett,TOR,reb,under,5.5,0.616,False,10.0,loss,-1.0,5.5,-138.0,True,loss,-1.0
+2026-11-01,TOR@LAL,Immanuel Quickley,TOR,ra,under,9.5,0.555,False,13.0,loss,-1.0,9.5,-118.0,True,loss,-1.0
+2026-11-01,TOR@LAL,Quentin Grimes,LAL,pts,over,7.5,0.61,False,7.0,loss,-1.0,,,False,,0.0
+2026-11-01,TOR@LAL,Scottie Barnes,TOR,ra,over,10.5,0.602,False,11.0,win,0.8333,13.5,104.0,False,,0.0
+2026-11-01,LAC@GSW,Kris Dunn,LAC,reb,under,4.5,0.648,False,2.0,win,0.8333,4.5,-161.0,True,win,0.6211
+2026-11-01,LAC@GSW,Al Horford,GSW,ast,over,0.5,0.719,True,2.0,win,0.8333,,,False,,0.0
+2026-11-01,LAC@GSW,Derrick Jones Jr.,LAC,reb,under,4.5,0.663,False,7.0,loss,-1.0,4.5,-150.0,True,loss,-1.0
+2026-11-01,LAC@GSW,Darius Garland,LAC,ast,over,5.5,0.606,False,7.0,win,0.8333,7.5,102.0,False,,0.0
+2026-11-01,LAC@GSW,Brandon Williams,GSW,ra,over,4.5,0.722,True,6.0,win,0.8333,6.5,-112.0,False,,0.0
+2026-11-01,LAC@GSW,Brandin Podziemski,GSW,ast,over,3.5,0.777,True,8.0,win,0.8333,4.5,108.0,False,,0.0

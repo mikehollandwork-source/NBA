@@ -1,0 +1,21 @@
+team,opp,player,status,pra_cv_last,proj_min,proj_pts,pts_p10,pts_p90,proj_reb,reb_p10,reb_p90,proj_ast,ast_p10,ast_p90,proj_pra,pra_p10,pra_p90,proj_fg3m,proj_stl,proj_blk,proj_tov,lean_stat,lean_side,lean_ref,lean_prob_cal,strong,star_g1_under
+ORL,PHX,Desmond Bane,Active,0.3,34.9,19.8,11.0,30.0,4.0,1.0,7.0,3.8,1.0,7.0,26.6,17.0,39.0,3.2,1.3,0.6,2.5,ast,over,2.5,0.7,False,False
+ORL,PHX,Franz Wagner,Active,0.3,34.9,23.4,14.0,33.0,5.7,3.0,9.0,7.5,4.0,11.0,35.0,25.0,48.0,1.6,1.0,0.2,3.0,pts,over,19.5,0.6,False,False
+ORL,PHX,Wendell Carter Jr.,Active,0.3,31.9,12.3,6.0,19.0,8.6,4.0,13.0,1.6,0.0,3.0,22.6,14.0,32.0,0.8,1.0,0.5,1.7,ast,over,0.5,0.7,True,False
+ORL,PHX,Anthony Black,Active,0.4,29.6,16.3,8.0,26.0,4.1,1.0,7.0,5.1,2.0,8.0,26.0,15.0,37.0,1.9,1.4,0.6,2.3,ast,over,3.5,0.7,True,False
+PHX,ORL,Devin Booker,Active,0.2,34.9,26.4,15.0,39.0,3.6,1.0,6.0,5.6,2.0,9.0,34.8,23.0,49.0,1.8,0.9,0.3,2.8,reb,over,2.5,0.6,False,False
+PHX,ORL,Miles Bridges,Active,0.4,33.3,17.7,9.0,27.0,6.5,3.0,10.0,3.4,1.0,6.0,27.2,17.0,38.0,2.1,1.0,0.6,1.4,ast,over,2.5,0.6,False,False
+PHX,ORL,Dillon Brooks,Active,0.3,32.1,18.0,9.0,28.0,4.0,2.0,7.0,3.0,1.0,5.0,24.7,15.0,36.0,1.9,1.1,0.2,2.0,pts,over,15.5,0.6,False,False
+PHX,ORL,Collin Gillespie,Active,0.4,25.6,9.4,3.0,16.0,3.0,1.0,5.0,4.7,2.0,8.0,15.9,9.0,26.0,2.3,1.5,0.2,1.5,reb,over,1.5,0.7,True,False
+GSW,MIA,Brandin Podziemski,Active,0.4,32.7,17.0,9.0,26.0,5.1,2.0,8.0,5.3,2.0,9.0,26.3,17.0,39.0,2.4,1.0,0.3,1.8,ast,over,4.5,0.6,False,False
+GSW,MIA,Stephen Curry,Active,0.3,29.6,29.2,16.0,44.0,4.0,1.0,7.0,5.2,2.0,9.0,36.9,23.0,54.0,5.0,1.2,0.3,2.6,pr,under,33.5,0.6,False,False
+GSW,MIA,Draymond Green,Active,0.3,26.4,5.7,2.0,11.0,5.4,2.0,9.0,6.3,2.0,10.0,16.7,9.0,26.0,0.7,0.9,0.7,2.4,pts,over,1.5,0.8,True,False
+GSW,MIA,Al Horford,Active,0.4,16.4,5.0,0.0,10.0,3.7,1.0,7.0,1.2,0.0,3.0,9.7,2.0,18.0,1.2,0.4,0.6,0.6,ast,over,0.5,0.6,False,False
+GSW,MIA,Brandon Williams,Active,0.4,10.1,6.6,1.0,13.0,1.5,0.0,3.0,1.6,0.0,4.0,9.7,2.0,18.0,0.5,0.5,0.2,0.9,pra,under,15.5,0.8,True,False
+MIA,GSW,Davion Mitchell,Active,0.3,31.8,14.0,7.0,22.0,2.3,0.0,4.0,7.9,4.0,12.0,24.1,15.0,34.0,1.7,1.1,0.4,2.1,reb,over,0.5,0.8,True,False
+MIA,GSW,Bam Adebayo,Active,0.3,31.5,17.2,9.0,26.0,8.1,4.0,12.0,3.4,1.0,6.0,28.6,18.0,41.0,1.3,1.5,0.7,2.1,pa,over,18.5,0.6,False,False
+MIA,GSW,Giannis Antetokounmpo,Active,0.3,31.5,29.2,17.0,42.0,10.5,6.0,15.0,6.2,3.0,10.0,46.0,30.0,62.0,0.8,1.1,0.8,3.3,reb,under,12.5,0.7,True,False
+MIA,GSW,Andrew Wiggins,Active,0.3,27.4,11.4,5.0,19.0,3.4,1.0,6.0,1.7,0.0,3.1,16.0,8.0,25.0,1.8,1.0,0.8,1.2,ra,over,3.5,0.6,False,False
+MIA,GSW,Klay Thompson,Active,0.4,23.5,11.2,4.0,19.0,1.8,0.0,4.0,1.4,0.0,3.0,14.9,7.0,23.0,2.9,0.5,0.2,0.9,reb,over,0.5,0.8,True,False
+MIA,GSW,Bobby Portis,Active,0.4,21.2,9.7,3.0,17.0,5.5,2.0,9.0,1.6,0.0,3.0,16.9,8.0,27.0,1.5,0.6,0.4,0.9,ra,under,8.5,0.7,False,False
+MIA,GSW,Tim Hardaway Jr.,Active,0.4,18.1,7.6,2.0,14.0,1.8,0.0,4.0,0.9,0.0,2.0,10.6,4.0,18.0,1.8,0.4,0.2,0.7,pa,over,5.5,0.7,False,False

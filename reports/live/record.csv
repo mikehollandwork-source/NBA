@@ -1025,3 +1025,13 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-04,DAL@SAS,Dylan Harper,SAS,reb,under,5.5,0.62,False,5.0,win,0.8333,5.5,-145.0,True,win,0.6897
 2026-11-04,DAL@SAS,Cooper Flagg,DAL,ast,under,6.5,0.649,False,5.0,win,0.8333,5.5,-125.0,False,,0.0
 2026-11-04,DAL@SAS,Victor Wembanyama,SAS,ra,over,13.5,0.579,False,26.0,win,0.8333,14.5,-105.0,False,,0.0
+2026-11-04,MIA@LAC,Tim Hardaway Jr.,MIA,pa,over,5.5,0.672,False,0.0,loss,-1.0,,,False,,0.0
+2026-11-04,MIA@LAC,Kris Dunn,LAC,ra,under,8.5,0.561,False,8.0,win,0.8333,8.5,105.0,True,win,1.05
+2026-11-04,MIA@LAC,Giannis Antetokounmpo,MIA,reb,under,12.5,0.691,False,14.0,loss,-1.0,11.5,-112.0,False,,0.0
+2026-11-04,MIA@LAC,Andrew Wiggins,MIA,ra,over,3.5,0.633,False,5.0,win,0.8333,,,False,,0.0
+2026-11-04,MIA@LAC,Bobby Portis,MIA,reb,under,6.5,0.657,False,10.0,loss,-1.0,5.5,-101.0,False,,0.0
+2026-11-04,MIA@LAC,Derrick Jones Jr.,LAC,reb,under,4.5,0.623,False,8.0,loss,-1.0,4.5,-159.0,True,loss,-1.0
+2026-11-04,MIA@LAC,Bam Adebayo,MIA,ast,under,3.5,0.613,False,4.0,loss,-1.0,3.5,-152.0,True,loss,-1.0
+2026-11-04,MIA@LAC,Davion Mitchell,MIA,reb,over,0.5,0.822,True,2.0,win,0.8333,2.5,-104.0,False,,0.0
+2026-11-04,MIA@LAC,Darius Garland,LAC,ra,over,7.5,0.656,False,8.0,win,0.8333,9.5,-130.0,False,,0.0
+2026-11-04,MIA@LAC,Klay Thompson,MIA,reb,over,0.5,0.756,True,5.0,win,0.8333,,,False,,0.0

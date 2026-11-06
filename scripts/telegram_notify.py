@@ -174,6 +174,29 @@ def game_message(g, r) -> str:
 WIN_MIN = 0.70  # user 2026-11-06: post 70%+ winner predictions at the lock
 
 
+def winners_morning(d, G) -> str:
+    """Morning heads-up (user 2026-11-06): today's 70%+ winner predictions + 🏠 spots, as of the morning run.
+    Final versions post at each game's lock; injury news can change or drop them."""
+    wp = ROOT / f"data/live/winners_{d}.parquet"
+    if not wp.exists():
+        return ""
+    w = pd.read_parquet(wp)
+    if w.empty:
+        return ""
+    w = w[w.p_pick.astype(float) >= WIN_MIN].copy()
+    if w.empty:
+        return "📈 <b>Early winners</b>: no team at 70%+ today (as of this morning)"
+    tips = G.assign(event_id=G.event_id.astype(str)).set_index("event_id").tip_utc
+    w["tip"] = w.event_id.astype(str).map(tips)
+    lines = ["📈 <b>Early winners — 70%+</b> (predictions, not picks)",
+             "<i>As of this morning, before the final injury report. Confirmed at each game's lock (1 hr before tip).</i>"]
+    for _, q in w.sort_values("tip").iterrows():
+        t = pd.Timestamp(q.tip).tz_convert("America/New_York").strftime("%-I:%M %p") if pd.notna(q.tip) else ""
+        rule = " 🏠 home fav vs back-to-back" if q.pick_team == q.home and float(q.get("b2b_away", 0) or 0) == 1 else ""
+        lines.append(f"• <b>{q.pick_team}</b> {float(q.p_pick):.0%} ({q.away} @ {q.home}, {t}){rule}")
+    return "\n".join(lines)
+
+
 def winner_lines(g) -> list:
     """📈 70%+ winner predictions, plus the home-favorite-vs-back-to-back spot (user's rule 2026-11-06).
     Backtest 2019-25 at 70%+: rule 573 games won 79.9% (stated 79.0%); home favs vs rested teams 79.1% (78.4%):
@@ -343,6 +366,9 @@ def main(d: date):
         fire = on_fire(r)
         if fire:
             send(fire)
+        early = winners_morning(d, G)
+        if early:
+            send(early)
     else:
         old = json.loads(state_path.read_text())
         locked_now = {n["game"] for pid, n in now.items()

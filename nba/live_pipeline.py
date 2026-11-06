@@ -518,6 +518,8 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
     for c in ("strong", "star_g1_under"):
         if c not in keep:
             keep[c] = False
+    if "conf" not in keep:  # locks written before the confluence rule
+        keep["conf"] = np.nan
     keep[cols].round(1).to_csv(out_dir / f"game_day_{d}.csv", index=False)
     L = [f"# Picks — {d:%a %b %-d, %Y}", "",
          "**✅ PICK** = our model's lean at 70%+ that DraftKings offers at our line or better (graded at DK's line + odds). **🚫 NOT A PICK** = Kalshi paper tracking (testing the model vs real prices; do not bet). "

@@ -104,3 +104,5 @@ date,game,pick_team,p_pick,proj_margin_home,home_pts,away_pts,winner,result
 2026-11-04,ATL@WAS,ATL,0.601,-3.4,105,120,ATL,win
 2026-11-04,TOR@DEN,DEN,0.502,0.2,128,109,DEN,win
 2026-11-04,DAL@SAS,SAS,0.808,11.6,112,111,SAS,win
+2026-11-05,ORL@PHX,PHX,0.507,0.3,117,104,PHX,win
+2026-11-05,MIA@GSW,GSW,0.633,4.7,120,100,GSW,win

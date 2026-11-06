@@ -172,3 +172,8 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - **At each game's lock (1 hour before tip):** that game's ✅ picks, or just the teams and start time if there are none.
 - **After games:** results for games that had picks, then the updated record.
 - **Disagreement cap:** a 70%+ lean is not a pick if our probability is more than 20 points above DraftKings' implied probability for that price. When we disagree that much, the line has usually known something (Oct 22-27: 41% hit, n=54).
+
+## 17. 🎯 Confluence checks (safety layer)
+- A 70%+ lean becomes a pick only if at least 3 of these 4 agree: all three models land on the same side of the line, the player is a regular starter (started 3+ of his last 5), his last-5 average is on the lean's side, and his projected minutes are within 3 of his last-5 average.
+- Backtest 2019-25 (pregame information only): leans passing 0-1 checks hit 3-6 points less than stated; 4/4 hit 1.8 points more. 🎯 marks 4/4.
+- Tested and dropped (no effect vs a placebo): teammates out, blowout risk, steady minutes, home/away, team back-to-back.

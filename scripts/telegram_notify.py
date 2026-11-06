@@ -148,6 +148,8 @@ def lean_line(q) -> str:
     stat = STAT_NAME.get(q.lean_stat, str(q.lean_stat).upper())
     proj = q.get(f"proj_{q.lean_stat}", float("nan"))
     flag = " ⚠️" if str(q.get("star_g1_under", "")).lower() == "true" else ""
+    conf = q.get("conf")
+    flag += " 🎯" if conf is not None and pd.notna(conf) and float(conf) >= 4 else ""
     dtd = " (DTD)" if q.get("status") == "Day-To-Day" else ""
     from nba.ingest import espn_props
     return (f"✅ <b>PICK</b> · <b>{html.escape(q.player)}</b>{dtd}{flag} — {stat} {q.lean_side} {float(q.dk_line):g} "

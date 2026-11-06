@@ -51,3 +51,7 @@ STAT_NAME = {"pts": "Points", "reb": "Rebounds", "ast": "Assists", "pra": "Pts+R
 # probability by more than this. Oct 22-27 leans 20+ pts above DK's implied: 41% hit, -21% ROI (n=54).
 MAX_DISAGREE = 0.20
 CAP_FROM = "2026-10-28"  # first lock date the cap applies to in the record
+
+# Confluence (user rule 2026-11-06): a pick / On fire player needs >= CONF_MIN of 4 pregame safety checks
+# (3/3 models agree, regular starter, last-5 agrees, stable role). Applies to locks that carry a `conf` column.
+CONF_MIN = 3

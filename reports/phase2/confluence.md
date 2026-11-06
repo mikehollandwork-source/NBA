@@ -29,3 +29,7 @@ Score = count of: 3/3 models agree, starter, last-5 average agrees with the lean
 
 Score 4 beats stated in 7/7 seasons (2019 +0.2, 2020-25 +3.4 to +5.5); ~10 such leans per night in 2025.
 Flags that did nothing (|diff| within ~1 placebo SD or inconsistent): teammates out, blowout risk, steady minutes, home, team back-to-back.
+
+## Correction: same-game starter flag is look-ahead
+The `starter` flag above is whether he started THAT game (not known at the 1-hour lock). With pregame start rate (last 5 >= 0.6):
+score 0: -6.4, 1: -3.1, 2: -0.5, 3: +0.4, 4: +1.8 (gap = hit - stated). Score <= 2 under stated in 7/7 seasons. Live rule uses this version.

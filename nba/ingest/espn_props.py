@@ -94,6 +94,9 @@ def ok_mask(r: pd.DataFrame, cap: bool = True) -> pd.Series:
     price = pd.to_numeric(r.get("dk_price"), errors="coerce")
     ok = ((r.lean_side == "under") & (line >= r.lean_ref)) | ((r.lean_side == "over") & (line <= r.lean_ref))
     ok = ok & line.notna() & price.notna()
+    if "conf" in r:  # confluence rule (2026-11-06): only locks written after it carry `conf`
+        from nba.config import CONF_MIN
+        ok = ok & (pd.to_numeric(r.conf, errors="coerce").fillna(0) >= CONF_MIN)
     if cap and "lean_prob_cal" in r:
         ok = ok & ((pd.to_numeric(r.lean_prob_cal, errors="coerce") - implied(price)) <= MAX_DISAGREE + 1e-9)
     return ok

@@ -251,7 +251,35 @@ def add_leans(r: pd.DataFrame, te: pd.DataFrame, season: int) -> pd.DataFrame:
                           & (r.lean_side.to_numpy() == "under"))
     # same 10-minute floor the board, Telegram and grader use
     r["strong"] = (r.lean_prob_cal.round(2) >= STRONG_MIN) & (r.proj_min >= 10)
+    r["conf"] = confluence(r, te)
     return r
+
+
+def confluence(r: pd.DataFrame, te: pd.DataFrame) -> pd.Series:
+    """🎯 0-4 safety checks on the lean (user 2026-11-06; nba/analysis/confluence.py, reports/phase2/confluence.md):
+    all 3 models on the lean's side of the line, regular starter (start rate last 5 >= 0.6), last-5 average on
+    the lean's side, role stable (proj min within 3 of last-5). Pregame-only inputs. Backtest 2019-25, 70%+ leans:
+    0-1 checks hit 3-6 pts under stated, 4 checks +1.8. A pick needs >= CONF_MIN."""
+    stat = r.lean_stat.where(r.lean_stat.apply(lambda v: isinstance(v, str)))
+    out = pd.Series(np.nan, index=r.index)
+    ok = stat.notna()
+    if not ok.any():
+        return out
+    over = (r.lean_side == "over").to_numpy()
+    ref = r.lean_ref.to_numpy(dtype=float)
+    def pick(fmt, src):
+        return np.array([src[fmt.format(s)].to_numpy(dtype=float)[i] if isinstance(s, str) and fmt.format(s) in src
+                         else np.nan for i, s in enumerate(stat)])
+    votes = sum(np.where(over, pick("{}_" + m, r) > ref, pick("{}_" + m, r) < ref).astype(int)
+                for m in ("two_stage", "direct", "residual"))
+    l5 = pick("{}_l5", te)
+    l5_ok = np.where(over, l5 > ref, l5 < ref)
+    start = te.start_rate_l5.to_numpy(dtype=float) >= 0.6 if "start_rate_l5" in te else np.zeros(len(r), bool)
+    role = np.abs(r.proj_min.to_numpy(dtype=float) - te.min_l5.to_numpy(dtype=float)) <= 3 if "min_l5" in te \
+        else np.zeros(len(r), bool)
+    score = (votes == 3).astype(int) + start.astype(int) + l5_ok.astype(int) + role.astype(int)
+    out[ok] = score[ok.to_numpy()]
+    return out
 
 
 LOCKS = ROOT / "reports" / "live" / "locked"
@@ -479,7 +507,7 @@ def write_sheet(r, G, R, d, kb=None, wb=None):
     keep = r[(r.proj_min >= 10) & r.projected].sort_values(["gameId", "team", "proj_min"], ascending=[True, True, False])
     cols = ["team", "opp", "player", "status", "pra_cv_last", "proj_min", "proj_pts", "pts_p10", "pts_p90", "proj_reb", "reb_p10", "reb_p90",
             "proj_ast", "ast_p10", "ast_p90", "proj_pra", "pra_p10", "pra_p90", "proj_fg3m", "proj_stl", "proj_blk", "proj_tov",
-            "lean_stat", "lean_side", "lean_ref", "lean_prob_cal", "strong", "star_g1_under"]
+            "lean_stat", "lean_side", "lean_ref", "lean_prob_cal", "strong", "star_g1_under", "conf"]
     keep = keep.copy()
     for c in ("strong", "star_g1_under"):
         if c not in keep:

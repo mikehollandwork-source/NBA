@@ -1035,3 +1035,23 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-04,MIA@LAC,Davion Mitchell,MIA,reb,over,0.5,0.822,True,2.0,win,0.8333,2.5,-104.0,False,,0.0
 2026-11-04,MIA@LAC,Darius Garland,LAC,ra,over,7.5,0.656,False,8.0,win,0.8333,9.5,-130.0,False,,0.0
 2026-11-04,MIA@LAC,Klay Thompson,MIA,reb,over,0.5,0.756,True,5.0,win,0.8333,,,False,,0.0
+2026-11-05,MIA@GSW,Tim Hardaway Jr.,MIA,pa,over,4.5,0.658,False,1.0,loss,-1.0,,,False,,0.0
+2026-11-05,MIA@GSW,Giannis Antetokounmpo,MIA,reb,under,12.5,0.69,False,14.0,loss,-1.0,10.5,106.0,False,,0.0
+2026-11-05,MIA@GSW,Andrew Wiggins,MIA,pr,over,10.5,0.629,False,8.0,loss,-1.0,14.5,-122.0,False,,0.0
+2026-11-05,MIA@GSW,Bobby Portis,MIA,reb,under,6.5,0.67,False,5.0,win,0.8333,5.5,-138.0,False,,0.0
+2026-11-05,MIA@GSW,Al Horford,GSW,ast,over,0.5,0.645,False,1.0,win,0.8333,,,False,,0.0
+2026-11-05,MIA@GSW,Stephen Curry,GSW,pa,under,33.5,0.57,False,33.0,win,0.8333,32.5,-115.0,False,,0.0
+2026-11-05,MIA@GSW,Bam Adebayo,MIA,ast,under,3.5,0.559,False,0.0,win,0.8333,3.5,-158.0,True,win,0.6329
+2026-11-05,MIA@GSW,Davion Mitchell,MIA,reb,over,1.5,0.627,False,2.0,win,0.8333,2.5,103.0,False,,0.0
+2026-11-05,MIA@GSW,Brandon Williams,GSW,pra,under,15.5,0.771,True,15.0,win,0.8333,,,False,,0.0
+2026-11-05,MIA@GSW,Brandin Podziemski,GSW,ast,over,4.5,0.574,False,3.0,loss,-1.0,4.5,119.0,True,loss,-1.0
+2026-11-05,MIA@GSW,Klay Thompson,MIA,ra,over,2.5,0.63,False,3.0,win,0.8333,,,False,,0.0
+2026-11-05,MIA@GSW,Draymond Green,GSW,pts,over,1.5,0.794,True,2.0,win,0.8333,5.5,-113.0,False,,0.0
+2026-11-05,ORL@PHX,Devin Booker,PHX,reb,over,2.5,0.644,False,1.0,loss,-1.0,3.5,-143.0,False,,0.0
+2026-11-05,ORL@PHX,Dillon Brooks,PHX,pts,over,15.5,0.596,False,24.0,win,0.8333,15.5,-116.0,True,win,0.8621
+2026-11-05,ORL@PHX,Desmond Bane,ORL,ast,over,2.5,0.691,False,0.0,loss,-1.0,3.5,-102.0,False,,0.0
+2026-11-05,ORL@PHX,Miles Bridges,PHX,ast,over,2.5,0.612,False,5.0,win,0.8333,2.5,-160.0,True,win,0.625
+2026-11-05,ORL@PHX,Wendell Carter Jr.,ORL,ast,over,0.5,0.739,True,2.0,win,0.8333,1.5,-108.0,False,,0.0
+2026-11-05,ORL@PHX,Collin Gillespie,PHX,reb,over,1.5,0.725,True,2.0,win,0.8333,3.5,108.0,False,,0.0
+2026-11-05,ORL@PHX,Franz Wagner,ORL,pts,over,19.5,0.642,False,15.0,loss,-1.0,22.5,-117.0,False,,0.0
+2026-11-05,ORL@PHX,Anthony Black,ORL,ast,over,3.5,0.699,True,6.0,win,0.8333,3.5,-150.0,True,win,0.6667

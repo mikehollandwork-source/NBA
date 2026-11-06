@@ -369,7 +369,13 @@ def apply_locks(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, source="gam
         else:
             rows["lock_state"] = "no pre-tip projection"
             out.append(rows)
-    return pd.concat(out, ignore_index=True)
+    res = pd.concat(out, ignore_index=True)
+    # text columns can come back from CSVs as numbers (an all-digit commit hash) next to strings:
+    # keep them text so the parquet write never sees mixed types (crashed live runs on 2026-11-05)
+    for c in ("model_commit", "lock_source", "lock_state", "locked_at_utc"):
+        if c in res:
+            res[c] = res[c].where(res[c].isna(), res[c].astype(str))
+    return res
 
 
 def kalshi_board(r: pd.DataFrame, G: pd.DataFrame, d: date, now=None, writable: set | None = None) -> pd.DataFrame:

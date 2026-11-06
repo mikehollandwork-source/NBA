@@ -271,8 +271,14 @@ def moneyline_movement_backtest(min_p=0.70) -> dict:
     W = pd.read_parquet(PROC / "winners_backtest.parquet")
     W = W[W.season >= 2019].dropna(subset=["model"]).copy()
     W["date"] = pd.to_datetime(W.game_date).dt.date
-    X = W.merge(M[["date", "home", "home_open", "home_close", "away_open", "away_close", "provider"]],
-                left_on=["date", "home_team"], right_on=["date", "home"], how="inner")
+    # winners_backtest dates can be the UTC date (a day after the US date): match same day, else the day before
+    cols = ["date", "home", "home_open", "home_close", "away_open", "away_close", "provider"]
+    X = W.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="left")
+    miss = X.home_open.isna()
+    W2 = W[miss.to_numpy()].assign(date=lambda d: (pd.to_datetime(d.date) - pd.Timedelta(days=1)).dt.date)
+    X2 = W2.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="inner")
+    X = pd.concat([X[~miss], X2], ignore_index=True).dropna(subset=["home_open", "home_close", "away_open", "away_close"])
+    X = X[(X[["home_open", "home_close", "away_open", "away_close"]].abs() >= 100).all(1)]  # drop malformed prices
     home_pick = X.model >= 0.5
     X["p"] = np.where(home_pick, X.model, 1 - X.model)
     X["won"] = np.where(home_pick, X.y == 1, X.y == 0)

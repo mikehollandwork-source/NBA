@@ -165,9 +165,33 @@ def game_message(g, r) -> str:
     strong = p[p.lean_prob_cal.round(2) >= STRONG]  # match the displayed %
     from nba.ingest import espn_props
     pub = strong[espn_props.ok_mask(strong)] if len(strong) else strong
-    if pub.empty:  # user 2026-10-28: no picks -> just the teams and start time
+    win = winner_lines(g)
+    if pub.empty and not win:  # user 2026-10-28: no picks -> just the teams and start time
         return f"<b>{g.away} @ {g.home}</b> · {tip}"
-    return "\n".join([f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"] + [lean_line(q) for _, q in pub.iterrows()])
+    return "\n".join([f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"] + [lean_line(q) for _, q in pub.iterrows()] + win)
+
+
+WIN_MIN = 0.70  # user 2026-11-06: post 70%+ winner predictions at the lock
+
+
+def winner_lines(g) -> list:
+    """📈 70%+ winner predictions, plus the home-favorite-vs-back-to-back spot (user's rule 2026-11-06).
+    Backtest 2019-25 at 70%+: rule 573 games won 79.9% (stated 79.0%); home favs vs rested teams 79.1% (78.4%):
+    accurate, but the back-to-back adds no edge beyond the model. Predictions, not picks."""
+    wp = ROOT / f"data/live/winners_{pd.Timestamp(g.tip_utc).tz_convert('America/New_York').date()}.parquet"
+    if not wp.exists():
+        return []
+    w = pd.read_parquet(wp)
+    w = w[w.event_id.astype(str) == str(g.event_id)] if len(w) else w
+    if w.empty:
+        return []
+    q = w.iloc[0]
+    if float(q.p_pick) < WIN_MIN:
+        return []
+    out = [f"📈 Winner (prediction, not a pick): <b>{q.pick_team}</b> {float(q.p_pick):.0%}"]
+    if q.pick_team == q.home and float(q.get("b2b_away", 0) or 0) == 1:
+        out.append(f"🏠 Home favorite vs a team on a back-to-back: <b>{q.pick_team}</b> (rule: 80% in 2019-25)")
+    return out
 
 
 def snapshot(r) -> dict:

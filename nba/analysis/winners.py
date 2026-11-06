@@ -314,5 +314,6 @@ def live_predict(G: pd.DataFrame, R: pd.DataFrame, season: int, d) -> pd.DataFra
         out.append({"event_id": q.event_id, "gameId": int(q.event_id), "home": q.home, "away": q.away,
                     "proj_margin_home": round(float(p.proj_margin), 1), "p_home": round(float(p.p_home), 3),
                     "pick_team": fav, "p_pick": round(float(max(p.p_home, 1 - p.p_home)), 3),
-                    "home_missing": h.missing, "away_missing": a.missing})
+                    "home_missing": h.missing, "away_missing": a.missing,
+                    "b2b_home": float(h.b2b), "b2b_away": float(a.b2b)})
     return pd.DataFrame(out)

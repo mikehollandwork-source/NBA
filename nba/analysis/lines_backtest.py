@@ -184,3 +184,127 @@ def proxy_backtest(odds: int = -120, proxies=("szn", "l10", "l5"), min_gp: int =
     seasons = (m[m.p_side >= 0.58].groupby(["proxy", "season"])
                .agg(bets=("win", "size"), hit_rate=("win", "mean"), roi=("profit", "mean")).reset_index())
     return pd.DataFrame(rows), seasons
+
+
+# ---------------------------------------------------------------- moneyline movement (evaluation only)
+ML_CACHE = ROOT / "data" / "raw" / "espn_odds"
+TEAM_FIX = {"GS": "GSW", "NY": "NYK", "SA": "SAS", "NO": "NOP", "UTAH": "UTA", "WSH": "WAS"}
+PREF = ("DraftKings", "Caesars", "ESPN BET", "MGM", "consensus")
+
+
+def _american(x):
+    try:
+        return float(str(x).replace("+", ""))
+    except (TypeError, ValueError):
+        return np.nan
+
+
+def _ml_event(eid: str) -> dict | None:
+    """Open/close moneylines for one ESPN event (cached). Evaluation only, never a model input."""
+    import json
+    import requests
+    f = ML_CACHE / f"{eid}.json"
+    if f.exists():
+        return json.loads(f.read_text()) or None
+    u = f"https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/events/{eid}/competitions/{eid}/odds"
+    for _ in range(3):
+        try:
+            j = requests.get(u, timeout=30, headers={"User-Agent": "Mozilla/5.0 nba-research"}).json()
+            break
+        except Exception:
+            j = None
+    if j is None:
+        return None
+    best = None
+    for it in j.get("items", []):
+        h, a = it.get("homeTeamOdds") or {}, it.get("awayTeamOdds") or {}
+        ho, hc = (h.get("open") or {}).get("moneyLine"), (h.get("close") or {}).get("moneyLine")
+        ao, ac = (a.get("open") or {}).get("moneyLine"), (a.get("close") or {}).get("moneyLine")
+        if not (ho and hc and ao and ac):
+            continue
+        row = {"provider": it.get("provider", {}).get("name", ""),
+               "home_open": _american(ho.get("american")), "home_close": _american(hc.get("american")),
+               "away_open": _american(ao.get("american")), "away_close": _american(ac.get("american"))}
+        rank = next((i for i, p in enumerate(PREF) if p.lower() in row["provider"].lower()), len(PREF))
+        if best is None or rank < best[0]:
+            best = (rank, row)
+    out = best[1] if best else {}
+    ML_CACHE.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(out))
+    return out or None
+
+
+def fetch_moneylines(seasons=range(2019, 2026), workers=8) -> pd.DataFrame:
+    """ESPN event -> (ET date, home, away) from cached summaries, plus open/close moneylines."""
+    import gzip
+    import json
+    from concurrent.futures import ThreadPoolExecutor
+    from nba.config import RAW
+    ev = []
+    for y in seasons:
+        for p in sorted((RAW / "espn" / str(y)).glob("*.json.gz")):
+            try:
+                c = json.loads(gzip.decompress(p.read_bytes()))["header"]["competitions"][0]
+            except Exception:
+                continue
+            side = {x["homeAway"]: TEAM_FIX.get(x["team"]["abbreviation"], x["team"]["abbreviation"])
+                    for x in c["competitors"]}
+            ev.append({"season": y, "eid": p.name.split(".")[0], "home": side.get("home"), "away": side.get("away"),
+                       "date": pd.Timestamp(c["date"]).tz_convert("America/New_York").date()})
+    E = pd.DataFrame(ev)
+    with ThreadPoolExecutor(workers) as ex:
+        res = list(ex.map(_ml_event, E.eid))
+    M = pd.concat([E, pd.DataFrame([r or {} for r in res])], axis=1)
+    M.to_parquet(PROC / "moneylines.parquet", index=False)
+    return M
+
+
+def _imp(a):
+    a = np.asarray(a, float)
+    return np.where(a < 0, -a / (-a + 100), 100 / (a + 100))
+
+
+def moneyline_movement_backtest(min_p=0.70) -> dict:
+    """Winner model at >= min_p (out-of-sample): does line movement toward / against our team change
+    the hit rate or ROI? Placebo = movement shuffled within season."""
+    M = pd.read_parquet(PROC / "moneylines.parquet").dropna(subset=["home_open", "home_close"])
+    W = pd.read_parquet(PROC / "winners_backtest.parquet")
+    W = W[W.season >= 2019].dropna(subset=["model"]).copy()
+    W["date"] = pd.to_datetime(W.game_date).dt.date
+    # winners_backtest dates can be the UTC date (a day after the US date): match same day, else the day before
+    cols = ["date", "home", "home_open", "home_close", "away_open", "away_close", "provider"]
+    X = W.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="left")
+    miss = X.home_open.isna()
+    W2 = W[miss.to_numpy()].assign(date=lambda d: (pd.to_datetime(d.date) - pd.Timedelta(days=1)).dt.date)
+    X2 = W2.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="inner")
+    X = pd.concat([X[~miss], X2], ignore_index=True).dropna(subset=["home_open", "home_close", "away_open", "away_close"])
+    X = X[(X[["home_open", "home_close", "away_open", "away_close"]].abs() >= 100).all(1)]  # drop malformed prices
+    home_pick = X.model >= 0.5
+    X["p"] = np.where(home_pick, X.model, 1 - X.model)
+    X["won"] = np.where(home_pick, X.y == 1, X.y == 0)
+    for t in ("open", "close"):
+        h, a = _imp(X[f"home_{t}"]), _imp(X[f"away_{t}"])
+        X[f"mkt_{t}"] = np.where(home_pick, h / (h + a), a / (h + a))      # no-vig, our team
+        X[f"price_{t}"] = np.where(home_pick, X[f"home_{t}"], X[f"away_{t}"])
+    X["move"] = X.mkt_close - X.mkt_open                                      # + = market moved toward us
+    X["edge_close"] = X.p - X.mkt_close
+    pay = lambda a: np.where(a < 0, 100 / -a, a / 100)
+    X["u_close"] = np.where(X.won, pay(X.price_close), -1.0)
+    X["u_open"] = np.where(X.won, pay(X.price_open), -1.0)
+    S = X[X.p >= min_p].copy()
+    S["mv"] = pd.cut(S.move, [-1, -0.02, 0.02, 1], labels=["moved against us", "flat (<2 pts)", "moved toward us"])
+    agg = dict(n=("won", "size"), stated=("p", "mean"), market=("mkt_close", "mean"), won=("won", "mean"),
+               roi_close=("u_close", "mean"), roi_open=("u_open", "mean"))
+    out = {"n_matched": len(X), "overall": S.agg({"won": "mean", "p": "mean", "u_close": "mean", "u_open": "mean"}),
+           "by_move": S.groupby("mv", observed=True).agg(**agg),
+           "by_season": S.groupby(["season", "mv"], observed=True).agg(n=("won", "size"), won=("won", "mean"),
+                                                                          roi_close=("u_close", "mean")),
+           "by_edge": S.groupby(pd.cut(S.edge_close, [-1, -0.05, 0, 0.05, 1]), observed=True).agg(**agg)}
+    rng = np.random.default_rng(5)
+    plc = []
+    for _ in range(50):
+        sh = S.groupby("season").move.transform(lambda s: rng.permutation(s.to_numpy()))
+        plc.append(S[sh > 0.02].u_close.mean() - S[sh < -0.02].u_close.mean())
+    out["placebo_roi_gap_sd"] = float(np.std(plc))
+    out["roi_gap_toward_minus_against"] = float(S[S.move > 0.02].u_close.mean() - S[S.move < -0.02].u_close.mean())
+    return out

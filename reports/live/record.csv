@@ -1061,6 +1061,16 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-06,UTA@DAL,Max Christie,DAL,reb,under,3.5,0.708,True,1.0,win,0.8333,2.5,-119.0,False,,0.0
 2026-11-06,UTA@DAL,Keyonte George,UTA,ast,over,5.5,0.578,False,9.0,win,0.8333,5.5,-154.0,True,win,0.6494
 2026-11-06,UTA@DAL,Cooper Flagg,DAL,ast,under,6.5,0.6,False,7.0,loss,-1.0,6.5,-151.0,False,,0.0
+2026-11-06,POR@LAL,Luka Doncic,LAL,pra,under,54.5,0.665,False,63.0,loss,-1.0,50.5,-117.0,False,,0.0
+2026-11-06,POR@LAL,Jrue Holiday,POR,ast,over,3.5,0.646,False,7.0,win,0.8333,4.5,-104.0,False,,0.0
+2026-11-06,POR@LAL,Robert Williams III,POR,reb,under,6.5,0.617,False,5.0,win,0.8333,6.5,-141.0,False,,0.0
+2026-11-06,POR@LAL,Austin Reaves,LAL,reb,over,2.5,0.674,False,3.0,win,0.8333,3.5,-141.0,False,,0.0
+2026-11-06,POR@LAL,Sandro Mamukelashvili,LAL,pts,over,7.5,0.572,False,7.0,loss,-1.0,8.5,-106.0,False,,0.0
+2026-11-06,POR@LAL,Quentin Grimes,LAL,pr,over,9.5,0.584,False,2.0,loss,-1.0,9.5,-127.0,True,loss,-1.0
+2026-11-06,POR@LAL,Toumani Camara,POR,ast,over,0.5,0.755,True,1.0,win,0.8333,1.5,107.0,False,,0.0
+2026-11-06,POR@LAL,Deni Avdija,POR,pts,over,22.5,0.58,False,22.0,loss,-1.0,24.5,-106.0,False,,0.0
+2026-11-06,POR@LAL,Scoot Henderson,POR,pa,over,8.5,0.736,True,2.0,loss,-1.0,14.5,-117.0,False,,0.0
+2026-11-06,POR@LAL,Donovan Clingan,POR,reb,under,10.5,0.642,False,11.0,loss,-1.0,10.5,-113.0,True,loss,-1.0
 2026-11-06,OKC@MEM,Jerami Grant,MEM,reb,over,1.5,0.667,False,0.0,loss,-1.0,2.5,106.0,False,,0.0
 2026-11-06,OKC@MEM,Isaiah Hartenstein,OKC,pts,over,6.5,0.633,False,2.0,loss,-1.0,9.5,-104.0,False,,0.0
 2026-11-06,OKC@MEM,Shai Gilgeous-Alexander,OKC,ra,over,8.5,0.612,False,7.0,loss,-1.0,10.5,-110.0,False,,0.0
@@ -1091,6 +1101,14 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-06,BOS@CHA,Neemias Queta,BOS,ast,under,1.5,0.628,False,1.0,win,0.8333,,,False,,0.0
 2026-11-06,BOS@CHA,Brandon Miller,CHA,ast,over,2.5,0.64,False,1.0,loss,-1.0,3.5,118.0,False,,0.0
 2026-11-06,BOS@CHA,Ryan Kalkbrenner,CHA,reb,over,3.5,0.688,False,5.0,win,0.8333,6.5,-108.0,False,,0.0
+2026-11-06,SAS@SAC,Zach LaVine,SAC,reb,over,2.5,0.586,False,4.0,win,0.8333,2.5,-146.0,True,win,0.6849
+2026-11-06,SAS@SAC,De'Aaron Fox,SAS,ra,under,10.5,0.578,False,6.0,win,0.8333,9.5,-121.0,False,,0.0
+2026-11-06,SAS@SAC,Devin Vassell,SAS,ra,under,7.5,0.596,False,4.0,win,0.8333,6.5,-103.0,False,,0.0
+2026-11-06,SAS@SAC,Keldon Johnson,SAS,ast,over,0.5,0.689,False,6.0,win,0.8333,,,False,,0.0
+2026-11-06,SAS@SAC,Julian Champagnie,SAS,ast,under,1.5,0.606,False,2.0,loss,-1.0,,,False,,0.0
+2026-11-06,SAS@SAC,Stephon Castle,SAS,pa,over,18.5,0.587,False,26.0,win,0.8333,23.5,-104.0,False,,0.0
+2026-11-06,SAS@SAC,Dylan Harper,SAS,reb,under,5.5,0.631,False,2.0,win,0.8333,5.5,-134.0,True,win,0.7463
+2026-11-06,SAS@SAC,Victor Wembanyama,SAS,ast,over,2.5,0.634,False,2.0,loss,-1.0,2.5,-166.0,True,loss,-1.0
 2026-11-06,TOR@MIL,Myles Turner,MIL,pa,over,9.5,0.642,False,0.0,loss,-1.0,12.5,-114.0,False,,0.0
 2026-11-06,TOR@MIL,Kyle Kuzma,MIL,pts,over,8.5,0.614,False,13.0,win,0.8333,10.5,-104.0,False,,0.0
 2026-11-06,TOR@MIL,Jakob Poeltl,TOR,ast,over,0.5,0.66,False,1.0,win,0.8333,,,False,,0.0

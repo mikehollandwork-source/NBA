@@ -1205,3 +1205,16 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-07,NYK@CLE,James Harden,CLE,pa,over,21.5,0.629,False,12.0,loss,-1.0,22.5,-123.0,False,,0.0
 2026-11-07,NYK@CLE,Miles McBride,NYK,ast,over,0.5,0.712,True,0.0,loss,-1.0,1.5,126.0,False,,0.0
 2026-11-07,NYK@CLE,Evan Mobley,CLE,pa,over,21.5,0.541,False,17.0,loss,-1.0,20.5,-120.0,True,loss,-1.0
+2026-11-08,PHI@CHI,LeBron James,PHI,pts,over,13.5,0.676,False,22.0,win,0.8333,17.5,-109.0,False,,0.0
+2026-11-08,PHI@CHI,Kentavious Caldwell-Pope,PHI,ast,over,0.5,0.709,True,3.0,win,0.8333,,,False,,0.0
+2026-11-08,PHI@CHI,Joel Embiid,PHI,pts,over,17.5,0.697,True,18.0,win,0.8333,21.5,-122.0,False,,0.0
+2026-11-08,PHI@CHI,Jaylen Brown,PHI,pts,over,20.5,0.665,False,29.0,win,0.8333,21.5,-122.0,False,,0.0
+2026-11-08,PHI@CHI,Nic Claxton,CHI,ra,under,10.5,0.859,True,8.0,win,0.8333,,,False,,0.0
+2026-11-08,PHI@CHI,Anfernee Simons,PHI,ast,over,0.5,0.726,True,2.0,win,0.8333,,,False,,0.0
+2026-11-08,PHI@CHI,Tre Jones,CHI,ast,over,2.5,0.717,True,1.0,loss,-1.0,3.5,-122.0,False,,0.0
+2026-11-08,PHI@CHI,Jalen Smith,CHI,pr,over,17.5,0.57,False,25.0,win,0.8333,18.5,-114.0,False,,0.0
+2026-11-08,PHI@CHI,Tyrese Maxey,PHI,pr,over,29.5,0.612,False,31.0,win,0.8333,29.5,-113.0,True,win,0.885
+2026-11-08,PHI@CHI,Isaac Okoro,CHI,reb,over,0.5,0.75,True,2.0,win,0.8333,,,False,,0.0
+2026-11-08,PHI@CHI,Matas Buzelis,CHI,pr,over,16.5,0.663,False,24.0,win,0.8333,19.5,-107.0,False,,0.0
+2026-11-08,PHI@CHI,Josh Giddey,CHI,pr,over,12.5,0.793,True,26.0,win,0.8333,19.5,-103.0,False,,0.0
+2026-11-08,PHI@CHI,VJ Edgecombe,PHI,reb,under,6.5,0.625,False,6.0,win,0.8333,5.5,109.0,False,,0.0

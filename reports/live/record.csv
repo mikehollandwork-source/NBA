@@ -1205,6 +1205,53 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-07,NYK@CLE,James Harden,CLE,pa,over,21.5,0.629,False,12.0,loss,-1.0,22.5,-123.0,False,,0.0
 2026-11-07,NYK@CLE,Miles McBride,NYK,ast,over,0.5,0.712,True,0.0,loss,-1.0,1.5,126.0,False,,0.0
 2026-11-07,NYK@CLE,Evan Mobley,CLE,pa,over,21.5,0.541,False,17.0,loss,-1.0,20.5,-120.0,True,loss,-1.0
+2026-11-08,LAL@DET,Duncan Robinson,DET,ast,over,1.5,0.631,False,3.0,win,0.8333,2.5,122.0,False,,0.0
+2026-11-08,LAL@DET,John Collins,DET,pa,over,8.5,0.621,False,9.0,win,0.8333,12.5,-108.0,False,,0.0
+2026-11-08,LAL@DET,Austin Reaves,LAL,reb,over,2.5,0.702,True,5.0,win,0.8333,4.5,113.0,False,,0.0
+2026-11-08,LAL@DET,Collin Sexton,LAL,ast,over,1.5,0.729,True,2.0,win,0.8333,2.5,108.0,False,,0.0
+2026-11-08,LAL@DET,Sandro Mamukelashvili,LAL,pra,over,13.5,0.644,False,10.0,loss,-1.0,,,False,,0.0
+2026-11-08,LAL@DET,Quentin Grimes,LAL,pa,over,8.5,0.686,False,16.0,win,0.8333,14.5,-126.0,False,,0.0
+2026-11-08,LAL@DET,Cade Cunningham,DET,pa,over,30.5,0.588,False,22.0,loss,-1.0,34.5,-113.0,False,,0.0
+2026-11-08,LAL@DET,Ausar Thompson,DET,reb,under,8.5,0.651,False,11.0,loss,-1.0,6.5,105.0,False,,0.0
+2026-11-08,UTA@MIN,Rudy Gobert,MIN,ast,over,0.5,0.708,True,2.0,win,0.8333,,,False,,0.0
+2026-11-08,UTA@MIN,Lauri Markkanen,UTA,pr,over,23.5,0.639,False,,void,0.0,26.5,-121.0,False,,0.0
+2026-11-08,UTA@MIN,Ayo Dosunmu,MIN,pa,over,20.5,0.654,False,27.0,win,0.8333,23.5,-114.0,False,,0.0
+2026-11-08,UTA@MIN,Jaden McDaniels,MIN,pts,over,16.5,0.602,False,16.0,loss,-1.0,17.5,-118.0,False,,0.0
+2026-11-08,UTA@MIN,LaMelo Ball,MIN,pts,over,16.5,0.724,True,24.0,win,0.8333,21.5,-115.0,False,,0.0
+2026-11-08,UTA@MIN,Keyonte George,UTA,pts,over,20.5,0.573,False,19.0,loss,-1.0,21.5,-108.0,False,,0.0
+2026-11-08,NOP@LAC,Kris Dunn,LAC,pra,over,15.5,0.608,False,23.0,win,0.8333,17.5,-103.0,False,,0.0
+2026-11-08,NOP@LAC,Derrick Jones Jr.,LAC,ast,under,1.5,0.569,False,3.0,loss,-1.0,,,False,,0.0
+2026-11-08,NOP@LAC,Herbert Jones,NOP,ast,over,0.5,0.689,False,1.0,win,0.8333,,,False,,0.0
+2026-11-08,NOP@LAC,Zion Williamson,NOP,ra,over,7.5,0.593,False,6.0,loss,-1.0,,,False,,0.0
+2026-11-08,NOP@LAC,Darius Garland,LAC,ra,over,7.5,0.694,False,10.0,win,0.8333,9.5,-127.0,False,,0.0
+2026-11-08,NOP@LAC,Saddiq Bey,NOP,ast,over,1.5,0.591,False,3.0,win,0.8333,,,False,,0.0
+2026-11-08,NOP@LAC,Trey Murphy III,NOP,pr,over,17.5,0.615,False,33.0,win,0.8333,20.5,-114.0,False,,0.0
+2026-11-08,NOP@LAC,Jeremiah Fears,NOP,pts,over,13.5,0.593,False,25.0,win,0.8333,14.5,-107.0,False,,0.0
+2026-11-08,MIA@SAC,Giannis Antetokounmpo,MIA,reb,under,12.5,0.66,False,14.0,loss,-1.0,12.5,-140.0,True,loss,-1.0
+2026-11-08,MIA@SAC,Andrew Wiggins,MIA,pra,over,11.5,0.678,False,10.0,loss,-1.0,15.5,-115.0,False,,0.0
+2026-11-08,MIA@SAC,Zach LaVine,SAC,reb,over,2.5,0.599,False,4.0,win,0.8333,3.5,116.0,False,,0.0
+2026-11-08,MIA@SAC,Bobby Portis,MIA,reb,under,6.5,0.684,False,1.0,win,0.8333,5.5,-118.0,False,,0.0
+2026-11-08,MIA@SAC,De'Andre Hunter,SAC,ast,over,0.5,0.762,True,1.0,win,0.8333,,,False,,0.0
+2026-11-08,MIA@SAC,Bam Adebayo,MIA,ast,over,2.5,0.568,False,4.0,win,0.8333,3.5,117.0,False,,0.0
+2026-11-08,MIA@SAC,Davion Mitchell,MIA,reb,over,1.5,0.625,False,3.0,win,0.8333,2.5,119.0,False,,0.0
+2026-11-08,MIA@SAC,Keegan Murray,SAC,pra,under,20.5,0.781,True,13.0,win,0.8333,,,False,,0.0
+2026-11-08,MIA@SAC,Klay Thompson,MIA,ra,over,2.5,0.651,False,6.0,win,0.8333,4.5,122.0,False,,0.0
+2026-11-08,BOS@MIL,Derrick White,BOS,reb,over,2.5,0.675,False,3.0,win,0.8333,3.5,-104.0,False,,0.0
+2026-11-08,BOS@MIL,Myles Turner,MIL,pts,over,6.5,0.638,False,3.0,loss,-1.0,9.5,-112.0,False,,0.0
+2026-11-08,BOS@MIL,Kyle Kuzma,MIL,pts,over,8.5,0.611,False,27.0,win,0.8333,9.5,-107.0,False,,0.0
+2026-11-08,BOS@MIL,Payton Pritchard,BOS,reb,over,2.5,0.586,False,5.0,win,0.8333,2.5,-161.0,True,win,0.6211
+2026-11-08,BOS@MIL,Paul George,BOS,ast,under,4.5,0.574,False,1.0,win,0.8333,3.5,-108.0,False,,0.0
+2026-11-08,BOS@MIL,Tyler Herro,MIL,pa,under,26.5,0.565,False,15.0,win,0.8333,24.5,-120.0,False,,0.0
+2026-11-08,BOS@MIL,Neemias Queta,BOS,ast,over,0.5,0.714,True,4.0,win,0.8333,1.5,115.0,False,,0.0
+2026-11-08,BOS@MIL,Jaime Jaquez Jr.,MIL,ast,over,2.5,0.656,False,2.0,loss,-1.0,2.5,-176.0,True,loss,-1.0
+2026-11-08,BOS@MIL,Ryan Rollins,MIL,pra,under,18.5,0.575,False,18.0,win,0.8333,15.5,-110.0,False,,0.0
+2026-11-08,BKN@DAL,Julius Randle,BKN,ast,over,4.5,0.602,False,4.0,loss,-1.0,4.5,-110.0,True,loss,-1.0
+2026-11-08,BKN@DAL,P.J. Washington,DAL,ast,over,0.5,0.738,True,0.0,loss,-1.0,,,False,,0.0
+2026-11-08,BKN@DAL,Michael Porter Jr.,BKN,ast,over,0.5,0.813,True,0.0,loss,-1.0,1.5,-195.0,False,,0.0
+2026-11-08,BKN@DAL,Naji Marshall,DAL,ast,under,5.5,0.697,True,2.0,win,0.8333,3.5,-165.0,False,,0.0
+2026-11-08,BKN@DAL,Day'Ron Sharpe,BKN,pts,over,6.5,0.627,False,6.0,loss,-1.0,8.5,-131.0,False,,0.0
+2026-11-08,BKN@DAL,Noah Clowney,BKN,pts,over,3.5,0.697,True,2.0,loss,-1.0,6.5,101.0,False,,0.0
+2026-11-08,BKN@DAL,Cooper Flagg,DAL,ast,under,6.5,0.585,False,12.0,loss,-1.0,6.5,-146.0,True,loss,-1.0
 2026-11-08,PHI@CHI,LeBron James,PHI,pts,over,13.5,0.676,False,22.0,win,0.8333,17.5,-109.0,False,,0.0
 2026-11-08,PHI@CHI,Kentavious Caldwell-Pope,PHI,ast,over,0.5,0.709,True,3.0,win,0.8333,,,False,,0.0
 2026-11-08,PHI@CHI,Joel Embiid,PHI,pts,over,17.5,0.697,True,18.0,win,0.8333,21.5,-122.0,False,,0.0

@@ -286,43 +286,23 @@ def record_brief() -> str:
             f"Last night ({pd.Timestamp(last):%b %-d}): {f(ln) if ln['w'] + ln['l'] else 'no picks'}")
 
 
-def on_fire(r: pd.DataFrame, n: int = 5) -> str:
-    """🔥 Players who scored well above their average last game, ranked by how strongly our data leans today
-    (user's choice 2026-10-28). Backtest 2019-25 (5 a day, vs own baseline): stated 76.7% -> hit 79.3%, better than
-    stated in 7/7 seasons; unders after a hot game hit 64% vs 70% stated, so they're flagged ⚠️."""
-    from nba.config import PROC, LIVE_SEASON
-    from nba.ingest import espn_props
-    f = PROC / f"player_games_{LIVE_SEASON}.parquet"
-    if not f.exists():
-        return ""
-    pg = pd.read_parquet(f)
-    pg = pg[(pg.source != "pending") & pg.pts.notna() & (pg["min"] > 0)].sort_values("game_date")  # finished games only
-    last = pg.assign(pid=pg.espn_id.astype(str)).groupby("pid").tail(1).set_index("pid")[["pts"]].rename(columns={"pts": "last_pts"})
-    x = r[r.lean_stat.apply(lambda v: isinstance(v, str)) & (r.proj_min >= 20) & r.pts_ref.notna()].copy()
-    if "projected" in x:
-        x = x[x.projected.astype(str).str.lower() == "true"]
-    if "status" in x:
-        x = x[~x.status.fillna("").str.lower().isin(["out", "doubtful"])]
-    x["pid"] = x.pid.astype(str)
-    x = x.join(last, on="pid")
-    x = x[x.last_pts.notna()]
-    x["hot"] = x.last_pts - x.pts_ref
-    # user rule 2026-10-28: only players DraftKings offers at our number or better (same check + cap as picks)
-    x = x[(x.hot > 0) & espn_props.ok_mask(x)].nlargest(15, "hot").nlargest(n, "lean_prob_cal")
-    if x.empty:
-        return "🔥 <b>On fire</b>: none with a DraftKings line at our number or better yet"
-    x["is_pick"] = x.lean_prob_cal.round(2) >= STRONG
-    lines = ["🔥 <b>On fire — 5 players our data likes most today</b>"]
-    for _, q in x.iterrows():
-        stat = STAT_NAME.get(q.lean_stat, str(q.lean_stat).upper())
-        warn = " ⚠️" if q.lean_side == "under" else ""
-        tag = f" · DK {'o' if q.lean_side == 'over' else 'u'}{float(q.dk_line):g} {int(q.dk_price):+d}" + (
-            " ✅ PICK" if q.is_pick else "")
-        lines.append(f"• <b>{html.escape(q.player)}</b> ({q.team}) — {q.last_pts:.0f} pts last game (avg {q.pts_ref:.1f}) → "
-                     f"{stat} {q.lean_side} {q.lean_ref:g} · <b>{q.lean_prob_cal:.0%}</b>{warn}{tag}")
-    lines.append("Only players DraftKings offers at our number or better. ✅ PICK = 70%+. "
-                 "⚠️ under after a hot game (hits less than stated).")
-    return "\n".join(lines)
+def best_play_message(d, r: pd.DataFrame, G: pd.DataFrame) -> str:
+    """⭐ Play of the day (nba/best_play.py; replaced 🔥 On fire on 2026-11-11). Frozen at the first post."""
+    from nba import best_play
+    p = best_play.load(d)
+    if p is None:
+        p = best_play.pick(r, G)
+        if p is None:
+            return "⭐ <b>Play of the day</b>: none yet (no lean at 60%+ on DraftKings at our number)"
+        if LIVE:  # dry runs must not freeze a play
+            best_play.save(d, p)
+    stat = STAT_NAME.get(p["stat"], p["stat"].upper())
+    target = " 🎯" if p.get("conf") == 4 else ""
+    return (f"⭐ <b>Play of the day</b> (best lean, not a 70% pick){target}\n"
+            f"<b>{html.escape(p['player'])}</b> ({p['team']} vs {p['opp']}) — {stat} {p['side']} {p['line']:g} "
+            f"<b>{p['price']:+d}</b> at DraftKings · <b>{p['prob']:.0%}</b> (proj {p['proj']:.1f})\n"
+            f"<i>As of this post; skip it if he is ruled out or the line moves against us.</i> "
+            f"Record: {best_play.summary()}")
 
 
 def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
@@ -365,9 +345,7 @@ def main(d: date):
         # morning post (user's choice 2026-10-28): record + on-fire list only; games post when they lock
         send(f"🏀 <b>{d:%a %b %-d}</b> · {len(G)} games · picks post as each game locks (1 hr before tip)\n\n"
              + record_brief())
-        fire = on_fire(r)
-        if fire:
-            send(fire)
+        send(best_play_message(d, r, G))
         early = winners_morning(d, G)
         if early:
             send(early)

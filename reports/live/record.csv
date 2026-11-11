@@ -1339,3 +1339,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-09,SAS@PHX,Stephon Castle,SAS,ast,over,4.5,0.622,False,7.0,win,0.8333,5.5,-135.0,False,,0.0
 2026-11-09,SAS@PHX,Dylan Harper,SAS,reb,under,5.5,0.608,False,5.0,win,0.8333,5.5,-140.0,True,win,0.7143
 2026-11-09,SAS@PHX,Victor Wembanyama,SAS,ast,over,2.5,0.631,False,3.0,win,0.8333,2.5,-150.0,True,win,0.6667
+2026-11-10,MIL@NYK,Myles Turner,MIL,pts,over,5.5,0.697,True,3.0,loss,-1.0,10.5,-109.0,False,,0.0
+2026-11-10,MIL@NYK,Kyle Kuzma,MIL,reb,under,5.5,0.596,False,5.0,win,0.8333,4.5,110.0,False,,0.0
+2026-11-10,MIL@NYK,Karl-Anthony Towns,NYK,ast,over,2.5,0.634,False,3.0,win,0.8333,3.5,108.0,False,,0.0
+2026-11-10,MIL@NYK,Mikal Bridges,NYK,pa,over,7.5,0.729,True,5.0,loss,-1.0,13.5,-131.0,False,,0.0
+2026-11-10,MIL@NYK,Jalen Brunson,NYK,ast,over,5.5,0.629,False,2.0,loss,-1.0,6.5,112.0,False,,0.0
+2026-11-10,MIL@NYK,OG Anunoby,NYK,pts,over,15.5,0.573,False,19.0,win,0.8333,17.5,-111.0,False,,0.0
+2026-11-10,MIL@NYK,Miles McBride,NYK,ra,over,1.5,0.736,True,3.0,win,0.8333,,,False,,0.0
+2026-11-10,MIL@NYK,Jaime Jaquez Jr.,MIL,ast,over,2.5,0.673,False,3.0,win,0.8333,3.5,123.0,False,,0.0
+2026-11-10,MIL@NYK,Ryan Rollins,MIL,reb,under,4.5,0.634,False,5.0,loss,-1.0,3.5,105.0,False,,0.0

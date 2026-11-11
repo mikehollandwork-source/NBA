@@ -51,30 +51,36 @@ def candidates(r: pd.DataFrame, G: pd.DataFrame | None = None, now=None) -> pd.D
     return x.sort_values(["ev", "lean_prob_cal"], ascending=False)
 
 
-def pick(r: pd.DataFrame, G: pd.DataFrame | None = None, now=None) -> dict | None:
-    c = candidates(r, G, now)
-    if c.empty:
-        return None
-    q = c.iloc[0]
-    return {"gameId": int(q.gameId), "pid": str(q.pid), "player": q.player, "team": q.team, "opp": q.opp,
-            "stat": q.lean_stat, "side": q.lean_side, "line": float(q.dk_line), "price": int(q.dk_price),
-            "prob": round(float(q.lean_prob_cal), 3), "proj": round(float(q.get(f"proj_{q.lean_stat}", np.nan)), 1),
-            "ev": round(float(q.ev), 3), "conf": None if pd.isna(q.get("conf")) else int(q.conf)}
+N_PLAYS = 5  # user 2026-11-11: list the top 5 each morning, ranked; #1 is the ⭐ play
 
 
-def save(d, p: dict, now=None) -> None:
-    """Freeze the posted play (first post of the day wins; later runs never overwrite it)."""
+def picks(r: pd.DataFrame, G: pd.DataFrame | None = None, now=None, n: int = N_PLAYS) -> list:
+    """Top n plays, ranked by expected return at DraftKings' odds (one per player)."""
+    c = candidates(r, G, now).drop_duplicates("pid").head(n)
+    return [{"rank": i + 1, "gameId": int(q.gameId), "pid": str(q.pid), "player": q.player, "team": q.team,
+             "opp": q.opp, "stat": q.lean_stat, "side": q.lean_side, "line": float(q.dk_line),
+             "price": int(q.dk_price), "prob": round(float(q.lean_prob_cal), 3),
+             "proj": round(float(q.get(f"proj_{q.lean_stat}", np.nan)), 1), "ev": round(float(q.ev), 3),
+             "conf": None if pd.isna(q.get("conf")) else int(q.conf)}
+            for i, (_, q) in enumerate(c.iterrows())]
+
+
+def save(d, plays: list, now=None) -> None:
+    """Freeze the posted list (first post of the day wins; later runs never overwrite it)."""
     f = DIR / f"{d}.json"
-    if f.exists():
+    if f.exists() or not plays:
         return
     DIR.mkdir(parents=True, exist_ok=True)
-    f.write_text(json.dumps({**p, "date": str(d),
+    f.write_text(json.dumps({"date": str(d), "plays": plays,
                              "posted_utc": (now or pd.Timestamp.now(tz="UTC")).isoformat(timespec="seconds")}))
 
 
-def load(d) -> dict | None:
+def load(d) -> list | None:
     f = DIR / f"{d}.json"
-    return json.loads(f.read_text()) if f.exists() else None
+    return json.loads(f.read_text())["plays"] if f.exists() else None
+
+
+COLS = ["date", "rank", "player", "team", "opp", "stat", "side", "line", "price", "prob", "actual", "result", "units"]
 
 
 def grade() -> pd.DataFrame:
@@ -82,37 +88,35 @@ def grade() -> pd.DataFrame:
     from nba import record
     rows = []
     for f in sorted(DIR.glob("*.json")) if DIR.exists() else []:
-        p = json.loads(f.read_text())
-        box = record._box(p["date"])
-        b = box[(box.pid == str(p["pid"])) & (box.gameId == int(p["gameId"]))] if len(box) else box
-        if b.empty:
-            continue  # game not final yet
-        b = b.iloc[0]
-        actual = float(sum(b[c] for c in COMBOS.get(p["stat"], [p["stat"]])))
-        if b.get("dnp", 0) == 1:
-            res, u = "void", 0.0
-        elif actual == p["line"]:
-            res, u = "push", 0.0
-        else:
-            win = actual > p["line"] if p["side"] == "over" else actual < p["line"]
-            res, u = ("win", float(payout(p["price"]))) if win else ("loss", -1.0)
-        rows.append({**{k: p[k] for k in ("date", "player", "team", "opp", "stat", "side", "line", "price", "prob")},
-                     "actual": actual, "result": res, "units": round(u, 4)})
-    led = pd.DataFrame(rows, columns=["date", "player", "team", "opp", "stat", "side", "line", "price", "prob",
-                                      "actual", "result", "units"])
+        j = json.loads(f.read_text())
+        box = record._box(j["date"])
+        for p in j["plays"]:
+            b = box[(box.pid == str(p["pid"])) & (box.gameId == int(p["gameId"]))] if len(box) else box
+            if b.empty:
+                continue  # game not final yet
+            b = b.iloc[0]
+            actual = float(sum(b[c] for c in COMBOS.get(p["stat"], [p["stat"]])))
+            if b.get("dnp", 0) == 1:
+                res, u = "void", 0.0
+            elif actual == p["line"]:
+                res, u = "push", 0.0
+            else:
+                win = actual > p["line"] if p["side"] == "over" else actual < p["line"]
+                res, u = ("win", float(payout(p["price"]))) if win else ("loss", -1.0)
+            rows.append({"date": j["date"], **{k: p[k] for k in COLS[1:10]}, "actual": actual, "result": res,
+                         "units": round(u, 4)})
+    led = pd.DataFrame(rows, columns=COLS)
     led.to_csv(LEDGER, index=False)
     return led
 
 
+def _wl(x: pd.DataFrame) -> str:
+    w, l = (x.result == "win").sum(), (x.result == "loss").sum()
+    return f"{w}-{l} ({w / (w + l):.0%}) · {x.units.sum():+.2f}u" if w + l else "none graded yet"
+
+
 def summary(led: pd.DataFrame | None = None) -> str:
+    """'⭐ #1: W-L · units | all 5: W-L · units'."""
     if led is None:
-        led = pd.read_csv(LEDGER) if LEDGER.exists() else pd.DataFrame()
-    if led.empty:
-        return "no graded plays yet"
-    w, l = (led.result == "win").sum(), (led.result == "loss").sum()
-    if not w + l:
-        return "no graded plays yet"
-    q = led.iloc[-1]
-    icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}[q.result]
-    last = f" · last: {icon} {q.player} {q.stat.upper()} {q.side} {q.line:g} → {q.actual:g}"
-    return f"{w}-{l} ({w / (w + l):.0%}) · {led.units.sum():+.2f}u{last}"
+        led = pd.read_csv(LEDGER) if LEDGER.exists() else pd.DataFrame(columns=COLS)
+    return f"⭐ #1 {_wl(led[led['rank'] == 1])} · all 5: {_wl(led)}"

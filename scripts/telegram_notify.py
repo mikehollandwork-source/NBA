@@ -287,22 +287,25 @@ def record_brief() -> str:
 
 
 def best_play_message(d, r: pd.DataFrame, G: pd.DataFrame) -> str:
-    """⭐ Play of the day (nba/best_play.py; replaced 🔥 On fire on 2026-11-11). Frozen at the first post."""
+    """⭐ Top 5 plays, ranked (nba/best_play.py; replaced 🔥 On fire on 2026-11-11). Frozen at the first post."""
     from nba import best_play
-    p = best_play.load(d)
-    if p is None:
-        p = best_play.pick(r, G)
-        if p is None:
-            return "⭐ <b>Play of the day</b>: none yet (no lean at 60%+ on DraftKings at our number)"
-        if LIVE:  # dry runs must not freeze a play
-            best_play.save(d, p)
-    stat = STAT_NAME.get(p["stat"], p["stat"].upper())
-    target = " 🎯" if p.get("conf") == 4 else ""
-    return (f"⭐ <b>Play of the day</b> (best lean, not a 70% pick){target}\n"
-            f"<b>{html.escape(p['player'])}</b> ({p['team']} vs {p['opp']}) — {stat} {p['side']} {p['line']:g} "
-            f"<b>{p['price']:+d}</b> at DraftKings · <b>{p['prob']:.0%}</b> (proj {p['proj']:.1f})\n"
-            f"<i>As of this post; skip it if he is ruled out or the line moves against us.</i> "
-            f"Record: {best_play.summary()}")
+    plays = best_play.load(d)
+    if plays is None:
+        plays = best_play.picks(r, G)
+        if not plays:
+            return "⭐ <b>Top plays</b>: none yet (no lean at 60%+ on DraftKings at our number)"
+        if LIVE:  # dry runs must not freeze the list
+            best_play.save(d, plays)
+    lines = ["⭐ <b>Top plays today</b> — ranked, best first (leans, not 70% picks)"]
+    for p in plays:
+        stat = STAT_NAME.get(p["stat"], p["stat"].upper())
+        mark = "⭐" if p["rank"] == 1 else f"{p['rank']}."
+        lines.append(f"{mark} <b>{html.escape(p['player'])}</b> ({p['team']} vs {p['opp']}) — {stat} {p['side']} "
+                     f"{p['line']:g} <b>{p['price']:+d}</b> · {p['prob']:.0%} (proj {p['proj']:.1f})"
+                     + (" 🎯" if p.get("conf") == 4 else ""))
+    lines.append("<i>DraftKings lines as of this post; skip a play if he is ruled out or the line moves against us.</i>")
+    lines.append("Record — " + best_play.summary())
+    return "\n".join(lines)
 
 
 def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:

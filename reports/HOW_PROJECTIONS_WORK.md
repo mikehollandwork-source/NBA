@@ -183,3 +183,4 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - ⭐ is one play a day: among leans DraftKings offers at our number or better that pass the safety checks, with 60%+ probability, 20+ projected minutes and a price no worse than -160, the one with the highest expected return at DraftKings' odds.
 - It is a lean, not a 70% pick. It is saved when posted and graded at that line and price, with its own record.
 - The rule went 14-5 on Oct 22 - Nov 10, but that is 19 plays picked from 8 candidate rules, so expect closer to 55-60% going forward.
+- The morning post lists the top 5 by that same ranking (best first); the record is kept for #1 alone and for all 5. In the rule test, plays ranked 2-3 added little (top 3 a day: +1%), so the lower ranks are weaker.

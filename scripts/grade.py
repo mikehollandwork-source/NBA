@@ -13,4 +13,4 @@ txt = record.report(led, kled, wled)
 (record.ROOT / "reports" / "live" / "record_summary.md").write_text(txt + "\n")
 print(txt)
 from nba import best_play  # noqa: E402
-print("⭐ Play of the day:", best_play.summary(best_play.grade()))
+print("Top plays:", best_play.summary(best_play.grade()))

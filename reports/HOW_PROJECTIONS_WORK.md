@@ -177,3 +177,9 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - A 70%+ lean becomes a pick only if at least 3 of these 4 agree: all three models land on the same side of the line, the player is a regular starter (started 3+ of his last 5), his last-5 average is on the lean's side, and his projected minutes are within 3 of his last-5 average.
 - Backtest 2019-25 (pregame information only): leans passing 0-1 checks hit 3-6 points less than stated; 4/4 hit 1.8 points more. 🎯 marks 4/4.
 - Tested and dropped (no effect vs a placebo): teammates out, blowout risk, steady minutes, home/away, team back-to-back.
+
+## 18. ⭐ Play of the day (replaced 🔥 On fire, 2026-11-11)
+- 🔥 On fire was dropped: at DraftKings' real lines and odds it lost 9% over about 70 bets.
+- ⭐ is one play a day: among leans DraftKings offers at our number or better that pass the safety checks, with 60%+ probability, 20+ projected minutes and a price no worse than -160, the one with the highest expected return at DraftKings' odds.
+- It is a lean, not a 70% pick. It is saved when posted and graded at that line and price, with its own record.
+- The rule went 14-5 on Oct 22 - Nov 10, but that is 19 plays picked from 8 candidate rules, so expect closer to 55-60% going forward.

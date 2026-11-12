@@ -1,2 +1,2 @@
-event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,locked_at_utc
-401909976,401909976,PHI,TOR,2.4,0.571,PHI,0.571,LeBron James,Scottie Barnes,0.0,1.0,2026-11-12T19:55:47+00:00
+event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,locked_at_utc
+401909976,401909976,PHI,TOR,2.4,0.571,PHI,0.571,LeBron James,Scottie Barnes,0.0,1.0,-270.0,221.0,0.701,TOR,0.13,221.0,2026-11-12T22:11:20+00:00

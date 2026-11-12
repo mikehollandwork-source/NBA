@@ -211,11 +211,17 @@ def winner_lines(g) -> list:
     if w.empty:
         return []
     q = w.iloc[0]
-    if float(q.p_pick) < WIN_MIN:
-        return []
-    out = [f"📈 Winner (prediction, not a pick): <b>{q.pick_team}</b> {float(q.p_pick):.0%}"]
-    if q.pick_team == q.home and float(q.get("b2b_away", 0) or 0) == 1:
-        out.append(f"🏠 Home favorite vs a team on a back-to-back: <b>{q.pick_team}</b> (rule: 80% in 2019-25)")
+    out = []
+    if float(q.p_pick) >= WIN_MIN:
+        out.append(f"📈 Winner (prediction, not a pick): <b>{q.pick_team}</b> {float(q.p_pick):.0%}")
+        if q.pick_team == q.home and float(q.get("b2b_away", 0) or 0) == 1:
+            out.append(f"🏠 Home favorite vs a team on a back-to-back: <b>{q.pick_team}</b> (rule: 80% in 2019-25)")
+    vt = q.get("value_team")
+    if isinstance(vt, str) and vt:
+        ours = float(q.p_home) if vt == q.home else 1 - float(q.p_home)
+        mkt = float(q.mkt_home) if vt == q.home else 1 - float(q.mkt_home)
+        out.append(f"💰 Value (PAPER, not a pick): <b>{vt}</b> {int(q.value_price):+d} at DraftKings · "
+                   f"ours {ours:.0%} vs market {mkt:.0%}")
     return out
 
 
@@ -305,6 +311,13 @@ def recap_last_night(last) -> str:
         if len(w):
             lines.append("📈 70%+ winners: " + " · ".join(
                 f"{'✅' if q.result == 'win' else '❌'} {q.pick_team} {q.p_pick:.0%}" for _, q in w.iterrows()))
+    if record.VLEDGER.exists():
+        v = pd.read_csv(record.VLEDGER)
+        lv = v[v.date == last]
+        if len(lv) or len(v):
+            lines.append("💰 Value (paper): " + (" · ".join(
+                f"{'✅' if q.result == 'win' else '❌'} {q.team} {int(q.price):+d}" for _, q in lv.iterrows()) + " · "
+                if len(lv) else "") + "season " + record.summarize_v(v))
     return ("\n" + "\n".join(lines)) if lines else ""
 
 

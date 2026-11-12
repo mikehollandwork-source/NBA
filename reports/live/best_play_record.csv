@@ -1,1 +1,3 @@
 date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
+2026-11-11,1,Victor Wembanyama,SAS,CHI,pr,under,41.5,-111,0.653,41.0,win,0.9009
+2026-11-11,2,Jaime Jaquez Jr.,MIL,LAL,ast,over,2.5,-152,0.643,3.0,win,0.6579

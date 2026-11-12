@@ -14,4 +14,5 @@ txt = record.report(led, kled, wled)
 print(txt)
 from nba import best_play  # noqa: E402
 print("Top plays:", best_play.summary(best_play.grade()))
-print("📈 Value (paper):", record.summarize_v(record.grade_value(wled)))
+print("💰 Value (paper):", record.summarize_v(record.grade_value(wled)))
+print("📏 ATS (paper):", record.summarize_v(record.grade_ats(wled)))

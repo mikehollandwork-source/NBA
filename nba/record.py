@@ -238,6 +238,35 @@ def grade_value(wled: pd.DataFrame | None = None) -> pd.DataFrame:
     return led
 
 
+ALEDGER = ROOT / "reports" / "live" / "ats_record.csv"
+
+
+def grade_ats(wled: pd.DataFrame | None = None) -> pd.DataFrame:
+    """📏 ATS paper bets (our margin beats DraftKings' spread by 6+), graded at the locked spread + price."""
+    wled = pd.read_csv(WLEDGER) if wled is None else wled
+    rows = []
+    for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
+        for f in day.glob("*.winner.csv"):
+            w = pd.read_csv(f).iloc[0]
+            if "ats_team" not in w or not isinstance(w.ats_team, str):
+                continue
+            g = wled[(wled.date == day.name) & (wled.game == f.name.replace(".winner.csv", ""))]
+            if g.empty:
+                continue
+            g = g.iloc[0]
+            diff = (g.home_pts - g.away_pts) if w.ats_team == w.home else (g.away_pts - g.home_pts)
+            cover = diff + float(w.ats_line)
+            price = float(w.ats_price)
+            res = "push" if cover == 0 else ("win" if cover > 0 else "loss")
+            u = 0.0 if res == "push" else ((100 / -price if price < 0 else price / 100) if res == "win" else -1.0)
+            rows.append({"date": day.name, "game": g.game, "team": w.ats_team, "line": float(w.ats_line),
+                         "price": price, "edge": float(w.ats_edge), "margin": int(diff), "result": res,
+                         "units": round(u, 4)})
+    led = pd.DataFrame(rows, columns=["date", "game", "team", "line", "price", "edge", "margin", "result", "units"])
+    led.to_csv(ALEDGER, index=False)
+    return led
+
+
 def summarize_v(x: pd.DataFrame) -> str:
     w, l = (x.result == "win").sum(), (x.result == "loss").sum()
     return f"{w}-{l} · {x.units.sum():+.2f}u · ROI {x.units.sum() / (w + l):+.1%}" if w + l else "none graded yet"

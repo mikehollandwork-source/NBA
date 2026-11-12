@@ -222,6 +222,11 @@ def winner_lines(g) -> list:
         mkt = float(q.mkt_home) if vt == q.home else 1 - float(q.mkt_home)
         out.append(f"💰 Value (PAPER, not a pick): <b>{vt}</b> {int(q.value_price):+d} at DraftKings · "
                    f"ours {ours:.0%} vs market {mkt:.0%}")
+    at = q.get("ats_team")
+    if isinstance(at, str) and at:
+        our = float(q.proj_margin_home) if at == q.home else -float(q.proj_margin_home)
+        out.append(f"📏 ATS (PAPER, not a pick): <b>{at} {float(q.ats_line):+g}</b> ({int(q.ats_price):+d}) at DraftKings · "
+                   f"our margin {our:+.1f}, {float(q.ats_edge):.1f} pts better than the spread")
     return out
 
 
@@ -318,6 +323,14 @@ def recap_last_night(last) -> str:
             lines.append("💰 Value (paper): " + (" · ".join(
                 f"{'✅' if q.result == 'win' else '❌'} {q.team} {int(q.price):+d}" for _, q in lv.iterrows()) + " · "
                 if len(lv) else "") + "season " + record.summarize_v(v))
+    if record.ALEDGER.exists():
+        a = pd.read_csv(record.ALEDGER)
+        la = a[a.date == last]
+        if len(la) or len(a):
+            ic = {"win": "✅", "loss": "❌", "push": "➖"}
+            lines.append("📏 ATS (paper): " + (" · ".join(
+                f"{ic.get(q.result, '·')} {q.team} {q.line:+g}" for _, q in la.iterrows()) + " · " if len(la) else "")
+                + "season " + record.summarize_v(a))
     return ("\n" + "\n".join(lines)) if lines else ""
 
 

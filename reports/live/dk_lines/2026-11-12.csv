@@ -1,0 +1,4 @@
+run_utc,gameId,pid,player,lean_stat,lean_side,lean_ref,lean_prob_cal,dk_line,dk_price
+2026-11-12T06:50:07+00:00,401909979,4395651,Coby White,pr,under,19.5,0.7110196891651386,16.5,-109.0
+2026-11-12T06:50:07+00:00,401909978,4432816,LaMelo Ball,reb,over,2.5,0.7181497612604938,3.5,-154.0
+2026-11-12T06:50:07+00:00,401909979,4576060,Ryan Kalkbrenner,pr,over,8.5,0.7033986574965503,10.5,-109.0

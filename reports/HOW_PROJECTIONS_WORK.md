@@ -189,3 +189,8 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - At each game's lock we read DraftKings' moneyline and remove the vig to get the market's win %. If our winner model rates a team 10 or more points higher than the market, the lock post shows "💰 Value (PAPER, not a pick)" with the price.
 - Backtest 2023-25 at closing prices: betting those teams returned +6.5% (860 bets), 2 of 3 seasons positive; every smaller gap lost money, and backing teams we rate LOWER than the market lost 7-10% every season.
 - It is graded at the price shown at the lock and tracked on its own record. It becomes a real pick only if that record holds up for 3-4 weeks. DraftKings prices never feed the model.
+
+## 20. 📏 Against-the-spread value (paper tracking, not picks)
+- At each lock we also read DraftKings' point spread. If our projected margin beats the spread by 6 or more points, the lock post shows "📏 ATS (PAPER, not a pick)" with the side, spread and price.
+- Backtest 2023-25 at closing spreads: those sides covered 62% (+19%, 302 games), positive every season. With the model's injury information removed entirely (the pessimistic check) it was still 57.5% (+9.7%). Every edge smaller than 6 points lost money.
+- Graded at the spread and price shown at the lock, on its own record. Promoted to a pick only if it holds up for 3-4 weeks.

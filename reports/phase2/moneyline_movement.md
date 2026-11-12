@@ -44,3 +44,22 @@ gap = our win % minus the market's no-vig closing win %; bet that team at the cl
 - When we're LOWER than the market the market is right: those teams win close to the market's rate, and betting
   them loses 7-10% (every season).
 - Caveat: the backtest's missing-player input uses who actually sat; live edges will be smaller. 3 seasons only.
+
+## Against the spread (user 2026-11-12), 2023-25, 3,683 games, closing spread + its price (-110 if missing)
+Our projected margin (winner model) vs the closing spread; bet the side we favour by `edge` points.
+
+| Our margin vs spread | n | cover | ROI | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|
+| < 1 pt | 932 | 48.9% | -6.7% | -3.5% | -9.6% | -6.9% |
+| 1-2 | 847 | 51.8% | -1.2% | +3.5% | -4.5% | -2.4% |
+| 2-3 | 642 | 52.3% | -0.2% | +3.3% | +2.5% | -6.3% |
+| 3-4 | 491 | 50.9% | -2.9% | -4.6% | -0.4% | -4.3% |
+| 4-6 | 469 | 50.1% | -4.7% | -4.5% | -5.6% | -4.2% |
+| **6+** | **302** | **62.3%** | **+19.0%** | +7.0% | +22.0% | +24.0% |
+Laying points with 3+ edge: 287 bets, 58% cover, +10.6%; getting points: 975, 52%, -1.0%.
+
+### Look-ahead check (model WITHOUT the missing-player input, so no knowledge of who sat)
+- ATS 6+: 464 bets, 57.5% cover, **+9.7%** (2023 +5.6%, 2024 +9.9%, 2025 +12.5%); 1-6 pt edges all lose.
+- Moneyline 10+ higher: 1,144 bets, **+2.7%** (+5.3%, +1.3%, +1.3%).
+The live model knows the injury report at the lock (not late scratches), so expect live results between the two
+versions: ATS 6+ roughly +10-19%, moneyline 10+ roughly +3-6%. Paper-track before treating either as a pick.

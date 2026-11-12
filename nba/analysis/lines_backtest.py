@@ -352,3 +352,100 @@ def moneyline_gap_backtest() -> dict:
             "by_gap_season": S.groupby(["gap_bucket", "season"], observed=True).agg(n=("won", "size"),
                                                                                  roi_close=("u_close", "mean")),
             "sides": S}
+
+
+# ---------------------------------------------------------------- spreads / ATS (evaluation only)
+SP_CACHE = ROOT / "data" / "raw" / "espn_spreads"
+
+
+def _sp_event(eid: str) -> dict | None:
+    """Open/close home point spread + prices for one ESPN event (cached). Evaluation only."""
+    import json
+    import requests
+    f = SP_CACHE / f"{eid}.json"
+    if f.exists():
+        return json.loads(f.read_text()) or None
+    u = f"https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/events/{eid}/competitions/{eid}/odds"
+    j = None
+    for _ in range(3):
+        try:
+            j = requests.get(u, timeout=30, headers={"User-Agent": "Mozilla/5.0 nba-research"}).json()
+            break
+        except Exception:
+            pass
+    if j is None:
+        return None
+    best = None
+    for it in j.get("items", []):
+        h = it.get("homeTeamOdds") or {}
+        o, c = h.get("open") or {}, h.get("close") or {}
+        try:
+            row = {"provider": it.get("provider", {}).get("name", ""),
+                   "spread_open": float(o["pointSpread"]["american"]), "spread_close": float(c["pointSpread"]["american"]),
+                   "home_spread_price": _american(c.get("spread", {}).get("american")),
+                   "away_spread_price": _american(((it.get("awayTeamOdds") or {}).get("close") or {})
+                                                  .get("spread", {}).get("american"))}
+        except (KeyError, TypeError, ValueError):
+            continue
+        rank = next((i for i, p in enumerate(PREF) if p.lower() in row["provider"].lower()), len(PREF))
+        if best is None or rank < best[0]:
+            best = (rank, row)
+    out = best[1] if best else {}
+    SP_CACHE.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(out))
+    return out or None
+
+
+def fetch_spreads(workers=8) -> pd.DataFrame:
+    from concurrent.futures import ThreadPoolExecutor
+    M = pd.read_parquet(PROC / "moneylines.parquet")
+    M = M[M.season >= 2023].reset_index(drop=True)
+    with ThreadPoolExecutor(workers) as ex:
+        res = list(ex.map(_sp_event, M.eid))
+    S = pd.concat([M[["season", "eid", "date", "home", "away"]], pd.DataFrame([r or {} for r in res])], axis=1)
+    S.to_parquet(PROC / "spreads.parquet", index=False)
+    return S
+
+
+def ats_gap_backtest(sd=13.4) -> dict:
+    """User 2026-11-12: our projected margin vs the market spread. Bet the side our margin favours by `edge` points
+    (home covers if margin + spread > 0); graded at the closing spread and its price (-110 if missing). Push = 0."""
+    from scipy.stats import norm
+    S = pd.read_parquet(PROC / "spreads.parquet").dropna(subset=["spread_close"])
+    W = pd.read_parquet(PROC / "winners_backtest.parquet")
+    W = W[W.season >= 2023].dropna(subset=["model"]).copy()
+    W["date"] = pd.to_datetime(W.game_date).dt.date
+    cols = ["date", "home", "spread_open", "spread_close", "home_spread_price", "away_spread_price"]
+    X = W.merge(S[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="left")
+    miss = X.spread_close.isna()
+    W2 = W[miss.to_numpy()].assign(date=lambda d: (pd.to_datetime(d.date) - pd.Timedelta(days=1)).dt.date)
+    X = pd.concat([X[~miss], W2.merge(S[cols], left_on=["date", "home_team"], right_on=["date", "home"])],
+                  ignore_index=True).dropna(subset=["spread_close"])
+    X["proj"] = norm.ppf(X.model.clip(0.005, 0.995)) * sd           # our projected home margin
+    X["edge"] = X.proj + X.spread_close                               # > 0: we like home vs the number
+    X["bet_home"] = X.edge > 0
+    cover = X.margin + X.spread_close                                 # > 0 home covered
+    X["push"] = cover == 0
+    X["won"] = np.where(X.bet_home, cover > 0, cover < 0)
+    price = np.where(X.bet_home, X.home_spread_price, X.away_spread_price)
+    price = np.where(np.isnan(price) | (np.abs(price) < 100), -110, price)
+    pay = np.where(price < 0, 100 / -price, price / 100)
+    X["u"] = np.where(X.push, 0.0, np.where(X.won, pay, -1.0))
+    X["abs_edge"] = X.edge.abs()
+    X["bucket"] = pd.cut(X.abs_edge, [0, 1, 2, 3, 4, 6, 99], labels=["<1", "1-2", "2-3", "3-4", "4-6", "6+"])
+    X["side"] = np.where(X.bet_home, "home", "away")
+    X["fav"] = np.where((X.bet_home & (X.spread_close < 0)) | (~X.bet_home & (X.spread_close > 0)), "laying points",
+                        "getting points")
+    agg = dict(n=("u", "size"), cover=("won", lambda s: s[~X.loc[s.index, "push"]].mean()), roi=("u", "mean"))
+    rng = np.random.default_rng(7)
+    plc = []
+    for _ in range(200):
+        e = X.groupby("season").edge.transform(lambda s: rng.permutation(s.to_numpy()))
+        bh = e > 0
+        w = np.where(bh, cover > 0, cover < 0)
+        u = np.where(X.push, 0.0, np.where(w, pay, -1.0))
+        plc.append(u[e.abs() >= 4].mean())
+    return {"n": len(X), "all": X.u.mean(), "by_edge": X.groupby("bucket", observed=True).agg(**agg),
+            "by_edge_season": X.groupby(["bucket", "season"], observed=True).u.mean().unstack(),
+            "by_fav": X[X.abs_edge >= 3].groupby("fav").agg(**agg),
+            "placebo_4plus": (float(np.mean(plc)), float(np.std(plc))), "real_4plus": float(X[X.abs_edge >= 4].u.mean())}

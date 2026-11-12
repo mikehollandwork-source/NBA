@@ -282,8 +282,30 @@ def record_brief() -> str:
     def f(t):
         n = t["w"] + t["l"]
         return f"{t['w']}-{t['l']}" + (f" ({t['w'] / n:.0%}) · {t['units']:+.2f}u" if n else "")
-    return (f"📊 <b>Record</b> (DraftKings line + odds): {f(tot)}\n"
-            f"Last night ({pd.Timestamp(last):%b %-d}): {f(ln) if ln['w'] + ln['l'] else 'no picks'}")
+    out = (f"📊 <b>Record</b> (DraftKings line + odds): {f(tot)}\n"
+           f"Last night ({pd.Timestamp(last):%b %-d}): ✅ picks {f(ln) if ln['w'] + ln['l'] else 'none'}")
+    return out + recap_last_night(last)
+
+
+def recap_last_night(last) -> str:
+    """Last night's ⭐ top plays (each result) and 📈 70%+ winners (user 2026-11-12: recap in the morning board)."""
+    from nba import best_play, record
+    lines = []
+    if best_play.LEDGER.exists():
+        b = pd.read_csv(best_play.LEDGER)
+        b = b[b.date == last]
+        if len(b):
+            icon = {"win": "✅", "loss": "❌", "push": "➖", "void": "⚪"}
+            lines.append("⭐ Top plays: " + " · ".join(
+                f"{icon.get(q.result, '·')} {html.escape(q.player)} {q.stat.upper()} {q.side} {q.line:g} → {q.actual:g}"
+                for _, q in b.sort_values("rank").iterrows()))
+    if record.WLEDGER.exists():
+        w = pd.read_csv(record.WLEDGER)
+        w = w[(w.date == last) & (w.p_pick >= WIN_MIN)]
+        if len(w):
+            lines.append("📈 70%+ winners: " + " · ".join(
+                f"{'✅' if q.result == 'win' else '❌'} {q.pick_team} {q.p_pick:.0%}" for _, q in w.iterrows()))
+    return ("\n" + "\n".join(lines)) if lines else ""
 
 
 def best_play_message(d, r: pd.DataFrame, G: pd.DataFrame) -> str:

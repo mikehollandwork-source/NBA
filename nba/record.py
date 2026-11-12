@@ -211,6 +211,38 @@ def grade_winners() -> pd.DataFrame:
     return led
 
 
+VLEDGER = ROOT / "reports" / "live" / "value_record.csv"
+
+
+def grade_value(wled: pd.DataFrame | None = None) -> pd.DataFrame:
+    """📈 Value paper bets (team we rate 10+ pts above DraftKings' no-vig win %), graded at the locked DK price."""
+    wled = pd.read_csv(WLEDGER) if wled is None else wled
+    rows = []
+    for day in sorted(p for p in LOCKS.iterdir() if p.is_dir()):
+        for f in day.glob("*.winner.csv"):
+            w = pd.read_csv(f).iloc[0]
+            if "value_team" not in w or not isinstance(w.value_team, str):
+                continue
+            g = wled[(wled.date == day.name) & (wled.game == f.name.replace(".winner.csv", ""))]
+            if g.empty:
+                continue
+            won = g.iloc[0].winner == w.value_team
+            price = float(w.value_price)
+            u = (100 / -price if price < 0 else price / 100) if won else -1.0
+            p_team = float(w.p_home) if w.value_team == w.home else 1 - float(w.p_home)
+            rows.append({"date": day.name, "game": g.iloc[0].game, "team": w.value_team, "price": price,
+                         "ours": round(p_team, 3), "gap": float(w.value_gap), "result": "win" if won else "loss",
+                         "units": round(u, 4)})
+    led = pd.DataFrame(rows, columns=["date", "game", "team", "price", "ours", "gap", "result", "units"])
+    led.to_csv(VLEDGER, index=False)
+    return led
+
+
+def summarize_v(x: pd.DataFrame) -> str:
+    w, l = (x.result == "win").sum(), (x.result == "loss").sum()
+    return f"{w}-{l} · {x.units.sum():+.2f}u · ROI {x.units.sum() / (w + l):+.1%}" if w + l else "none graded yet"
+
+
 def summarize_w(x: pd.DataFrame) -> str:
     if x.empty:
         return "none graded yet"

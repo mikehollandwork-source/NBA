@@ -425,6 +425,12 @@ def winners_board(G: pd.DataFrame, R: pd.DataFrame, season: int, d: date, now=No
             W = winners.live_predict(pre, R, season, d)
         except Exception as ex:
             print("winner model unavailable:", ex, flush=True)
+        if len(W):
+            try:  # DraftKings moneylines: display + 📈 value paper tracking only, never a model input
+                from nba.ingest import espn_ml
+                W = espn_ml.attach(W)
+            except Exception as ex:
+                print("DK moneylines unavailable:", ex, flush=True)
     out = []
     for _, g in G.iterrows():
         path = lock_path(d, g).with_suffix(".winner.csv")

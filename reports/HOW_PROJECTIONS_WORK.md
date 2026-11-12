@@ -184,3 +184,8 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - It is a lean, not a 70% pick. It is saved when posted and graded at that line and price, with its own record.
 - The rule went 14-5 on Oct 22 - Nov 10, but that is 19 plays picked from 8 candidate rules, so expect closer to 55-60% going forward.
 - The morning post lists the top 5 by that same ranking (best first); the record is kept for #1 alone and for all 5. In the rule test, plays ranked 2-3 added little (top 3 a day: +1%), so the lower ranks are weaker.
+
+## 19. 💰 Value moneylines (paper tracking, not picks)
+- At each game's lock we read DraftKings' moneyline and remove the vig to get the market's win %. If our winner model rates a team 10 or more points higher than the market, the lock post shows "💰 Value (PAPER, not a pick)" with the price.
+- Backtest 2023-25 at closing prices: betting those teams returned +6.5% (860 bets), 2 of 3 seasons positive; every smaller gap lost money, and backing teams we rate LOWER than the market lost 7-10% every season.
+- It is graded at the price shown at the lock and tracked on its own record. It becomes a real pick only if that record holds up for 3-4 weeks. DraftKings prices never feed the model.

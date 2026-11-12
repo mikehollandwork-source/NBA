@@ -308,3 +308,47 @@ def moneyline_movement_backtest(min_p=0.70) -> dict:
     out["placebo_roi_gap_sd"] = float(np.std(plc))
     out["roi_gap_toward_minus_against"] = float(S[S.move > 0.02].u_close.mean() - S[S.move < -0.02].u_close.mean())
     return out
+
+
+def moneyline_gap_backtest() -> dict:
+    """User 2026-11-12: when our win % is ABOVE vs BELOW the market's (no-vig), what happens if you bet that team?
+    Every game gives two team-sides (gap = model - market); a team with gap > 0 is one we like more than the market,
+    gap < 0 one the market likes more than us. Graded at closing (and opening) DraftKings/Caesars/ESPN BET prices."""
+    M = pd.read_parquet(PROC / "moneylines.parquet").dropna(subset=["home_open", "home_close"])
+    W = pd.read_parquet(PROC / "winners_backtest.parquet")
+    W = W[W.season >= 2019].dropna(subset=["model"]).copy()
+    W["date"] = pd.to_datetime(W.game_date).dt.date
+    cols = ["date", "home", "home_open", "home_close", "away_open", "away_close"]
+    X = W.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"], how="left")
+    miss = X.home_open.isna()
+    W2 = W[miss.to_numpy()].assign(date=lambda d: (pd.to_datetime(d.date) - pd.Timedelta(days=1)).dt.date)
+    X = pd.concat([X[~miss], W2.merge(M[cols], left_on=["date", "home_team"], right_on=["date", "home"])],
+                  ignore_index=True).dropna(subset=cols[2:])
+    X = X[(X[cols[2:]].abs() >= 100).all(1)]
+    pay = lambda a: np.where(a < 0, 100 / -a, a / 100)
+    rows = []
+    for side in ("home", "away"):
+        p = X.model if side == "home" else 1 - X.model
+        won = X.y == 1 if side == "home" else X.y == 0
+        h, a = _imp(X.home_close), _imp(X.away_close)
+        mk = (h if side == "home" else a) / (h + a)
+        ho, ao = _imp(X.home_open), _imp(X.away_open)
+        mko = (ho if side == "home" else ao) / (ho + ao)
+        rows.append(pd.DataFrame({"season": X.season, "p": p, "mkt": mk, "mkt_open": mko, "won": won,
+                                  "price": X[f"{side}_close"], "price_open": X[f"{side}_open"]}))
+    S = pd.concat(rows, ignore_index=True)
+    S["gap"] = S.p - S.mkt
+    S["u_close"] = np.where(S.won, pay(S.price), -1.0)
+    S["u_open"] = np.where(S.won, pay(S.price_open), -1.0)
+    S["fav"] = np.where(S.mkt >= 0.5, "market favorite", "market underdog")
+    bins = [-1, -0.10, -0.05, -0.02, 0.02, 0.05, 0.10, 1]
+    labels = ["we're 10+ lower", "5-10 lower", "2-5 lower", "about equal", "2-5 higher", "5-10 higher", "10+ higher"]
+    S["gap_bucket"] = pd.cut(S.gap, bins, labels=labels)
+    agg = dict(n=("won", "size"), ours=("p", "mean"), market=("mkt", "mean"), won=("won", "mean"),
+               roi_close=("u_close", "mean"), roi_open=("u_open", "mean"))
+    return {"n_games": len(X),
+            "by_gap": S.groupby("gap_bucket", observed=True).agg(**agg),
+            "by_gap_fav": S.groupby(["fav", "gap_bucket"], observed=True).agg(**agg),
+            "by_gap_season": S.groupby(["gap_bucket", "season"], observed=True).agg(n=("won", "size"),
+                                                                                 roi_close=("u_close", "mean")),
+            "sides": S}

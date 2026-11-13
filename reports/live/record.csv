@@ -1480,3 +1480,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-11,BKN@NOP,Day'Ron Sharpe,BKN,pra,over,17.5,0.681,False,24.0,win,0.8333,23.5,-104.0,False,,0.0
 2026-11-11,BKN@NOP,Noah Clowney,BKN,pts,over,3.5,0.674,False,16.0,win,0.8333,,,False,,0.0
 2026-11-11,BKN@NOP,Jeremiah Fears,NOP,pr,over,18.5,0.638,False,18.0,loss,-1.0,21.5,-109.0,False,,0.0
+2026-11-12,TOR@PHI,Kentavious Caldwell-Pope,PHI,reb,under,2.5,0.616,False,4.0,loss,-1.0,,,False,,0.0
+2026-11-12,TOR@PHI,Joel Embiid,PHI,pts,over,16.5,0.723,True,20.0,win,0.8333,21.5,-110.0,False,,0.0
+2026-11-12,TOR@PHI,Jakob Poeltl,TOR,ast,over,0.5,0.725,True,3.0,win,0.8333,1.5,-167.0,False,,0.0
+2026-11-12,TOR@PHI,Jaylen Brown,PHI,pa,over,24.5,0.637,False,20.0,loss,-1.0,28.5,-118.0,False,,0.0
+2026-11-12,TOR@PHI,Anfernee Simons,PHI,ast,over,0.5,0.754,True,2.0,win,0.8333,,,False,,0.0
+2026-11-12,TOR@PHI,RJ Barrett,TOR,pa,over,23.5,0.63,False,36.0,win,0.8333,27.5,-111.0,False,,0.0
+2026-11-12,TOR@PHI,Immanuel Quickley,TOR,pra,over,24.5,0.611,False,36.0,win,0.8333,25.5,-119.0,False,,0.0
+2026-11-12,TOR@PHI,Tyrese Maxey,PHI,ra,over,8.5,0.621,False,10.0,win,0.8333,9.5,-127.0,False,,0.0
+2026-11-12,TOR@PHI,VJ Edgecombe,PHI,ast,over,2.5,0.666,False,8.0,win,0.8333,3.5,110.0,False,,0.0

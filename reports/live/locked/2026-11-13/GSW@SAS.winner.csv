@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909302,401909302,SAS,GSW,9.9,0.77,SAS,0.77,,"Stephen Curry, Brandon Williams",0.0,0.0,-750.0,530.0,0.848,,,,-12.5,,,,,2026-11-13T06:06:56+00:00
+401909302,401909302,SAS,GSW,9.9,0.77,SAS,0.77,,"Stephen Curry, Brandon Williams",0.0,0.0,-670.0,487.0,0.836,,,,-12.5,,,,,2026-11-13T18:35:06+00:00

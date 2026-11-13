@@ -1,0 +1,2 @@
+event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
+401909296,401909296,IND,NYK,-6.1,0.321,NYK,0.679,,,0.0,0.0,220.0,-269.0,0.3,,,,6.5,,,,,2026-11-13T06:06:56+00:00

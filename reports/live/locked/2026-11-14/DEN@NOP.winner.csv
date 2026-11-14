@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909980,401909980,NOP,DEN,-12.3,0.173,DEN,0.827,"Dejounte Murray, Trey Murphy III, Trendon Watford",,1.0,0.0,417.0,-556.0,0.186,,,,10.5,,,,,2026-11-14T05:53:54+00:00
+401909980,401909980,NOP,DEN,-12.3,0.173,DEN,0.827,"Dejounte Murray, Trey Murphy III, Trendon Watford",,1.0,0.0,443.0,-597.0,0.177,,,,12.5,,,,,2026-11-14T16:07:12+00:00

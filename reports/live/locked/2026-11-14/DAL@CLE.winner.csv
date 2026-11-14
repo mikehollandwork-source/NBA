@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909981,401909981,CLE,DAL,0.2,0.505,CLE,0.505,"Sam Merrill, Evan Mobley",,1.0,0.0,-142.0,120.0,0.563,,,,-3.5,,,,,2026-11-14T05:53:54+00:00
+401909981,401909981,CLE,DAL,2.4,0.569,CLE,0.569,Sam Merrill,,1.0,0.0,101.0,-119.0,0.478,,,,1.5,,,,,2026-11-14T16:07:12+00:00

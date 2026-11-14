@@ -1572,6 +1572,12 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-13,GSW@SAS,Dylan Harper,SAS,reb,under,5.5,0.645,False,3.0,win,0.8333,5.5,-152.0,True,win,0.6579
 2026-11-13,GSW@SAS,Victor Wembanyama,SAS,ast,over,2.5,0.6,False,6.0,win,0.8333,2.5,-149.0,True,win,0.6711
 2026-11-13,GSW@SAS,Draymond Green,GSW,pts,over,1.5,0.8,True,4.0,win,0.8333,5.5,-105.0,False,,0.0
+2026-11-13,OKC@LAC,Kris Dunn,LAC,ast,under,4.5,0.661,False,6.0,loss,-1.0,3.5,-106.0,False,,0.0
+2026-11-13,OKC@LAC,Derrick Jones Jr.,LAC,ast,under,1.5,0.59,False,0.0,win,0.8333,1.5,-194.0,True,win,0.5155
+2026-11-13,OKC@LAC,Isaiah Hartenstein,OKC,ast,under,3.5,0.578,False,6.0,loss,-1.0,4.5,-155.0,True,loss,-1.0
+2026-11-13,OKC@LAC,Shai Gilgeous-Alexander,OKC,ast,over,4.5,0.583,False,5.0,win,0.8333,5.5,-133.0,False,,0.0
+2026-11-13,OKC@LAC,Darius Garland,LAC,reb,over,1.5,0.642,False,4.0,win,0.8333,2.5,-111.0,False,,0.0
+2026-11-13,OKC@LAC,Ajay Mitchell,OKC,ast,over,2.5,0.594,False,,void,0.0,3.5,108.0,False,,0.0
 2026-11-13,MEM@NOP,Jerami Grant,MEM,reb,over,1.5,0.673,False,1.0,loss,-1.0,2.5,-106.0,False,,0.0
 2026-11-13,MEM@NOP,Herbert Jones,NOP,ast,over,0.5,0.789,True,3.0,win,0.8333,,,False,,0.0
 2026-11-13,MEM@NOP,Zion Williamson,NOP,ra,over,7.5,0.639,False,9.0,win,0.8333,8.5,-138.0,False,,0.0

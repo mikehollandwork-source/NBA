@@ -2,3 +2,5 @@ date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
 2026-11-11,1,Victor Wembanyama,SAS,CHI,pr,under,41.5,-111,0.653,41.0,win,0.9009
 2026-11-11,2,Jaime Jaquez Jr.,MIL,LAL,ast,over,2.5,-152,0.643,3.0,win,0.6579
 2026-11-12,1,Devin Booker,PHX,CHA,ast,over,4.5,-136,0.606,7.0,win,0.7353
+2026-11-13,1,Dylan Harper,SAS,GSW,reb,under,5.5,-131,0.645,3.0,win,0.7634
+2026-11-13,2,Nickeil Alexander-Walker,ATL,CHI,ast,over,2.5,-147,0.603,3.0,win,0.6803

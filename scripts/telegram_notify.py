@@ -376,8 +376,43 @@ def scoring_watch(r: pd.DataFrame, n: int = 5) -> str:
     return "\n".join(lines)
 
 
+def recap_message():
+    """🌙 Nightly recap (user 2026-11-15: must reach Discord every morning even when the daytime board run is
+    skipped). Sent once per game day, by the first run that finds every locked game of that day graded."""
+    from nba import record
+    st = ROOT / "reports/live/recap_state.json"
+    sent = set(json.loads(st.read_text())) if st.exists() else set()
+    days = sorted(p.name for p in record.LOCKS.iterdir() if p.is_dir()) if record.LOCKS.exists() else []
+    if not record.WLEDGER.exists():
+        return
+    w = pd.read_csv(record.WLEDGER)
+    for day in days[-3:]:
+        if day in sent:
+            continue
+        games = [f for f in (record.LOCKS / day).glob("*.winner.csv")]
+        graded = w[w.date == day]
+        if not games or len(graded) < len(games):
+            continue  # not every game final yet
+        led = pd.read_csv(record.LEDGER) if record.LEDGER.exists() else pd.DataFrame()
+        dv = record.dk_view(led[led.date == day]) if len(led) else led
+        t = record.summarize(dv) if len(dv) else {"w": 0, "l": 0, "units": 0.0}
+        lines = [f"🌙 <b>Recap — {pd.Timestamp(day):%a %b %-d}</b>",
+                 f"✅ Picks: {t['w']}-{t['l']} · {t['units']:+.2f}u" if t["w"] + t["l"] else "✅ Picks: none"]
+        rec = recap_last_night(day).strip()
+        if rec:
+            lines.append(rec)
+        ww = graded
+        lines.append(f"📈 All winner predictions: {(ww.result == 'win').sum()}-{(ww.result == 'loss').sum()}")
+        lines.append("Season: " + record_brief().split("\n")[0].replace("📊 ", ""))
+        send("\n".join(lines))
+        sent.add(day)
+    if LIVE:
+        st.write_text(json.dumps(sorted(sent)))
+
+
 def main(d: date):
     results_messages()  # Kalshi paper is graded in the record files only; never posted (user 2026-10-28)
+    recap_message()
     proj = ROOT / f"data/live/projections_{d}.parquet"
     if not proj.exists():
         print(f"no projections for {d}; results only")

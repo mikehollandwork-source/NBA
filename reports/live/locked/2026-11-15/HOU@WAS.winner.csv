@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909991,401909991,WAS,HOU,-7.8,0.279,HOU,0.721,,"Fred VanVleet, Clint Capela",0.0,0.0,262.0,-326.0,0.265,,,,8.5,,,,,2026-11-15T20:58:05+00:00
+401909991,401909991,WAS,HOU,-7.8,0.281,HOU,0.719,,"Fred VanVleet, Clint Capela",0.0,0.0,262.0,-326.0,0.265,,,,8.5,,,,,2026-11-15T21:01:27+00:00

@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909988,401909988,UTA,SAS,-17.3,0.096,SAS,0.904,"Lauri Markkanen, Jaxson Hayes",De'Aaron Fox,1.0,1.0,670.0,-1040.0,0.125,,,,14.5,,,,,2026-11-15T20:58:05+00:00
+401909988,401909988,UTA,SAS,-17.3,0.095,SAS,0.905,"Lauri Markkanen, Jaxson Hayes",De'Aaron Fox,1.0,1.0,670.0,-1040.0,0.125,,,,14.5,,,,,2026-11-15T21:01:27+00:00

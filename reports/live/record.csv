@@ -1656,6 +1656,16 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-15,DAL@BOS,Neemias Queta,BOS,pra,over,16.5,0.597,False,16.0,loss,-1.0,18.5,-123.0,False,,0.0
 2026-11-15,DAL@BOS,Santi Aldama,DAL,ast,over,0.5,0.623,False,,void,0.0,,,False,,0.0
 2026-11-15,DAL@BOS,Cooper Flagg,DAL,ast,under,6.5,0.591,False,4.0,win,0.8333,5.5,-122.0,False,,0.0
+2026-11-15,ATL@MIL,CJ McCollum,ATL,ast,over,3.5,0.584,False,2.0,loss,-1.0,3.5,-157.0,True,loss,-1.0
+2026-11-15,ATL@MIL,Myles Turner,MIL,pa,over,8.5,0.674,False,9.0,win,0.8333,12.5,-106.0,False,,0.0
+2026-11-15,ATL@MIL,Kyle Kuzma,MIL,pa,over,12.5,0.626,False,16.0,win,0.8333,14.5,-126.0,False,,0.0
+2026-11-15,ATL@MIL,Nickeil Alexander-Walker,ATL,ast,over,2.5,0.617,False,4.0,win,0.8333,2.5,-172.0,True,win,0.5814
+2026-11-15,ATL@MIL,Tyler Herro,MIL,reb,over,3.5,0.617,False,5.0,win,0.8333,4.5,-125.0,False,,0.0
+2026-11-15,ATL@MIL,Luguentz Dort,ATL,ast,under,1.5,0.538,False,0.0,win,0.8333,,,False,,0.0
+2026-11-15,ATL@MIL,Onyeka Okongwu,ATL,pts,over,12.5,0.584,False,16.0,win,0.8333,13.5,-119.0,False,,0.0
+2026-11-15,ATL@MIL,Jaime Jaquez Jr.,MIL,ast,over,2.5,0.644,False,4.0,win,0.8333,3.5,-115.0,False,,0.0
+2026-11-15,ATL@MIL,Jalen Johnson,ATL,pts,over,19.5,0.605,False,14.0,loss,-1.0,22.5,-102.0,False,,0.0
+2026-11-15,ATL@MIL,Dyson Daniels,ATL,ast,over,5.5,0.571,False,5.0,loss,-1.0,5.5,-129.0,True,loss,-1.0
 2026-11-15,NYK@TOR,Josh Hart,NYK,pa,over,9.5,0.614,False,2.0,loss,-1.0,12.5,-114.0,False,,0.0
 2026-11-15,NYK@TOR,Jakob Poeltl,TOR,ast,over,0.5,0.749,True,1.0,win,0.8333,,,False,,0.0
 2026-11-15,NYK@TOR,Karl-Anthony Towns,NYK,reb,under,13.5,0.639,False,17.0,loss,-1.0,12.5,-111.0,False,,0.0
@@ -1694,6 +1704,13 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-15,CHA@LAC,Naz Reid,CHA,ast,over,1.5,0.669,False,3.0,win,0.8333,1.5,-190.0,True,win,0.5263
 2026-11-15,CHA@LAC,Moussa Diabate,CHA,ast,over,1.5,0.562,False,2.0,win,0.8333,1.5,-165.0,True,win,0.6061
 2026-11-15,CHA@LAC,Brandon Miller,CHA,ast,over,1.5,0.736,True,4.0,win,0.8333,2.5,-139.0,False,,0.0
+2026-11-15,OKC@SAC,Zach LaVine,SAC,reb,over,2.5,0.603,False,,void,0.0,3.5,123.0,False,,0.0
+2026-11-15,OKC@SAC,De'Andre Hunter,SAC,ra,over,5.5,0.598,False,,void,0.0,5.5,-110.0,True,void,0.0
+2026-11-15,OKC@SAC,Isaiah Hartenstein,OKC,pts,over,7.5,0.558,False,3.0,loss,-1.0,9.5,-136.0,False,,0.0
+2026-11-15,OKC@SAC,Shai Gilgeous-Alexander,OKC,pts,over,29.5,0.589,False,37.0,win,0.8333,32.5,-104.0,False,,0.0
+2026-11-15,OKC@SAC,Dylan Cardwell,SAC,pts,over,3.5,0.587,False,10.0,win,0.8333,,,False,,0.0
+2026-11-15,OKC@SAC,Keegan Murray,SAC,reb,over,2.5,0.697,True,1.0,loss,-1.0,4.5,-130.0,False,,0.0
+2026-11-15,OKC@SAC,Ajay Mitchell,OKC,reb,under,3.5,0.592,False,3.0,win,0.8333,3.5,-143.0,False,,0.0
 2026-11-15,HOU@WAS,Kevin Durant,HOU,pra,over,29.5,0.649,False,34.0,win,0.8333,31.5,-113.0,False,,0.0
 2026-11-15,HOU@WAS,Jabari Smith Jr.,HOU,ra,over,7.5,0.584,False,11.0,win,0.8333,7.5,-132.0,True,win,0.7576
 2026-11-15,HOU@WAS,Tari Eason,HOU,ast,over,0.5,0.734,True,1.0,win,0.8333,1.5,-104.0,False,,0.0

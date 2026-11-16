@@ -6,4 +6,6 @@ date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
 2026-11-13,2,Nickeil Alexander-Walker,ATL,CHI,ast,over,2.5,-147,0.603,3.0,win,0.6803
 2026-11-14,1,Jaden McDaniels,MIN,CHI,reb,under,6.5,-149,0.66,5.0,win,0.6711
 2026-11-14,2,Julius Randle,BKN,MEM,reb,under,6.5,-137,0.611,4.0,win,0.7299
+2026-11-15,1,Jaime Jaquez Jr.,MIL,ATL,reb,under,5.5,-140,0.624,5.0,win,0.7143
 2026-11-15,2,Kevin Durant,HOU,WAS,ast,over,3.5,-151,0.627,5.0,win,0.6623
+2026-11-15,3,Nickeil Alexander-Walker,ATL,MIL,ast,over,2.5,-160,0.613,4.0,win,0.625

@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909995,401909995,CLE,CHI,9.0,0.75,CLE,0.75,"Sam Merrill, Evan Mobley",Caleb Wilson,0.0,0.0,-344.0,276.0,0.744,,,,-8.5,,,,,2026-11-16T22:42:32+00:00
+401909995,401909995,CLE,CHI,7.9,0.722,CLE,0.722,"Sam Merrill, Evan Mobley, Jaylon Tyson",Caleb Wilson,0.0,0.0,-344.0,276.0,0.744,,,,-8.5,,,,,2026-11-16T23:00:16+00:00

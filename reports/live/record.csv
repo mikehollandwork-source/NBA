@@ -1647,6 +1647,14 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-14,DET@MIA,Cade Cunningham,DET,ast,over,7.5,0.607,False,8.0,win,0.8333,8.5,-119.0,False,,0.0
 2026-11-14,DET@MIA,Ausar Thompson,DET,ra,under,13.5,0.603,False,13.0,win,0.8333,11.5,-107.0,False,,0.0
 2026-11-14,DET@MIA,Klay Thompson,MIA,ra,over,2.5,0.661,False,5.0,win,0.8333,4.5,120.0,False,,0.0
+2026-11-15,LAL@PHX,Devin Booker,PHX,ast,over,4.5,0.665,False,7.0,win,0.8333,5.5,117.0,False,,0.0
+2026-11-15,LAL@PHX,Dillon Brooks,PHX,pts,over,13.5,0.624,False,1.0,loss,-1.0,15.5,-114.0,False,,0.0
+2026-11-15,LAL@PHX,Luka Doncic,LAL,ast,over,7.5,0.563,False,9.0,win,0.8333,7.5,-148.0,True,win,0.6757
+2026-11-15,LAL@PHX,Miles Bridges,PHX,ra,under,10.5,0.611,False,6.0,win,0.8333,8.5,-122.0,False,,0.0
+2026-11-15,LAL@PHX,Collin Sexton,LAL,ra,over,3.5,0.686,False,3.0,loss,-1.0,,,False,,0.0
+2026-11-15,LAL@PHX,Sandro Mamukelashvili,LAL,pra,over,15.5,0.624,False,9.0,loss,-1.0,,,False,,0.0
+2026-11-15,LAL@PHX,Collin Gillespie,PHX,reb,over,1.5,0.702,True,4.0,win,0.8333,2.5,-124.0,False,,0.0
+2026-11-15,LAL@PHX,Quentin Grimes,LAL,pts,over,6.5,0.648,False,22.0,win,0.8333,12.5,100.0,False,,0.0
 2026-11-15,IND@PHI,LeBron James,PHI,pts,over,14.5,0.632,False,15.0,win,0.8333,17.5,-107.0,False,,0.0
 2026-11-15,IND@PHI,T.J. McConnell,IND,ast,under,4.5,0.783,True,5.0,loss,-1.0,,,False,,0.0
 2026-11-15,IND@PHI,Kentavious Caldwell-Pope,PHI,pa,over,5.5,0.59,False,9.0,win,0.8333,,,False,,0.0
@@ -1659,3 +1667,20 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-15,IND@PHI,Aaron Nesmith,IND,ra,over,3.5,0.597,False,8.0,win,0.8333,5.5,108.0,False,,0.0
 2026-11-15,IND@PHI,Tyrese Maxey,PHI,ra,over,8.5,0.61,False,10.0,win,0.8333,9.5,103.0,False,,0.0
 2026-11-15,IND@PHI,VJ Edgecombe,PHI,pts,over,11.5,0.591,False,11.0,loss,-1.0,12.5,-128.0,False,,0.0
+2026-11-15,CHA@LAC,Royce O'Neale,CHA,ast,over,0.5,0.659,False,1.0,win,0.8333,,,False,,0.0
+2026-11-15,CHA@LAC,Kris Dunn,LAC,ast,under,4.5,0.641,False,1.0,win,0.8333,3.5,-128.0,False,,0.0
+2026-11-15,CHA@LAC,Grayson Allen,CHA,ast,over,2.5,0.718,True,4.0,win,0.8333,3.5,122.0,False,,0.0
+2026-11-15,CHA@LAC,Derrick Jones Jr.,LAC,ast,over,0.5,0.681,False,1.0,win,0.8333,1.5,164.0,False,,0.0
+2026-11-15,CHA@LAC,Coby White,CHA,pr,over,10.5,0.696,True,21.0,win,0.8333,17.5,-107.0,False,,0.0
+2026-11-15,CHA@LAC,Darius Garland,LAC,reb,over,1.5,0.67,False,6.0,win,0.8333,2.5,109.0,False,,0.0
+2026-11-15,CHA@LAC,Naz Reid,CHA,ast,over,1.5,0.669,False,3.0,win,0.8333,1.5,-190.0,True,win,0.5263
+2026-11-15,CHA@LAC,Moussa Diabate,CHA,ast,over,1.5,0.562,False,2.0,win,0.8333,1.5,-165.0,True,win,0.6061
+2026-11-15,CHA@LAC,Brandon Miller,CHA,ast,over,1.5,0.736,True,4.0,win,0.8333,2.5,-139.0,False,,0.0
+2026-11-15,SAS@UTA,Devin Vassell,SAS,pr,over,13.5,0.601,False,12.0,loss,-1.0,15.5,-118.0,False,,0.0
+2026-11-15,SAS@UTA,Keldon Johnson,SAS,pts,over,7.5,0.682,False,11.0,win,0.8333,10.5,101.0,False,,0.0
+2026-11-15,SAS@UTA,Keyonte George,UTA,pa,over,26.5,0.574,False,21.0,loss,-1.0,25.5,-116.0,True,loss,-1.0
+2026-11-15,SAS@UTA,Julian Champagnie,SAS,reb,over,3.5,0.614,False,5.0,win,0.8333,4.5,-152.0,False,,0.0
+2026-11-15,SAS@UTA,Isaiah Collier,UTA,pr,over,8.5,0.637,False,,void,0.0,,,False,,0.0
+2026-11-15,SAS@UTA,Stephon Castle,SAS,pa,over,19.5,0.605,False,29.0,win,0.8333,,,False,,0.0
+2026-11-15,SAS@UTA,Dylan Harper,SAS,ast,under,4.5,0.539,False,4.0,win,0.8333,4.5,110.0,False,,0.0
+2026-11-15,SAS@UTA,Victor Wembanyama,SAS,reb,under,11.5,0.6,False,10.0,win,0.8333,11.5,-135.0,True,win,0.7407

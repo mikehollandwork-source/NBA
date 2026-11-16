@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910000,401910000,NOP,GSW,-7.5,0.28,GSW,0.72,"Dejounte Murray, Trey Murphy III, Trendon Watford","Stephen Curry, Brandon Williams",0.0,0.0,136.0,-161.0,0.407,GSW,0.127,-161.0,3.5,,,,,2026-11-16T23:00:16+00:00
+401910000,401910000,NOP,GSW,-7.5,0.287,GSW,0.713,"Dejounte Murray, Trey Murphy III, Trendon Watford","Stephen Curry, Brandon Williams",0.0,0.0,131.0,-155.0,0.416,GSW,0.129,-155.0,3.5,,,,,2026-11-16T23:30:16+00:00

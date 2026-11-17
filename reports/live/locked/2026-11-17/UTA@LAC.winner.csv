@@ -1,0 +1,2 @@
+event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
+401910006,401910006,LAC,UTA,11.5,0.803,LAC,0.803,,"Lauri Markkanen, Jaxson Hayes",0.0,0.0,-238.0,197.0,0.677,LAC,0.126,-238.0,-6.5,,,,,2026-11-17T07:31:28+00:00

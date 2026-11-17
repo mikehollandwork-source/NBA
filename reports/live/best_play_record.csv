@@ -9,3 +9,5 @@ date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
 2026-11-15,1,Jaime Jaquez Jr.,MIL,ATL,reb,under,5.5,-140,0.624,5.0,win,0.7143
 2026-11-15,2,Kevin Durant,HOU,WAS,ast,over,3.5,-151,0.627,5.0,win,0.6623
 2026-11-15,3,Nickeil Alexander-Walker,ATL,MIL,ast,over,2.5,-160,0.613,4.0,win,0.625
+2026-11-16,1,Donovan Clingan,POR,MIN,reb,under,10.5,105,0.629,10.0,win,1.05
+2026-11-16,2,Tyrese Maxey,PHI,BKN,reb,under,3.5,-116,0.605,1.0,win,0.8621

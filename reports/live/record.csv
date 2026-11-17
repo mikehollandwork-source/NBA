@@ -1730,6 +1730,39 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-15,SAS@UTA,Stephon Castle,SAS,pa,over,19.5,0.605,False,29.0,win,0.8333,,,False,,0.0
 2026-11-15,SAS@UTA,Dylan Harper,SAS,ast,under,4.5,0.539,False,4.0,win,0.8333,4.5,110.0,False,,0.0
 2026-11-15,SAS@UTA,Victor Wembanyama,SAS,reb,under,11.5,0.6,False,10.0,win,0.8333,11.5,-135.0,True,win,0.7407
+2026-11-16,PHX@DEN,Aaron Gordon,DEN,pts,over,9.5,0.615,False,11.0,win,0.8333,13.5,100.0,False,,0.0
+2026-11-16,PHX@DEN,Nikola Jokic,DEN,pr,over,33.5,0.618,False,43.0,win,0.8333,36.5,-120.0,False,,0.0
+2026-11-16,PHX@DEN,Devin Booker,PHX,ast,over,4.5,0.633,False,8.0,win,0.8333,5.5,-110.0,False,,0.0
+2026-11-16,PHX@DEN,Cameron Johnson,DEN,pa,over,12.5,0.564,False,10.0,loss,-1.0,14.5,-123.0,False,,0.0
+2026-11-16,PHX@DEN,Dillon Brooks,PHX,pts,over,12.5,0.597,False,15.0,win,0.8333,14.5,-124.0,False,,0.0
+2026-11-16,PHX@DEN,Jamal Murray,DEN,ast,over,5.5,0.635,False,4.0,loss,-1.0,6.5,101.0,False,,0.0
+2026-11-16,PHX@DEN,DeMar DeRozan,DEN,pts,over,8.5,0.63,False,2.0,loss,-1.0,9.5,-126.0,False,,0.0
+2026-11-16,PHX@DEN,Miles Bridges,PHX,reb,under,6.5,0.622,False,8.0,loss,-1.0,5.5,106.0,False,,0.0
+2026-11-16,PHX@DEN,Jordan Goodwin,PHX,pa,under,11.5,0.585,False,13.0,loss,-1.0,,,False,,0.0
+2026-11-16,PHX@DEN,Collin Gillespie,PHX,reb,over,1.5,0.697,True,3.0,win,0.8333,2.5,-172.0,False,,0.0
+2026-11-16,PHX@DEN,Christian Braun,DEN,ast,over,1.5,0.637,False,3.0,win,0.8333,2.5,141.0,False,,0.0
+2026-11-16,POR@MIN,Rudy Gobert,MIN,reb,under,11.5,0.668,False,15.0,loss,-1.0,10.5,-132.0,False,,0.0
+2026-11-16,POR@MIN,Jrue Holiday,POR,ra,over,6.5,0.588,False,7.0,win,0.8333,7.5,-111.0,False,,0.0
+2026-11-16,POR@MIN,Robert Williams III,POR,reb,under,6.5,0.653,False,5.0,win,0.8333,6.5,-142.0,True,win,0.7042
+2026-11-16,POR@MIN,Ayo Dosunmu,MIN,reb,under,4.5,0.623,False,5.0,loss,-1.0,3.5,115.0,False,,0.0
+2026-11-16,POR@MIN,Jaden McDaniels,MIN,reb,under,6.5,0.677,False,6.0,win,0.8333,5.5,-131.0,False,,0.0
+2026-11-16,POR@MIN,Toumani Camara,POR,pts,under,12.5,0.595,False,3.0,win,0.8333,11.5,-109.0,False,,0.0
+2026-11-16,POR@MIN,LaMelo Ball,MIN,ast,over,5.5,0.61,False,0.0,loss,-1.0,6.5,115.0,False,,0.0
+2026-11-16,POR@MIN,Deni Avdija,POR,ast,under,6.5,0.592,False,4.0,win,0.8333,5.5,115.0,False,,0.0
+2026-11-16,POR@MIN,Scoot Henderson,POR,ra,over,2.5,0.659,False,1.0,loss,-1.0,,,False,,0.0
+2026-11-16,POR@MIN,Donovan Clingan,POR,reb,under,10.5,0.629,False,10.0,win,0.8333,10.5,106.0,True,win,1.06
+2026-11-16,HOU@MIA,Giannis Antetokounmpo,MIA,ast,over,4.5,0.664,False,6.0,win,0.8333,5.5,120.0,False,,0.0
+2026-11-16,HOU@MIA,Andrew Wiggins,MIA,pts,over,7.5,0.601,False,17.0,win,0.8333,9.5,-109.0,False,,0.0
+2026-11-16,HOU@MIA,Bobby Portis,MIA,reb,under,5.5,0.66,False,6.0,loss,-1.0,4.5,-144.0,False,,0.0
+2026-11-16,HOU@MIA,Kevin Durant,HOU,ast,over,3.5,0.589,False,3.0,loss,-1.0,3.5,-153.0,True,loss,-1.0
+2026-11-16,HOU@MIA,Bam Adebayo,MIA,ra,over,11.5,0.574,False,3.0,loss,-1.0,11.5,-135.0,True,loss,-1.0
+2026-11-16,HOU@MIA,Davion Mitchell,MIA,reb,over,1.5,0.7,True,3.0,win,0.8333,2.5,121.0,False,,0.0
+2026-11-16,HOU@MIA,Jabari Smith Jr.,HOU,pra,under,23.5,0.609,False,23.0,win,0.8333,24.5,-121.0,True,win,0.8264
+2026-11-16,HOU@MIA,Tari Eason,HOU,ast,over,0.5,0.704,True,3.0,win,0.8333,,,False,,0.0
+2026-11-16,HOU@MIA,Amen Thompson,HOU,ra,over,9.5,0.628,False,,void,0.0,11.5,106.0,False,,0.0
+2026-11-16,HOU@MIA,Reed Sheppard,HOU,ra,over,3.5,0.608,False,4.0,win,0.8333,4.5,-122.0,False,,0.0
+2026-11-16,HOU@MIA,Alperen Sengun,HOU,ast,under,7.5,0.551,False,2.0,win,0.8333,6.5,104.0,False,,0.0
+2026-11-16,HOU@MIA,Klay Thompson,MIA,ra,over,2.5,0.725,True,2.0,loss,-1.0,,,False,,0.0
 2026-11-16,ORL@BOS,Derrick White,BOS,reb,over,2.5,0.604,False,3.0,win,0.8333,3.5,118.0,False,,0.0
 2026-11-16,ORL@BOS,Desmond Bane,ORL,pts,under,17.5,0.567,False,24.0,loss,-1.0,17.5,-118.0,True,loss,-1.0
 2026-11-16,ORL@BOS,Payton Pritchard,BOS,reb,over,2.5,0.58,False,4.0,win,0.8333,2.5,-168.0,True,win,0.5952
@@ -1739,6 +1772,16 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-16,ORL@BOS,Jalen Suggs,ORL,pra,under,22.5,0.727,True,22.0,win,0.8333,14.5,-106.0,False,,0.0
 2026-11-16,ORL@BOS,Franz Wagner,ORL,ast,under,8.5,0.691,False,9.0,loss,-1.0,6.5,-105.0,False,,0.0
 2026-11-16,ORL@BOS,Anthony Black,ORL,reb,under,5.5,0.673,False,2.0,win,0.8333,4.5,-104.0,False,,0.0
+2026-11-16,PHI@BKN,Kentavious Caldwell-Pope,PHI,ra,over,3.5,0.59,False,5.0,win,0.8333,,,False,,0.0
+2026-11-16,PHI@BKN,Joel Embiid,PHI,pa,over,20.5,0.68,False,38.0,win,0.8333,25.5,-119.0,False,,0.0
+2026-11-16,PHI@BKN,Julius Randle,BKN,reb,under,6.5,0.602,False,6.0,win,0.8333,6.5,-117.0,True,win,0.8547
+2026-11-16,PHI@BKN,Jaylen Brown,PHI,pa,over,24.5,0.624,False,35.0,win,0.8333,27.5,-112.0,False,,0.0
+2026-11-16,PHI@BKN,Michael Porter Jr.,BKN,ast,over,0.5,0.783,True,2.0,win,0.8333,1.5,-154.0,False,,0.0
+2026-11-16,PHI@BKN,Anfernee Simons,PHI,ast,over,0.5,0.712,True,2.0,win,0.8333,,,False,,0.0
+2026-11-16,PHI@BKN,Tyrese Maxey,PHI,pa,over,31.5,0.6,False,33.0,win,0.8333,31.5,-125.0,True,win,0.8
+2026-11-16,PHI@BKN,Day'Ron Sharpe,BKN,reb,over,6.5,0.588,False,9.0,win,0.8333,8.5,104.0,False,,0.0
+2026-11-16,PHI@BKN,Noah Clowney,BKN,reb,under,4.5,0.627,False,3.0,win,0.8333,3.5,-108.0,False,,0.0
+2026-11-16,PHI@BKN,VJ Edgecombe,PHI,ast,over,3.5,0.57,False,4.0,win,0.8333,3.5,-115.0,True,win,0.8696
 2026-11-16,MEM@WAS,Jerami Grant,MEM,pts,over,10.5,0.637,False,8.0,loss,-1.0,13.5,-114.0,False,,0.0
 2026-11-16,MEM@WAS,Cam Spencer,MEM,ast,over,4.5,0.71,True,9.0,win,0.8333,7.5,-128.0,False,,0.0
 2026-11-16,MEM@WAS,Bub Carrington,WAS,ast,over,1.5,0.627,False,0.0,loss,-1.0,,,False,,0.0
@@ -1759,3 +1802,9 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-16,CHI@CLE,Isaac Okoro,CHI,pr,over,6.5,0.692,False,19.0,win,0.8333,10.5,-120.0,False,,0.0
 2026-11-16,CHI@CLE,Matas Buzelis,CHI,pts,over,12.5,0.621,False,23.0,win,0.8333,14.5,-123.0,False,,0.0
 2026-11-16,CHI@CLE,Josh Giddey,CHI,pr,over,14.5,0.684,False,8.0,loss,-1.0,18.5,-113.0,False,,0.0
+2026-11-16,GSW@NOP,Herbert Jones,NOP,ast,over,0.5,0.837,True,3.0,win,0.8333,1.5,-165.0,False,,0.0
+2026-11-16,GSW@NOP,Zion Williamson,NOP,ast,over,2.5,0.654,False,2.0,loss,-1.0,3.5,122.0,False,,0.0
+2026-11-16,GSW@NOP,Saddiq Bey,NOP,ast,over,1.5,0.756,True,3.0,win,0.8333,2.5,-110.0,False,,0.0
+2026-11-16,GSW@NOP,Brandin Podziemski,GSW,ast,over,3.5,0.615,False,3.0,loss,-1.0,4.5,103.0,False,,0.0
+2026-11-16,GSW@NOP,Jeremiah Fears,NOP,ast,over,4.5,0.722,True,10.0,win,0.8333,6.5,118.0,False,,0.0
+2026-11-16,GSW@NOP,Draymond Green,GSW,pts,over,1.5,0.805,True,2.0,win,0.8333,5.5,-132.0,False,,0.0

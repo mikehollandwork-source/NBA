@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910011,401910011,BKN,CHI,4.7,0.633,BKN,0.633,,Caleb Wilson,0.0,0.0,,,,,,,,,,,,2026-11-18T16:42:35+00:00
+401910011,401910011,BKN,CHI,4.7,0.633,BKN,0.633,,Caleb Wilson,0.0,0.0,-124.0,105.0,0.532,BKN,0.101,-124.0,-1.5,,,,,2026-11-18T22:43:16+00:00

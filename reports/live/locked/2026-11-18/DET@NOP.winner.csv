@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910013,401910013,NOP,DET,-9.3,0.238,DET,0.762,"Dejounte Murray, Trey Murphy III, Trendon Watford",Duncan Robinson,0.0,1.0,,,,,,,,,,,,2026-11-18T16:42:35+00:00
+401910013,401910013,NOP,DET,-8.8,0.248,DET,0.752,"Dejounte Murray, Trey Murphy III, Trendon Watford","Duncan Robinson, Ronald Holland II",0.0,1.0,155.0,-185.0,0.377,DET,0.129,-185.0,4.5,,,,,2026-11-18T22:43:16+00:00

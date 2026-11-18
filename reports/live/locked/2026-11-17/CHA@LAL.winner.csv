@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910005,401910005,LAL,CHA,6.3,0.678,LAL,0.678,"Austin Reaves, Walker Kessler",Dennis Schroder,0.0,0.0,-299.0,243.0,0.72,,,,-6.5,,,,,2026-11-18T00:43:11+00:00
+401910005,401910005,LAL,CHA,7.4,0.706,LAL,0.706,"Austin Reaves, Walker Kessler","Dennis Schroder, Grayson Allen",0.0,0.0,-289.0,236.0,0.714,,,,-7.5,,,,,2026-11-18T02:42:30+00:00

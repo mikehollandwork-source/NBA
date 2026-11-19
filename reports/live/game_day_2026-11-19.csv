@@ -1,0 +1,35 @@
+team,opp,player,status,pra_cv_last,proj_min,proj_pts,pts_p10,pts_p90,proj_reb,reb_p10,reb_p90,proj_ast,ast_p10,ast_p90,proj_pra,pra_p10,pra_p90,proj_fg3m,proj_stl,proj_blk,proj_tov,lean_stat,lean_side,lean_ref,lean_prob_cal,strong,star_g1_under,conf
+GSW,MEM,Brandin Podziemski,Active,0.4,31.6,15.9,8.0,25.0,4.9,2.0,8.0,3.9,1.0,7.0,24.2,14.0,36.0,2.4,1.0,0.5,1.5,pts,over,14.5,0.6,False,False,4.0
+GSW,MEM,Draymond Green,Active,0.3,25.2,5.5,1.0,10.0,4.6,2.0,8.0,5.9,2.0,10.0,15.3,8.0,24.0,0.7,0.9,0.9,2.0,pts,over,1.5,0.8,True,False,4.0
+MEM,GSW,Cam Spencer,Active,0.4,30.5,14.3,7.0,23.0,3.6,1.0,6.0,7.6,4.0,12.0,25.3,15.0,36.0,2.1,0.9,0.2,1.9,pra,over,18.5,0.7,True,False,4.0
+MEM,GSW,Cedric Coward,Active,0.3,29.7,15.4,8.0,24.0,7.9,3.0,13.0,4.1,1.0,7.0,26.9,17.0,39.0,2.1,1.1,0.4,1.8,reb,under,8.5,0.6,False,False,4.0
+MEM,GSW,Jaylen Wells,Active,0.4,27.6,11.5,5.0,19.0,3.1,1.0,6.0,1.7,0.0,4.0,16.7,8.0,25.0,2.2,0.9,0.1,1.1,pra,over,13.5,0.6,False,False,4.0
+MEM,GSW,Jerami Grant,Active,0.4,24.5,13.1,5.0,22.0,2.3,0.0,4.0,2.1,0.0,4.0,17.8,9.0,27.0,2.2,0.7,0.7,1.5,pra,over,13.5,0.7,False,False,3.0
+MIL,POR,Tyler Herro,Active,0.2,30.5,19.6,10.0,29.0,4.0,1.0,7.0,3.8,1.0,7.0,26.8,16.0,39.0,2.7,0.9,0.3,1.9,pts,over,18.5,0.5,False,False,3.0
+MIL,POR,Kyle Kuzma,Active,0.4,28.1,13.0,6.0,21.0,5.0,2.0,8.0,2.6,0.0,5.0,20.1,12.0,30.0,1.6,1.0,0.4,1.8,pa,over,13.5,0.6,False,False,4.0
+MIL,POR,Myles Turner,Active,0.4,26.8,9.5,4.0,16.0,5.7,2.0,9.0,2.4,0.0,5.0,17.2,9.0,27.0,1.8,0.7,1.6,1.3,pts,over,5.5,0.7,True,False,4.0
+MIL,POR,Jaime Jaquez Jr.,Active,0.3,26.6,14.2,6.0,23.0,4.8,2.0,8.0,3.4,1.0,6.0,21.9,12.0,33.0,1.6,0.7,0.2,1.8,reb,under,5.5,0.6,False,False,3.0
+POR,MIL,Deni Avdija,Day-To-Day,0.3,32.9,25.2,15.0,37.0,6.5,3.0,10.0,6.1,3.0,10.0,37.2,25.0,52.0,2.2,1.0,0.5,3.3,reb,over,5.5,0.6,False,False,3.0
+POR,MIL,Toumani Camara,Day-To-Day,0.3,29.6,11.8,5.0,19.0,4.3,2.0,7.0,1.5,0.0,3.0,17.7,10.0,26.0,2.4,1.1,0.5,1.2,ast,over,0.5,0.7,True,False,3.0
+POR,MIL,Donovan Clingan,Active,0.3,25.8,11.4,5.0,19.0,11.6,6.0,18.0,1.9,0.0,4.0,24.3,14.0,36.0,1.0,0.7,1.7,1.2,ra,over,11.5,0.6,False,False,4.0
+POR,MIL,Jrue Holiday,Active,0.3,25.6,12.8,5.0,21.0,3.7,1.0,6.0,4.1,1.0,7.0,20.2,11.0,31.0,2.3,0.9,0.2,1.6,ast,over,3.5,0.6,False,False,3.0
+POR,MIL,Scoot Henderson,Active,0.3,21.8,9.8,3.0,17.0,2.0,0.0,4.0,1.8,0.0,4.0,13.3,5.0,22.0,1.6,0.7,0.2,1.7,pa,over,8.5,0.6,False,False,3.0
+MIN,NYK,Jaden McDaniels,Active,0.4,33.3,15.5,8.0,24.0,5.3,2.0,9.0,3.6,1.0,6.0,24.6,15.0,35.0,1.5,1.1,1.1,1.7,pra,under,26.5,0.6,False,False,3.0
+MIN,NYK,Ayo Dosunmu,Active,0.4,33.2,17.6,9.0,26.0,4.1,1.0,7.0,3.4,1.0,6.0,25.0,15.0,35.0,2.0,1.0,0.4,1.9,reb,under,4.5,0.6,False,False,4.0
+MIN,NYK,LaMelo Ball,Active,0.3,30.0,17.7,9.0,27.0,4.3,2.0,7.0,5.9,2.0,10.0,27.2,17.0,39.0,3.6,1.4,0.2,2.6,reb,over,3.5,0.6,False,False,4.0
+MIN,NYK,Rudy Gobert,Active,0.3,27.9,8.1,3.0,14.0,10.0,5.0,15.0,1.6,0.0,3.0,19.5,11.0,29.0,0.0,0.6,1.4,1.1,reb,under,10.5,0.6,False,False,4.0
+NYK,MIN,Jalen Brunson,Active,0.3,34.9,27.5,16.0,40.0,3.2,1.0,6.0,6.0,3.0,10.0,35.5,23.0,51.0,2.9,0.9,0.3,2.3,reb,over,2.5,0.6,False,False,4.0
+NYK,MIN,OG Anunoby,Active,0.4,34.2,15.2,7.0,24.0,5.1,2.0,8.0,2.0,0.0,4.0,21.6,13.0,32.0,2.0,1.3,0.9,2.1,pra,under,22.5,0.6,False,False,3.0
+NYK,MIN,Karl-Anthony Towns,Active,0.3,33.5,18.8,10.0,29.0,13.1,8.0,19.0,3.7,1.0,6.0,35.5,24.0,48.0,1.7,1.0,0.6,2.7,pra,under,38.5,0.6,False,False,3.0
+NYK,MIN,Josh Hart,Active,0.3,28.9,7.9,3.0,14.0,6.3,3.0,10.0,3.2,1.0,6.0,16.8,9.0,26.0,1.5,1.2,0.3,1.5,pa,over,8.5,0.6,False,False,3.0
+NYK,MIN,Mikal Bridges,Active,0.3,27.4,9.6,4.0,16.0,3.8,1.0,7.0,2.3,0.0,4.0,15.2,8.0,24.0,1.5,1.1,0.7,1.1,pr,over,9.5,0.7,False,False,4.0
+NYK,MIN,Miles McBride,Active,0.4,16.7,6.1,1.0,12.0,1.3,0.0,3.0,1.1,0.0,3.0,8.6,2.0,16.0,1.5,0.5,0.2,0.5,reb,over,0.5,0.7,False,False,3.0
+LAC,SAS,Darius Garland,Active,0.3,32.4,19.1,10.0,28.0,2.7,1.0,5.0,7.0,4.0,11.0,28.8,18.0,40.0,2.4,1.0,0.1,3.1,reb,over,1.5,0.7,False,False,4.0
+LAC,SAS,Derrick Jones Jr.,Active,0.4,27.3,9.8,4.0,17.0,3.8,1.0,7.0,1.3,0.0,3.0,15.1,7.0,23.0,1.4,0.8,0.9,1.0,ast,over,0.5,0.7,False,False,4.0
+LAC,SAS,Kris Dunn,Active,0.4,24.5,6.6,2.0,12.0,3.5,1.0,6.0,3.5,1.0,6.0,13.8,7.0,21.0,0.8,1.6,0.3,1.2,ra,under,7.5,0.6,False,False,2.0
+SAS,LAC,Stephon Castle,Active,0.3,31.1,17.7,9.0,27.0,5.5,2.0,9.0,7.0,3.0,11.0,28.8,18.0,43.0,2.0,1.1,0.3,2.7,pa,over,19.5,0.7,False,False,4.0
+SAS,LAC,Devin Vassell,Active,0.3,31.0,13.2,6.0,21.0,4.0,1.0,7.0,3.1,1.0,5.0,20.4,12.0,30.0,2.2,1.3,0.3,1.0,pa,over,12.5,0.7,False,False,3.0
+SAS,LAC,Victor Wembanyama,Active,0.3,30.9,29.8,17.0,43.0,11.6,6.0,17.0,4.1,1.0,7.0,44.3,29.0,62.0,2.3,1.1,2.9,2.8,pts,over,27.5,0.6,False,False,3.0
+SAS,LAC,De'Aaron Fox,Active,0.3,30.2,15.4,8.0,24.0,4.1,1.0,7.0,6.1,3.0,10.0,25.3,15.0,36.0,1.5,1.4,0.4,2.6,pa,over,17.5,0.6,False,False,2.0
+SAS,LAC,Julian Champagnie,Active,0.4,25.2,10.1,4.0,17.0,4.5,2.0,8.0,1.5,0.0,3.0,15.9,8.0,25.0,2.6,0.8,0.4,0.8,reb,over,3.5,0.6,False,False,4.0
+SAS,LAC,Keldon Johnson,Active,0.3,24.4,11.2,5.0,18.0,5.7,2.0,9.0,2.2,0.0,4.0,18.8,10.0,29.0,0.7,0.7,0.1,1.2,pts,over,7.5,0.7,False,False,3.0

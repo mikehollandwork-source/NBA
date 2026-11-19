@@ -1,0 +1,2 @@
+event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
+401910021,401910021,MIN,NYK,2.8,0.583,MIN,0.583,Jaylen Clark,,0.0,0.0,105.0,-124.0,0.468,MIN,0.115,105.0,1.5,,,,,2026-11-19T06:56:30+00:00

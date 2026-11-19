@@ -1,18 +1,21 @@
-date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
-2026-11-11,1,Victor Wembanyama,SAS,CHI,pr,under,41.5,-111,0.653,41.0,win,0.9009
-2026-11-11,2,Jaime Jaquez Jr.,MIL,LAL,ast,over,2.5,-152,0.643,3.0,win,0.6579
-2026-11-12,1,Devin Booker,PHX,CHA,ast,over,4.5,-136,0.606,7.0,win,0.7353
-2026-11-13,1,Dylan Harper,SAS,GSW,reb,under,5.5,-131,0.645,3.0,win,0.7634
-2026-11-13,2,Nickeil Alexander-Walker,ATL,CHI,ast,over,2.5,-147,0.603,3.0,win,0.6803
-2026-11-14,1,Jaden McDaniels,MIN,CHI,reb,under,6.5,-149,0.66,5.0,win,0.6711
-2026-11-14,2,Julius Randle,BKN,MEM,reb,under,6.5,-137,0.611,4.0,win,0.7299
-2026-11-15,1,Jaime Jaquez Jr.,MIL,ATL,reb,under,5.5,-140,0.624,5.0,win,0.7143
-2026-11-15,2,Kevin Durant,HOU,WAS,ast,over,3.5,-151,0.627,5.0,win,0.6623
-2026-11-15,3,Nickeil Alexander-Walker,ATL,MIL,ast,over,2.5,-160,0.613,4.0,win,0.625
-2026-11-16,1,Donovan Clingan,POR,MIN,reb,under,10.5,105,0.629,10.0,win,1.05
-2026-11-16,2,Tyrese Maxey,PHI,BKN,reb,under,3.5,-116,0.605,1.0,win,0.8621
-2026-11-17,1,Donovan Clingan,POR,MIN,reb,under,10.5,-109,0.626,12.0,loss,-1.0
-2026-11-17,2,Scottie Barnes,TOR,NYK,ast,over,4.5,-160,0.665,2.0,loss,-1.0
-2026-11-17,3,Ayo Dosunmu,MIN,POR,ast,under,3.5,-142,0.607,5.0,loss,-1.0
-2026-11-18,1,Alperen Sengun,HOU,IND,ra,under,16.5,-105,0.607,8.0,win,0.9524
-2026-11-18,2,Tyrese Maxey,PHI,ORL,pa,over,30.5,-111,0.62,,void,0.0
+date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units,lock_check
+2026-11-11,1,Victor Wembanyama,SAS,CHI,pr,under,41.5,-111,0.653,41.0,win,0.9009,
+2026-11-11,2,Jaime Jaquez Jr.,MIL,LAL,ast,over,2.5,-152,0.643,3.0,win,0.6579,
+2026-11-12,1,Devin Booker,PHX,CHA,ast,over,4.5,-136,0.606,7.0,win,0.7353,
+2026-11-13,1,Dylan Harper,SAS,GSW,reb,under,5.5,-131,0.645,3.0,win,0.7634,
+2026-11-13,2,Nickeil Alexander-Walker,ATL,CHI,ast,over,2.5,-147,0.603,3.0,win,0.6803,
+2026-11-14,1,Jaden McDaniels,MIN,CHI,reb,under,6.5,-149,0.66,5.0,win,0.6711,
+2026-11-14,2,Julius Randle,BKN,MEM,reb,under,6.5,-137,0.611,4.0,win,0.7299,
+2026-11-15,1,Jaime Jaquez Jr.,MIL,ATL,reb,under,5.5,-140,0.624,5.0,win,0.7143,
+2026-11-15,2,Kevin Durant,HOU,WAS,ast,over,3.5,-151,0.627,5.0,win,0.6623,
+2026-11-15,3,Nickeil Alexander-Walker,ATL,MIL,ast,over,2.5,-160,0.613,4.0,win,0.625,
+2026-11-16,1,Donovan Clingan,POR,MIN,reb,under,10.5,105,0.629,10.0,win,1.05,
+2026-11-16,2,Tyrese Maxey,PHI,BKN,reb,under,3.5,-116,0.605,1.0,win,0.8621,
+2026-11-17,1,Donovan Clingan,POR,MIN,reb,under,10.5,-109,0.626,12.0,loss,-1.0,
+2026-11-17,2,Scottie Barnes,TOR,NYK,ast,over,4.5,-160,0.665,2.0,loss,-1.0,
+2026-11-17,3,Ayo Dosunmu,MIN,POR,ast,under,3.5,-142,0.607,5.0,loss,-1.0,
+2026-11-18,1,Alperen Sengun,HOU,IND,ra,under,16.5,-105,0.607,8.0,win,0.9524,
+2026-11-18,2,Tyrese Maxey,PHI,ORL,pa,over,30.5,-111,0.62,,void,0.0,
+2026-11-18,3,RJ Barrett,TOR,WAS,reb,under,6.5,-115,0.603,,void,0.0,
+2026-11-18,4,Scottie Barnes,TOR,WAS,ast,over,4.5,-145,0.641,,void,0.0,
+2026-11-18,5,Miles Bridges,PHX,SAC,reb,under,6.5,-153,0.609,6.0,win,0.6536,

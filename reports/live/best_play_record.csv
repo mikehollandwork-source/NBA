@@ -14,3 +14,5 @@ date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units
 2026-11-17,1,Donovan Clingan,POR,MIN,reb,under,10.5,-109,0.626,12.0,loss,-1.0
 2026-11-17,2,Scottie Barnes,TOR,NYK,ast,over,4.5,-160,0.665,2.0,loss,-1.0
 2026-11-17,3,Ayo Dosunmu,MIN,POR,ast,under,3.5,-142,0.607,5.0,loss,-1.0
+2026-11-18,1,Alperen Sengun,HOU,IND,ra,under,16.5,-105,0.607,8.0,win,0.9524
+2026-11-18,2,Tyrese Maxey,PHI,ORL,pa,over,30.5,-111,0.62,,void,0.0

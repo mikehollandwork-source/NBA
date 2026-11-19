@@ -193,3 +193,6 @@ date,game,pick_team,p_pick,proj_margin_home,home_pts,away_pts,winner,result
 2026-11-17,CHA@LAL,LAL,0.708,7.4,118,114,LAL,win
 2026-11-17,DET@SAS,SAS,0.732,8.5,93,105,DET,loss
 2026-11-17,POR@MIN,MIN,0.609,3.8,106,105,MIN,win
+2026-11-18,MEM@CLE,CLE,0.534,1.2,121,124,MEM,loss
+2026-11-18,HOU@IND,HOU,0.734,-8.2,104,119,HOU,win
+2026-11-18,PHI@ORL,ORL,0.572,2.3,116,121,PHI,loss

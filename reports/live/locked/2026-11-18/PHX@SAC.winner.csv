@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910018,401910018,SAC,PHX,-5.8,0.331,PHX,0.669,,,0.0,0.0,221.0,-269.0,0.299,,,,6.5,,,,,2026-11-19T00:00:16+00:00
+401910018,401910018,SAC,PHX,-5.8,0.333,PHX,0.667,,,0.0,0.0,,,,,,,,,,,,2026-11-19T00:04:34+00:00

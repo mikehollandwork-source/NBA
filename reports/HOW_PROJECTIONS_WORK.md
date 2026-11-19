@@ -194,3 +194,4 @@ Known weaknesses: stars run ~1.9 pts low in their first game; minutes rule untes
 - At each lock we also read DraftKings' point spread. If our projected margin beats the spread by 6 or more points, the lock post shows "📏 ATS (PAPER, not a pick)" with the side, spread and price.
 - Backtest 2023-25 at closing spreads: those sides covered 62% (+19%, 302 games), positive every season. With the model's injury information removed entirely (the pessimistic check) it was still 57.5% (+9.7%). Every edge smaller than 6 points lost money.
 - Graded at the spread and price shown at the lock, on its own record. Promoted to a pick only if it holds up for 3-4 weeks.
+- Each morning play is re-checked when its game locks (1 hour before tip, with the final injury report): ✅ confirmed, ⚠️ skip (no longer passes) or ❌ scratched. Players who don't play are voided, not counted as losses. The record also shows plays confirmed at lock on their own.

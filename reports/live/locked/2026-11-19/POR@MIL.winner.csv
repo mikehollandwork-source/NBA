@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910020,401910020,MIL,POR,-9.6,0.233,POR,0.767,,Robert Williams III,1.0,0.0,,,,,,,,,,,,2026-11-19T16:42:54+00:00
+401910020,401910020,MIL,POR,-12.0,0.183,POR,0.817,"Myles Turner, Kyle Kuzma",Robert Williams III,1.0,0.0,378.0,-494.0,0.201,,,,11.5,,,,,2026-11-19T22:43:07+00:00

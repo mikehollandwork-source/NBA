@@ -168,9 +168,27 @@ def game_message(g, r) -> str:
     from nba.ingest import espn_props
     pub = strong[espn_props.ok_mask(strong)] if len(strong) else strong
     win = winner_lines(g)
-    if pub.empty and not win:  # user 2026-10-28: no picks -> just the teams and start time
+    star = star_lock_lines(g, r)
+    if pub.empty and not win and not star:  # user 2026-10-28: no picks -> just the teams and start time
         return f"<b>{g.away} @ {g.home}</b> · {tip}"
-    return "\n".join([f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"] + [lean_line(q) for _, q in pub.iterrows()] + win)
+    return "\n".join([f"<b>{g.away} @ {g.home}</b> · {tip}{lock}"] + [lean_line(q) for _, q in pub.iterrows()]
+                     + star + win)
+
+
+def star_lock_lines(g, r) -> list:
+    """Lock check of this morning's ⭐ plays in this game (user 2026-11-19)."""
+    from nba import best_play
+    d = pd.Timestamp(g.tip_utc).tz_convert("America/New_York").date()
+    out = []
+    for p, st, why in best_play.lock_check(d, int(g.event_id), r, save=LIVE):
+        name = f"{html.escape(p['player'])} {STAT_NAME.get(p['stat'], p['stat'].upper())} {p['side']} {p['line']:g}"
+        if st == "confirmed":
+            out.append(f"⭐ ✅ Confirmed at lock: <b>{name}</b> ({p['price']:+d})")
+        elif st == "scratched":
+            out.append(f"⭐ ❌ Scratched: {name} — {html.escape(why)}; voids if he sits")
+        else:
+            out.append(f"⭐ ⚠️ Skip: {name} — {html.escape(why)}")
+    return out
 
 
 WIN_MIN = 0.70  # user 2026-11-06: post 70%+ winner predictions at the lock

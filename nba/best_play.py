@@ -80,7 +80,8 @@ def load(d) -> list | None:
     return json.loads(f.read_text())["plays"] if f.exists() else None
 
 
-COLS = ["date", "rank", "player", "team", "opp", "stat", "side", "line", "price", "prob", "actual", "result", "units"]
+COLS = ["date", "rank", "player", "team", "opp", "stat", "side", "line", "price", "prob", "actual", "result", "units",
+        "lock_check"]
 
 
 def grade() -> pd.DataFrame:
@@ -91,23 +92,53 @@ def grade() -> pd.DataFrame:
         j = json.loads(f.read_text())
         box = record._box(j["date"])
         for p in j["plays"]:
-            b = box[(box.pid == str(p["pid"])) & (box.gameId == int(p["gameId"]))] if len(box) else box
-            if b.empty:
+            if not len(box) or int(p["gameId"]) not in set(box.gameId):
                 continue  # game not final yet
-            b = b.iloc[0]
-            actual = float(sum(b[c] for c in COMBOS.get(p["stat"], [p["stat"]])))
-            if b.get("dnp", 0) == 1:
-                res, u = "void", 0.0
-            elif actual == p["line"]:
+            b = box[(box.pid == str(p["pid"])) & (box.gameId == int(p["gameId"]))]
+            actual = np.nan
+            if b.empty or b.iloc[0].get("dnp", 0) == 1:
+                res, u = "void", 0.0  # did not play (ruled out after the post, or a late scratch)
+            elif (actual := float(sum(b.iloc[0][c] for c in COMBOS.get(p["stat"], [p["stat"]])))) == p["line"]:
                 res, u = "push", 0.0
             else:
                 win = actual > p["line"] if p["side"] == "over" else actual < p["line"]
                 res, u = ("win", float(payout(p["price"]))) if win else ("loss", -1.0)
             rows.append({"date": j["date"], **{k: p[k] for k in COLS[1:10]}, "actual": actual, "result": res,
-                         "units": round(u, 4)})
+                         "units": round(u, 4), "lock_check": p.get("lock_check", "")})
     led = pd.DataFrame(rows, columns=COLS)
     led.to_csv(LEDGER, index=False)
     return led
+
+
+def lock_check(d, game_id: int, r: pd.DataFrame, save: bool = True) -> list:
+    """At a game's final lock (user 2026-11-19: morning plays kept getting scratched), re-check each morning play
+    in that game against the lock data. Returns [(play, status, why)] with status confirmed / dropped / scratched,
+    and saves the status into the day's file (graded separately: 'confirmed at lock' record)."""
+    f = DIR / f"{d}.json"
+    if not f.exists():
+        return []
+    j = json.loads(f.read_text())
+    out, changed = [], False
+    ok_ids = set(candidates(r).pid.astype(str)) if len(r) else set()
+    for p in j["plays"]:
+        if int(p["gameId"]) != int(game_id) or p.get("lock_check"):
+            continue
+        row = r[r.pid.astype(str) == str(p["pid"])]
+        status = "" if row.empty else str(row.iloc[0].get("status", "") or "").lower()
+        if row.empty or status in ("out", "doubtful") or str(row.iloc[0].get("projected", True)).lower() == "false":
+            st, why = "scratched", (status or "not on the roster")
+        elif status in BAD_STATUS:
+            st, why = "dropped", f"listed {status}"
+        elif str(p["pid"]) not in ok_ids or row.iloc[0].get("lean_stat") != p["stat"]:
+            st, why = "dropped", "no longer passes our checks (line, minutes or injury news moved)"
+        else:
+            st, why = "confirmed", ""
+        p["lock_check"] = st
+        changed = True
+        out.append((p, st, why))
+    if changed and save:
+        f.write_text(json.dumps(j))
+    return out
 
 
 def _wl(x: pd.DataFrame) -> str:
@@ -119,4 +150,6 @@ def summary(led: pd.DataFrame | None = None) -> str:
     """'⭐ #1: W-L · units | all 5: W-L · units'."""
     if led is None:
         led = pd.read_csv(LEDGER) if LEDGER.exists() else pd.DataFrame(columns=COLS)
-    return f"⭐ #1 {_wl(led[led['rank'] == 1])} · all 5: {_wl(led)}"
+    conf = led[led["lock_check"].astype(str) == "confirmed"] if "lock_check" in led else led.iloc[0:0]
+    extra = f" · confirmed at lock: {_wl(conf)}" if len(conf) else ""
+    return f"⭐ #1 {_wl(led[led['rank'] == 1])} · all 5: {_wl(led)}{extra}"

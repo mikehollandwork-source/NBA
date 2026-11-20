@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401910019,401910019,MEM,GSW,4.1,0.621,MEM,0.621,"Ty Jerome, Zach Edey","Stephen Curry, Brandon Williams, Draymond Green",1.0,1.0,-216.0,179.0,0.656,,,,-5.5,,,,,2026-11-19T22:43:07+00:00
+401910019,401910019,MEM,GSW,4.1,0.621,MEM,0.621,"Ty Jerome, Zach Edey","Stephen Curry, Brandon Williams, Draymond Green",1.0,1.0,-217.0,180.0,0.657,,,,-5.5,,,,,2026-11-20T00:00:15+00:00

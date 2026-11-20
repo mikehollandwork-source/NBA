@@ -1,2 +1,2 @@
 event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
-401909313,401909313,LAL,SAC,14.6,0.861,LAL,0.861,Austin Reaves,Precious Achiuwa,0.0,0.0,-890.0,600.0,0.863,,,,-14.5,,,,,2026-11-20T23:00:16+00:00
+401909313,401909313,LAL,SAC,14.6,0.863,LAL,0.863,Austin Reaves,Precious Achiuwa,0.0,0.0,,,,,,,,,,,,2026-11-20T23:22:21+00:00

@@ -1953,3 +1953,36 @@ date,game,player,team,stat,side,ref,prob,strong,actual,result,units,dk_line,dk_p
 2026-11-18,GSW@DAL,Brandin Podziemski,GSW,pts,over,15.5,0.593,False,10.0,loss,-1.0,17.5,-111.0,False,,0.0
 2026-11-18,GSW@DAL,Cooper Flagg,DAL,ast,over,5.5,0.559,False,9.0,win,0.8333,6.5,116.0,False,,0.0
 2026-11-18,GSW@DAL,Draymond Green,GSW,pts,over,1.5,0.776,True,3.0,win,0.8333,4.5,-114.0,False,,0.0
+2026-11-19,GSW@MEM,Jerami Grant,MEM,pra,over,13.5,0.672,False,3.0,loss,-1.0,,,False,,0.0
+2026-11-19,GSW@MEM,Al Horford,GSW,ra,under,5.5,0.753,True,4.0,win,0.8333,6.5,-148.0,False,,0.0
+2026-11-19,GSW@MEM,Cam Spencer,MEM,pa,over,15.5,0.708,True,20.0,win,0.8333,20.5,-122.0,False,,0.0
+2026-11-19,GSW@MEM,Brandin Podziemski,GSW,ast,over,3.5,0.579,False,2.0,loss,-1.0,4.5,-107.0,False,,0.0
+2026-11-19,GSW@MEM,Cedric Coward,MEM,pa,over,16.5,0.604,False,23.0,win,0.8333,18.5,-120.0,False,,0.0
+2026-11-19,GSW@MEM,Jaylen Wells,MEM,pra,over,13.5,0.637,False,29.0,win,0.8333,14.5,-122.0,False,,0.0
+2026-11-19,POR@MIL,Jrue Holiday,POR,ast,over,3.5,0.56,False,7.0,win,0.8333,4.5,-113.0,False,,0.0
+2026-11-19,POR@MIL,Tyler Herro,MIL,pts,over,18.5,0.537,False,19.0,win,0.8333,21.5,-104.0,False,,0.0
+2026-11-19,POR@MIL,Toumani Camara,POR,ast,over,0.5,0.723,True,4.0,win,0.8333,,,False,,0.0
+2026-11-19,POR@MIL,Jaime Jaquez Jr.,MIL,ast,over,2.5,0.642,False,2.0,loss,-1.0,3.5,116.0,False,,0.0
+2026-11-19,POR@MIL,Ryan Rollins,MIL,reb,under,4.5,0.596,False,3.0,win,0.8333,3.5,119.0,False,,0.0
+2026-11-19,POR@MIL,Deni Avdija,POR,reb,over,5.5,0.593,False,,void,0.0,6.5,-131.0,False,,0.0
+2026-11-19,POR@MIL,Scoot Henderson,POR,pa,over,8.5,0.641,False,30.0,win,0.8333,13.5,-121.0,False,,0.0
+2026-11-19,POR@MIL,Donovan Clingan,POR,ra,over,11.5,0.628,False,15.0,win,0.8333,15.5,-101.0,False,,0.0
+2026-11-19,NYK@MIN,Rudy Gobert,MIN,reb,under,10.5,0.597,False,7.0,win,0.8333,9.5,104.0,False,,0.0
+2026-11-19,NYK@MIN,Josh Hart,NYK,pa,over,8.5,0.633,False,13.0,win,0.8333,10.5,-116.0,False,,0.0
+2026-11-19,NYK@MIN,Karl-Anthony Towns,NYK,pra,under,38.5,0.63,False,38.0,win,0.8333,37.5,-112.0,False,,0.0
+2026-11-19,NYK@MIN,Mikal Bridges,NYK,pr,over,9.5,0.655,False,11.0,win,0.8333,12.5,-113.0,False,,0.0
+2026-11-19,NYK@MIN,Jalen Brunson,NYK,reb,over,2.5,0.587,False,2.0,loss,-1.0,2.5,-168.0,True,loss,-1.0
+2026-11-19,NYK@MIN,OG Anunoby,NYK,pra,under,22.5,0.587,False,24.0,loss,-1.0,22.5,-119.0,True,loss,-1.0
+2026-11-19,NYK@MIN,Ayo Dosunmu,MIN,reb,under,4.5,0.615,False,4.0,win,0.8333,4.5,-151.0,True,win,0.6623
+2026-11-19,NYK@MIN,Jaden McDaniels,MIN,pra,under,26.5,0.614,False,21.0,win,0.8333,24.5,-105.0,False,,0.0
+2026-11-19,NYK@MIN,Miles McBride,NYK,reb,over,0.5,0.667,False,0.0,loss,-1.0,,,False,,0.0
+2026-11-19,NYK@MIN,LaMelo Ball,MIN,reb,over,3.5,0.597,False,8.0,win,0.8333,4.5,113.0,False,,0.0
+2026-11-19,LAC@SAS,Kris Dunn,LAC,ra,under,7.5,0.587,False,4.0,win,0.8333,6.5,-123.0,False,,0.0
+2026-11-19,LAC@SAS,Derrick Jones Jr.,LAC,ast,over,0.5,0.662,False,1.0,win,0.8333,1.5,165.0,False,,0.0
+2026-11-19,LAC@SAS,De'Aaron Fox,SAS,pa,over,17.5,0.637,False,15.0,loss,-1.0,21.5,-122.0,False,,0.0
+2026-11-19,LAC@SAS,Devin Vassell,SAS,pa,over,12.5,0.652,False,19.0,win,0.8333,14.5,-120.0,False,,0.0
+2026-11-19,LAC@SAS,Keldon Johnson,SAS,pts,over,7.5,0.673,False,10.0,win,0.8333,11.5,-106.0,False,,0.0
+2026-11-19,LAC@SAS,Darius Garland,LAC,reb,over,1.5,0.68,False,0.0,loss,-1.0,2.5,100.0,False,,0.0
+2026-11-19,LAC@SAS,Julian Champagnie,SAS,reb,over,3.5,0.617,False,4.0,win,0.8333,5.5,114.0,False,,0.0
+2026-11-19,LAC@SAS,Stephon Castle,SAS,pa,over,19.5,0.654,False,33.0,win,0.8333,25.5,-113.0,False,,0.0
+2026-11-19,LAC@SAS,Victor Wembanyama,SAS,pts,over,27.5,0.579,False,32.0,win,0.8333,27.5,-116.0,True,win,0.8621

@@ -21,3 +21,4 @@ date,rank,player,team,opp,stat,side,line,price,prob,actual,result,units,lock_che
 2026-11-18,5,Miles Bridges,PHX,SAC,reb,under,6.5,-153,0.609,6.0,win,0.6536,
 2026-11-19,1,Karl-Anthony Towns,NYK,MIN,pra,under,38.5,-121,0.63,38.0,win,0.8264,dropped
 2026-11-19,2,Ayo Dosunmu,MIN,NYK,reb,under,4.5,-152,0.615,4.0,win,0.6579,confirmed
+2026-11-20,1,Anthony Black,ORL,BKN,reb,under,4.5,-146,0.609,7.0,loss,-1.0,confirmed

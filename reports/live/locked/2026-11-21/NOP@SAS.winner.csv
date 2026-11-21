@@ -1,0 +1,2 @@
+event_id,gameId,home,away,proj_margin_home,p_home,pick_team,p_pick,home_missing,away_missing,b2b_home,b2b_away,dk_ml_home,dk_ml_away,mkt_home,value_team,value_gap,value_price,dk_spread_home,ats_team,ats_line,ats_price,ats_edge,locked_at_utc
+401910027,401910027,SAS,NOP,18.4,0.916,SAS,0.916,Dylan Harper,"Dejounte Murray, Trendon Watford",0.0,1.0,-1560.0,890.0,0.903,,,,-16.5,,,,,2026-11-21T06:42:19+00:00
